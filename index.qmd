@@ -1,0 +1,380 @@
+---
+title: "Kirikoue NLP"
+date: today
+date-format: D.MM.YYYY
+format: html
+df-print: paged
+execute:
+  warning: false
+  message: false
+  fig-width: 9
+editor: source
+code-fold: true
+editor_options: 
+  chunk_output_type: console
+---
+
+## 2024.07.01
+
+Я решил разбить все на три группы по переменным `socio_family_adoptive` и `residence_place`. Вот самые частотные униграммы:
+
+```{r}
+#| message: false
+
+# setwd("/home/agricolamz/work/articles/2025_kirikou")
+library(tidyverse)
+theme_set(theme_minimal()+theme(text = element_text(size = 16)))
+library(tidytext)
+readxl::read_xlsx("kirikou_annotations.xlsx") |> 
+  mutate(txenfant = str_remove_all(txenfant , "[/+]"),
+         txenfant = str_remove_all(txenfant, "\\[.*?\\]")) |> 
+  group_by(name, age, socio_family_adoptive, residence_place) |> 
+  summarize(text = str_c(txenfant, collapse = " ")) |> 
+  ungroup() |> 
+  mutate(soc = str_c(socio_family_adoptive, " (", residence_place, ")"),
+         soc = factor(soc, levels = c("Mano (Gody)", "Mano (Nzerekore)", "Bilingual (Nzerekore)"))) ->
+  corpus
+
+corpus |> 
+  unnest_tokens(input = text, output = word) |> 
+  count(soc, word) |> 
+  group_by(soc) |> 
+  slice_max(n, n = 20) |> 
+  mutate(word = reorder_within(word, by = n, within = soc)) |>  
+  ggplot(aes(n, word))+
+  geom_col()+
+  facet_wrap(~soc, scales = "free")+
+  scale_y_reordered()+
+  labs(x = NULL, y = NULL)
+```
+
+Из странного я вижу два разных gbaa, которые видимо, по разному набраны. Посмотрим на все символы, которые используются в тексте:
+
+```{r}
+corpus |> 
+  unnest_tokens(input = text, output = characters, token = "characters") |> 
+  distinct(characters) |> 
+  pull(characters) |> 
+  sort()
+```
+
+Видимо, проблема с символами, которые записаны по-французски и в МФА, а также с некоторыми символами: исправим.
+
+```{r}
+corpus |> 
+  mutate(text = str_replace_all(text, "á", "á"),
+         text = str_replace_all(text, "á", "á"),
+         text = str_replace_all(text, "à", "à"),
+         text = str_replace_all(text, "à", "à"),
+         text = str_replace_all(text, "á̰", "á̰"),
+         text = str_replace_all(text, "á̰", "á̰"),
+         text = str_replace_all(text, "à̰", "à̰"),
+         text = str_replace_all(text, "à̰", "à̰"),         
+         text = str_replace_all(text, "ā", "ā"),
+         text = str_replace_all(text, "ā", "ā"),
+         text = str_replace_all(text, "ā̰", "ā̰"),
+         text = str_replace_all(text, "ā̰", "á̰"),
+         text = str_replace_all(text, "a̰", "a̰"),
+         text = str_replace_all(text, "é", "é"),
+         text = str_replace_all(text, "é", "é"),
+         text = str_replace_all(text, "è", "è"),
+         text = str_replace_all(text, "è", "è"),
+         text = str_replace_all(text, "ē", "ē"),
+         text = str_replace_all(text, "ē", "ē"),         
+         text = str_replace_all(text, "ɛ̰̀", "ɛ̰̀"),
+         text = str_replace_all(text, "ɛ̰̀", "ɛ̰̀"),
+         text = str_replace_all(text, "ɛ̰́", "ɛ̰́"),
+         text = str_replace_all(text, "ɛ̰́", "ɛ̰́"),
+         text = str_replace_all(text, "ɛ̰̄", "ɛ̰̄"),  
+         text = str_replace_all(text, "ɛ̰̄", "ɛ̰̄"),         
+         text = str_replace_all(text, "ɛ̰̄", "ɛ̰̄"),         
+         text = str_replace_all(text, "í", "í"),
+         text = str_replace_all(text, "í", "í"),
+         text = str_replace_all(text, "ì", "ì"),
+         text = str_replace_all(text, "ì", "ì"),
+         text = str_replace_all(text, "ī", "ī"),
+         text = str_replace_all(text, "ḭ̄", "ḭ̄"),
+         text = str_replace_all(text, "ḭ̄", "ḭ̄"),
+         text = str_replace_all(text, "ɩ̀", "ì"),
+         text = str_replace_all(text, "ó", "ó"),
+         text = str_replace_all(text, "ó", "ó"),
+         text = str_replace_all(text, "ò", "ò"),
+         text = str_replace_all(text, "ò", "ò"),
+         text = str_replace_all(text, "ō", "ō"),
+         text = str_replace_all(text, "ō", "ō"),
+         text = str_replace_all(text, "ɔ̰́", "ɔ̰́"),
+         text = str_replace_all(text, "ɔ̰́", "ɔ̰́"),
+         text = str_replace_all(text, "ɔ̰̀", "ɔ̰̀"),
+         text = str_replace_all(text, "ɔ̰̀", "ɔ̰̀"),
+         text = str_replace_all(text, "ɔ̰̄", "ɔ̰̄"),
+         text = str_replace_all(text, "ɔ̰̄", "ɔ̰̄"),
+         text = str_replace_all(text, "ú", "ú"),
+         text = str_replace_all(text, "ú", "ú"),
+         text = str_replace_all(text, "ù", "ù"),
+         text = str_replace_all(text, "ù", "ù"),
+         text = str_replace_all(text, "ū", "ū"),
+         text = str_replace_all(text, "ū", "ū"),
+         text = str_replace_all(text, "ṵ́", "ṵ́"),
+         text = str_replace_all(text, "ṵ́", "ṵ́"),
+         text = str_replace_all(text, "ṵ̄", "ṵ̄"),
+         text = str_replace_all(text, "ṵ̄", "ṵ̄"),
+         text = str_remove_all(text, "[123¹]")) ->
+  corpus
+```
+
+### Частотность
+
+Теперь мы можем снова нарисовать наш график:
+
+```{r}
+corpus |> 
+  unnest_tokens(input = text, output = word) |> 
+  count(soc, word) |> 
+  group_by(soc) |> 
+  slice_max(n, n = 20) |> 
+  mutate(word = reorder_within(word, by = n, within = soc)) |> 
+  ggplot(aes(n, word))+
+  geom_col()+
+  facet_wrap(~soc, scales = "free")+
+  scale_y_reordered()+
+  labs(x = NULL, y = NULL)
+```
+
+Посмотрим на биграммы
+
+```{r}
+corpus |> 
+  unnest_tokens(input = text, output = ngram, token = "ngrams", n = 2) |> 
+  count(soc, ngram) |> 
+  group_by(soc) |> 
+  slice_max(n, n = 20) |> 
+  mutate(ngram = reorder_within(ngram, by = n, within = soc)) |> 
+  ggplot(aes(n, ngram))+
+  geom_col()+
+  facet_wrap(~soc, scales = "free")+
+  scale_y_reordered()+
+  labs(x = NULL, y = NULL)
+```
+
+Посмотрим на трииграммы
+
+```{r}
+corpus |> 
+  unnest_tokens(input = text, output = ngram, token = "ngrams", n = 3) |> 
+  count(soc, ngram) |> 
+  group_by(soc) |> 
+  slice_max(n, n = 20) |> 
+  mutate(ngram = reorder_within(ngram, by = n, within = soc)) |> 
+  ggplot(aes(n, ngram))+
+  geom_col()+
+  facet_wrap(~soc, scales = "free")+
+  scale_y_reordered()+
+  labs(x = NULL, y = NULL)
+```
+
+### tf-idf
+
+Посчитаем меру tf-idf для униграм, биграм и триграм
+
+```{r}
+corpus |> 
+  unnest_tokens(input = "text", output = "word", token = "words") |>
+  count(soc, word, sort = TRUE) |> 
+  bind_tf_idf(word, soc, n) |> 
+  arrange(desc(tf_idf)) |> 
+  group_by(soc) |> 
+  slice_max(order_by = tf_idf, n = 10) |> 
+  mutate(word = reorder_within(word, n, soc)) |> 
+  ggplot(aes(word, n)) +
+  geom_bar(stat="identity") +
+  facet_wrap(~ soc, scales = "free") +
+  coord_flip() +
+  scale_x_reordered() +
+  labs(x = NULL, y = NULL)
+
+corpus |> 
+  unnest_tokens(input = "text", output = "ngram", token = "ngrams", n = 2) |>
+  count(soc, ngram, sort = TRUE) |> 
+  bind_tf_idf(ngram, soc, n) |> 
+  arrange(desc(tf_idf)) |> 
+  group_by(soc) |> 
+  slice_max(order_by = tf_idf, n = 10) |> 
+  mutate(ngram = reorder_within(ngram, n, soc)) |> 
+  ggplot(aes(ngram, n)) +
+  geom_bar(stat="identity") +
+  facet_wrap(~ soc, scales = "free") +
+  coord_flip() +
+  scale_x_reordered() +
+  labs(x = NULL, y = NULL)
+
+corpus |> 
+  unnest_tokens(input = "text", output = "ngram", token = "ngrams", n = 3) |>
+  count(soc, ngram, sort = TRUE) |> 
+  bind_tf_idf(ngram, soc, n) |> 
+  arrange(desc(tf_idf)) |> 
+  group_by(soc) |> 
+  slice_max(order_by = tf_idf, n = 10) |> 
+  mutate(ngram = reorder_within(ngram, n, soc)) |> 
+  ggplot(aes(ngram, n)) +
+  geom_bar(stat="identity") +
+  facet_wrap(~ soc, scales = "free") +
+  coord_flip() +
+  scale_x_reordered() +
+  labs(x = NULL, y = NULL)
+```
+
+### Lexical diversity
+
+> Но я подумала что было бы интересно не самое частотное посчитать, а наоборот Предположительно оно должно различаться между группами
+
+> The American psychologist and speech pathologist Wendell Johnson (1939, 1944) proposed the type-token ratio (TTR)  (Javris 2019)
+
+Доля уникальных слов из всех слов. Размер --- количество слов в тексте. 
+
+```{r}
+corpus |> 
+  unnest_tokens(input = "text", output = "word", token = "words") |> 
+  count(name, age, soc, word) |> 
+  group_by(name, age, soc) |> 
+  summarise(size = sum(n),
+            richness = n(),
+            TTR = richness/size) |> 
+  ggplot(aes(age, TTR, color = soc, label = name))+
+  geom_point(aes(size = size))+
+  ggrepel::geom_text_repel()+
+  labs(size = NULL, color = NULL)
+```
+
+Энтропия текстов (чуть больше верю этой мере разнообразия).
+
+```{r}
+corpus |> 
+  unnest_tokens(input = "text", output = "word", token = "words") |> 
+  count(name, age, soc, word) |> 
+  group_by(name, age, soc) |> 
+  summarise(size = sum(n),
+            richness = n(),
+            TTR = richness/size,
+            entropy = -sum(TTR*log2(TTR))) |> 
+  ggplot(aes(age, entropy, color = soc, label = name))+
+  geom_point(aes(size = size))+
+  ggrepel::geom_text_repel()+
+  labs(size = NULL, color = NULL)
+```
+
+### Кластеризация людей
+
+Я взял частотные 50 слов и кластеризовал людей на основе нормализованной частотности слов в текстах людей:
+
+```{r}
+corpus |> 
+  unnest_tokens(input = "text", output = "word", token = "words") |> 
+  count(word, sort = TRUE) |> 
+  slice_max(order_by = n, n = 50) |> 
+  pull(word) ->
+  freq_words
+
+library(dendextend)
+par(mar=c(2,0,0,18))
+
+corpus |> 
+  mutate(name = str_c(name, " (", age, "): ", soc)) |> 
+  unnest_tokens(input = text, output = word, token = "words") |> 
+  count(name, word)  |> 
+  group_by(name) |> 
+  mutate(total = sum(n),
+            ratio = n/total,
+            ratio_normalized = scale(ratio)[1]) |> 
+  filter(word %in% freq_words) |> 
+  select(name, word, ratio_normalized) |> 
+  pivot_wider(names_from = word, values_from = ratio_normalized, values_fill = 0) |> 
+  column_to_rownames("name") |>  
+  dist(method = "manhattan") |> 
+  hclust(method = "complete") |> 
+  as.dendrogram() |> 
+  set("branches_k_color", k = 3) |>
+  set("labels_col", k = 3) |> 
+  plot(horiz = TRUE, cex = 3) 
+```
+
+Я попробовал разные количества слов (20-30-40-50, больше тупо брать --- совсем много пропусков буедт), но красные билингвы из Нзерекоре устойчивы, а синие-зеленые манцы перемешиваются, что в принципе подтверждает, что билингвы немного другие.
+
+### Векторизация
+
+Я использую простенький word2vec и umap для уменьшения размерности:
+
+```{r}
+library(word2vec)
+
+set.seed(42) 
+model <- word2vec(x = corpus$text, 
+                  type = "skip-gram",
+                  dim = 50,
+                  window = 5,
+                  iter = 20,
+                  hs = TRUE,
+                  min_count = 5,
+                  threads = 6)
+emb <- as.matrix(model)
+
+library(uwot)
+set.seed(42)
+viz <- umap(emb,  n_neighbors = 15, n_threads = 2)
+
+tibble(word = rownames(emb), 
+       V1 = viz[, 1], 
+       V2 = viz[, 2]) |> 
+  ggplot(aes(x = V1, y = V2, label = word)) + 
+  geom_text(size = 5, alpha = 0.4)
+```
+
+Слова находящиеся рядом должны иметь общую семантику. Эта картинка каждый раз перерисовывается с рандомизацией.
+
+### Анализ коллакаций
+
+Две меры коллакационности, посмотри верхушку списков:
+
+```{r}
+corpus |> 
+  unnest_tokens(input = "text", output = "ngram", token = "ngrams", n = 2) |> 
+  separate(ngram, into = c("word1", "word2"), sep = " ") |>
+  count(word1, word2) |> 
+  mutate(N = sum(n)) |> 
+  group_by(word1) |> 
+  mutate(R1 = sum(n),
+         R2 = N - R1) |> 
+  group_by(word2) |> 
+  mutate(C1 = sum(n),
+         C2 = N - C1) |> 
+  arrange(-R1, -C1) |> 
+  ungroup() |> 
+  rename(O11 = n) |> 
+  mutate(O12 = R1-O11,
+         O21 = C1-O11,
+         O22 = C2-O12, # or R2-O21 
+         E11 = R1 * C1 / N, 
+         E12 = R1 * C2 / N,
+         E21 = R2 * C1 / N, 
+         E22 = R2 * C2 / N,
+         MI = log2(O11 / E11),
+         liddle = (O11*O22-O12*O21)/(C1*C2), # Liddell (1976)
+         dice = 2*O11/(R1+C1), # Smadja et al. (1996)
+         jaccard = O11/(O11+O12+O21),
+         t.score = (O11 - E11) / sqrt(O11),
+         X2 = (O11-E11)^2/E11 + (O12-E12)^2/E12 + (O21-E21)^2/E21 + (O22-E22)^2/E22,
+         DP = O11 / R1 - O21 / R2) ->
+  collacations
+
+collacations |> 
+  arrange(desc(t.score)) |> 
+  select(word1, word2, O11, N, t.score) |> 
+  rename(total = N,
+         co_occurrence_frequency = O11)
+
+collacations |> 
+  arrange(desc(MI)) |> 
+  select(word1, word2, O11, N, MI) |> 
+  rename(total = N,
+         co_occurrence_frequency = O11)
+```
+
