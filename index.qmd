@@ -1,5 +1,5 @@
 ---
-title: "Kirikoue NLP"
+title: "Kirikou NLP"
 date: today
 date-format: D.MM.YYYY
 format: html
@@ -27,7 +27,7 @@ theme_set(theme_minimal()+theme(text = element_text(size = 16)))
 library(tidytext)
 readxl::read_xlsx("kirikou_annotations.xlsx") |> 
   mutate(txenfant = str_remove_all(txenfant , "[/+]"),
-         txenfant = str_remove_all(txenfant, "\\[.*?\\]")) |> 
+         txenfant = str_remove_all(txenfant, "\\[.*?\\]")) |>
   group_by(name, age, socio_family_adoptive, residence_place) |> 
   summarize(text = str_c(txenfant, collapse = " ")) |> 
   ungroup() |> 
@@ -80,7 +80,8 @@ corpus |>
          text = str_replace_all(text, "è", "è"),
          text = str_replace_all(text, "è", "è"),
          text = str_replace_all(text, "ē", "ē"),
-         text = str_replace_all(text, "ē", "ē"),         
+         text = str_replace_all(text, "ē", "ē"),   
+         text = str_replace_all(text, "ɛ̄", "ɛ̄"), 
          text = str_replace_all(text, "ɛ̰̀", "ɛ̰̀"),
          text = str_replace_all(text, "ɛ̰̀", "ɛ̰̀"),
          text = str_replace_all(text, "ɛ̰́", "ɛ̰́"),
@@ -92,9 +93,16 @@ corpus |>
          text = str_replace_all(text, "í", "í"),
          text = str_replace_all(text, "ì", "ì"),
          text = str_replace_all(text, "ì", "ì"),
+         text = str_replace_all(text, "ī", "ī"),
+         text = str_replace_all(text, "ī", "ī"),
          text = str_replace_all(text, "ī", "ī"),
          text = str_replace_all(text, "ḭ̄", "ḭ̄"),
+         text = str_replace_all(text, "ḭ̄", "ḭ̄"),
+         text = str_replace_all(text, "ḭ̄", "ḭ̄"),
          text = str_replace_all(text, "ḭ̄", "ḭ̄"),
+         text = str_replace_all(text, "ḭ́", "ḭ́"),
+         text = str_replace_all(text, "ḭ̀", "ḭ̀"),
+         text = str_replace_all(text, "ḭ̀", "ḭ̀"),
          text = str_replace_all(text, "ɩ̀", "ì"),
          text = str_replace_all(text, "ó", "ó"),
          text = str_replace_all(text, "ó", "ó"),
@@ -121,6 +129,17 @@ corpus |>
          text = str_remove_all(text, "[123¹]")) ->
   corpus
 ```
+
+Вот что получается после преобразования:
+
+```{r}
+corpus |> 
+  unnest_tokens(input = text, output = characters, token = "characters") |> 
+  distinct(characters) |> 
+  pull(characters) |> 
+  sort()
+```
+
 
 ### Частотность
 
