@@ -14,8 +14,6 @@ editor_options:
   chunk_output_type: console
 ---
 
-## 2024.07.01
-
 Я решил разбить все на три группы по переменным `socio_family_adoptive` и `residence_place`. Вот самые частотные униграммы:
 
 ```{r}
@@ -25,15 +23,32 @@ editor_options:
 library(tidyverse)
 theme_set(theme_minimal()+theme(text = element_text(size = 16)))
 library(tidytext)
-readxl::read_xlsx("kirikou_annotations.xlsx") |> 
+readxl::read_xlsx("kirikou_annotations.xlsx", sheet = "kirikou Mano") |>
+  bind_rows(readxl::read_xlsx("kirikou_annotations.xlsx", sheet = "folktales Mano children")) |> 
+  mutate(txenfant = str_remove_all(txenfant , "[/+]"),
+         txenfant = str_remove_all(txenfant, "\\[.*?\\]")) |>
+  filter(!is.na(txenfant)) |> 
+  group_by(name, age, socio_family_adoptive, residence_place) |> 
+  summarize(text = str_c(txenfant, collapse = " ")) |> 
+  ungroup() |> 
+  mutate(soc = str_c(socio_family_adoptive, " (", residence_place, ")"),
+         soc = factor(soc, levels = c("Mano (Gody)", "Mano (Nzerekore)", "Bilingual (Nzerekore)")),
+         age_group = "children") ->
+  corpus
+
+readxl::read_xlsx("kirikou_annotations.xlsx", sheet = "folktales Mano adults") |> 
+  mutate(age = 35) |> 
+  rename(txenfant = `txenfant = tx`) |> 
+  filter(!is.na(txenfant)) |> 
   mutate(txenfant = str_remove_all(txenfant , "[/+]"),
          txenfant = str_remove_all(txenfant, "\\[.*?\\]")) |>
   group_by(name, age, socio_family_adoptive, residence_place) |> 
   summarize(text = str_c(txenfant, collapse = " ")) |> 
   ungroup() |> 
   mutate(soc = str_c(socio_family_adoptive, " (", residence_place, ")"),
-         soc = factor(soc, levels = c("Mano (Gody)", "Mano (Nzerekore)", "Bilingual (Nzerekore)"))) ->
-  corpus
+         soc = factor(soc, levels = c("Mano (Bossou)", "Mano (Nzerekore)", "Bilingual (Le Teil)")),
+         age_group = "adolts") ->
+  corpus_ad
 
 corpus |> 
   unnest_tokens(input = text, output = word) |> 
@@ -77,6 +92,76 @@ corpus |>
          text = str_replace_all(text, "a̰", "a̰"),
          text = str_replace_all(text, "é", "é"),
          text = str_replace_all(text, "é", "é"),
+         text = str_replace_all(text, "è", "è"),
+         text = str_replace_all(text, "è", "è"),
+         text = str_replace_all(text, "è", "è"),         
+         text = str_replace_all(text, "ē", "ē"),
+         text = str_replace_all(text, "ē", "ē"),   
+         text = str_replace_all(text, "ɛ̄", "ɛ̄"), 
+         text = str_replace_all(text, "ɛ̰̀", "ɛ̰̀"),
+         text = str_replace_all(text, "ɛ̰̀", "ɛ̰̀"),
+         text = str_replace_all(text, "ɛ̰́", "ɛ̰́"),
+         text = str_replace_all(text, "ɛ̰́", "ɛ̰́"),
+         text = str_replace_all(text, "ɛ̰̄", "ɛ̰̄"),  
+         text = str_replace_all(text, "ɛ̰̄", "ɛ̰̄"),         
+         text = str_replace_all(text, "ɛ̰̄", "ɛ̰̄"),         
+         text = str_replace_all(text, "í", "í"),
+         text = str_replace_all(text, "í", "í"),
+         text = str_replace_all(text, "ì", "ì"),
+         text = str_replace_all(text, "ì", "ì"),
+         text = str_replace_all(text, "ī", "ī"),
+         text = str_replace_all(text, "ī", "ī"),
+         text = str_replace_all(text, "ī", "ī"),
+         text = str_replace_all(text, "ḭ̄", "ḭ̄"),
+         text = str_replace_all(text, "ḭ̄", "ḭ̄"),
+         text = str_replace_all(text, "ḭ̄", "ḭ̄"),
+         text = str_replace_all(text, "ḭ̄", "ḭ̄"),
+         text = str_replace_all(text, "ḭ́", "ḭ́"),
+         text = str_replace_all(text, "ḭ̀", "ḭ̀"),
+         text = str_replace_all(text, "ḭ̀", "ḭ̀"),
+         text = str_replace_all(text, "ɩ̀", "ì"),
+         text = str_replace_all(text, "ó", "ó"),
+         text = str_replace_all(text, "ó", "ó"),
+         text = str_replace_all(text, "ò", "ò"),
+         text = str_replace_all(text, "ò", "ò"),
+         text = str_replace_all(text, "ō", "ō"),
+         text = str_replace_all(text, "ō", "ō"),
+         text = str_replace_all(text, "ɔ̰́", "ɔ̰́"),
+         text = str_replace_all(text, "ɔ̰́", "ɔ̰́"),
+         text = str_replace_all(text, "ɔ̰̀", "ɔ̰̀"),
+         text = str_replace_all(text, "ɔ̰̀", "ɔ̰̀"),
+         text = str_replace_all(text, "ɔ̰̄", "ɔ̰̄"),
+         text = str_replace_all(text, "ɔ̰̄", "ɔ̰̄"),
+         text = str_replace_all(text, "ú", "ú"),
+         text = str_replace_all(text, "ú", "ú"),
+         text = str_replace_all(text, "ù", "ù"),
+         text = str_replace_all(text, "ù", "ù"),
+         text = str_replace_all(text, "ū", "ū"),
+         text = str_replace_all(text, "ū", "ū"),
+         text = str_replace_all(text, "ṵ́", "ṵ́"),
+         text = str_replace_all(text, "ṵ́", "ṵ́"),
+         text = str_replace_all(text, "ṵ̄", "ṵ̄"),
+         text = str_replace_all(text, "ṵ̄", "ṵ̄"),
+         text = str_remove_all(text, "[123¹]")) ->
+  corpus
+
+corpus_ad |> 
+  mutate(text = str_replace_all(text, "á", "á"),
+         text = str_replace_all(text, "á", "á"),
+         text = str_replace_all(text, "à", "à"),
+         text = str_replace_all(text, "à", "à"),
+         text = str_replace_all(text, "á̰", "á̰"),
+         text = str_replace_all(text, "á̰", "á̰"),
+         text = str_replace_all(text, "à̰", "à̰"),
+         text = str_replace_all(text, "à̰", "à̰"),         
+         text = str_replace_all(text, "ā", "ā"),
+         text = str_replace_all(text, "ā", "ā"),
+         text = str_replace_all(text, "ā̰", "ā̰"),
+         text = str_replace_all(text, "ā̰", "á̰"),
+         text = str_replace_all(text, "a̰", "a̰"),
+         text = str_replace_all(text, "é", "é"),
+         text = str_replace_all(text, "é", "é"),
+         text = str_replace_all(text, "è", "è"),
          text = str_replace_all(text, "è", "è"),
          text = str_replace_all(text, "è", "è"),
          text = str_replace_all(text, "ē", "ē"),
@@ -127,7 +212,7 @@ corpus |>
          text = str_replace_all(text, "ṵ̄", "ṵ̄"),
          text = str_replace_all(text, "ṵ̄", "ṵ̄"),
          text = str_remove_all(text, "[123¹]")) ->
-  corpus
+  corpus_ad
 ```
 
 Вот что получается после преобразования:
@@ -281,6 +366,42 @@ corpus |>
   labs(size = NULL, color = NULL)
 ```
 
+Оказывается (Baayen 2008, 222–36) исследовал меры разнообразия и написал несколько интересных мыслей.
+
+```{r}
+corpus |> 
+  bind_rows(corpus_ad) |> 
+  unnest_tokens(input = "text", output = "word", token = "words") |> 
+  group_by(name, age, socio_family_adoptive, residence_place, soc) |> 
+  mutate(id = 1:n(),
+         word_id = as.factor(word) |> fct_inorder() |>  as.double(),
+         max = cummax(word_id),
+         coord_max = max(max)) |> 
+  ungroup() ->
+  for_visualization
+
+for_visualization |>
+  mutate(name = str_replace(name, "_", " "),
+         name = str_c(name, " (", age, ")"),
+         name = str_replace(name, "\\(35\\)", "\\(adult\\)")) |> 
+  group_by(name, age, socio_family_adoptive, residence_place, soc, coord_max) |> 
+  summarise(id = max(id)) ->
+  labels
+
+for_visualization |> 
+  mutate(socio_family_adoptive = factor(socio_family_adoptive, levels = c("Mano", "Bilingual"))) |> 
+  ggplot(aes(id, max, group = name))+
+  geom_line(data = for_visualization |> select(-soc), color = "grey80")+
+  geom_line(aes(color = residence_place))+
+  geom_point(aes(id, coord_max), data = labels)+
+  ggrepel::geom_text_repel(aes(id, coord_max, label = name), data = labels)+
+  facet_wrap(~socio_family_adoptive)+
+  theme(legend.position = "bottom")+
+  labs(x = "tokens",
+       y = "types")
+```
+
+
 ### Кластеризация людей
 
 Я взял частотные 50 слов и кластеризовал людей на основе нормализованной частотности слов в текстах людей:
@@ -323,6 +444,9 @@ corpus |>
 Я использую простенький word2vec и umap для уменьшения размерности:
 
 ```{r}
+#| fig-height: 9
+#| fig-width: 12
+
 library(word2vec)
 
 set.seed(42) 
@@ -349,9 +473,9 @@ tibble(word = rownames(emb),
 
 Слова находящиеся рядом должны иметь общую семантику. Эта картинка каждый раз перерисовывается с рандомизацией.
 
-### Анализ коллакаций
+### Анализ коллокаций
 
-Две меры коллакационности, посмотри верхушку списков:
+Две меры коллокационности, посмотри верхушку списков:
 
 ```{r}
 corpus |> 
@@ -396,4 +520,63 @@ collacations |>
   rename(total = N,
          co_occurrence_frequency = O11)
 ```
+
+## Для составления списка стопслов
+
+Можно идти по этому списку, листая страницы и выписывать стопслова. Пожалуйста, копирую отсюда написание --- я вносил правки в орфографию.
+
+```{r}
+corpus |> 
+  unnest_tokens(input = text, output = word) |> 
+  count(word, sort = TRUE)
+```
+
+## Количество фр. заимствований
+
+Я буду считать, что ниже представлен список французского. Если я не прав, то скажи, я исключу что-то из списка.
+
+```{r}
+'á" "à" "ā" "a̰" "á̰" "à̰' |> 
+  str_remove_all('["a ]') |> 
+  str_c("ɓɛɲŋ]") ->
+  non_french
+
+non_french <- str_c("[", non_french)
+
+corpus |> 
+  unnest_tokens(input = text, output = word) |> 
+  count(word, sort = TRUE) |> 
+  filter(str_detect(word, non_french, negate = TRUE))
+
+corpus |> 
+  unnest_tokens(input = text, output = word) |> 
+  count(word, sort = TRUE) |> 
+  filter(str_detect(word, non_french, negate = TRUE)) |> 
+  pull(word) ->
+  french_words
+
+corpus |> 
+  unnest_tokens(input = text, output = word) |> 
+  mutate(french = if_else(word %in% french_words, "french", "non_french"),
+         name = str_c(name, " (", age, ")")) |> 
+  count(name, french) |> 
+  pivot_wider(names_from = french, values_from = n, values_fill = 0) 
+
+corpus |> 
+  unnest_tokens(input = text, output = word) |> 
+  mutate(french = if_else(word %in% french_words, "french", "non_french"),
+         name = str_c(name, " (", age, ")")) |> 
+  count(name, french) |> 
+  pivot_wider(names_from = french, values_from = n, values_fill = 0) |> 
+  ggplot(aes(non_french, french))+
+  scale_x_log10()+
+  scale_y_log10()+
+  geom_smooth(method = "lm", se = FALSE, color = "grey60", linetype = 2)+
+  geom_point()+
+  ggrepel::geom_text_repel(aes(label = name))+
+  coord_fixed()+
+  labs(x = "non french lexicon (log scaled)",
+       y = "french lexicon (log scaled)")
+```
+
 
