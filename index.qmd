@@ -538,7 +538,7 @@ corpus |>
 ```{r}
 'á" "à" "ā" "a̰" "á̰" "à̰' |> 
   str_remove_all('["a ]') |> 
-  str_c("ɓɛɲŋ]") ->
+  str_c("ɓɛɲŋɔ]") ->
   non_french
 
 non_french <- str_c("[", non_french)
@@ -554,7 +554,11 @@ corpus |>
   filter(str_detect(word, non_french, negate = TRUE)) |> 
   pull(word) ->
   french_words
+```
 
+Значение по людям:
+
+```{r}
 corpus |> 
   unnest_tokens(input = text, output = word) |> 
   mutate(french = if_else(word %in% french_words, "french", "non_french"),
@@ -579,4 +583,35 @@ corpus |>
        y = "french lexicon (log scaled)")
 ```
 
+## Количество ономатопей
+
+```{r}
+readxl::read_xlsx("kirikou_annotations.xlsx", sheet = "kirikou Mano") |>
+  bind_rows(readxl::read_xlsx("kirikou_annotations.xlsx", sheet = "folktales Mano children")) |> 
+  mutate(onomatopoeia = str_extract_all(ft, "ONOMAT")) |>
+  select(name, age, onomatopoeia) |> 
+  unnest_longer(onomatopoeia) |> 
+  na.omit() |> 
+  count(name, age)
+```
+
+Что-то они всего у четырех людей...
+
+## Diversity of tense marking
+
+```{r}
+readxl::read_xlsx("kirikou_annotations.xlsx", sheet = "kirikou Mano") |>
+  bind_rows(readxl::read_xlsx("kirikou_annotations.xlsx", sheet = "folktales Mano children")) |> 
+  rename(chunk_structure = `chunk structure`) |> 
+  mutate(chunk_structure = str_remove_all(chunk_structure, "<.*?>"),
+         chunk_structure = str_remove_all(chunk_structure, "[…ɛ́a-z\\(\\)]"),
+         #chunk_structure = str_remove_all(chunk_structure, not_french),
+         chunk_structure = str_remove_all(chunk_structure, "(NP)|(CR)|(SR)|(ONOMAT)|(NMLZ)|(\\.\\.\\.)"),
+         chunk_structure = str_split(chunk_structure, "\\] \\[")) |> 
+  unnest_longer(chunk_structure) |> 
+  mutate(chunk_structure = str_remove_all(chunk_structure, "[\\]\\[]"),
+         chunk_structure = str_remove_all(chunk_structure, "^_{1,}")) |> 
+  count(chunk_structure, sort = TRUE) |> 
+  filter(chunk_structure != "") 
+```
 
