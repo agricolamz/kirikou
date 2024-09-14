@@ -603,15 +603,22 @@ readxl::read_xlsx("kirikou_annotations.xlsx", sheet = "kirikou Mano") |>
 readxl::read_xlsx("kirikou_annotations.xlsx", sheet = "kirikou Mano") |>
   bind_rows(readxl::read_xlsx("kirikou_annotations.xlsx", sheet = "folktales Mano children")) |> 
   rename(chunk_structure = `chunk structure`) |> 
-  mutate(chunk_structure = str_remove_all(chunk_structure, "<.*?>"),
-         chunk_structure = str_remove_all(chunk_structure, "[…ɛ́a-z\\(\\)]"),
+  group_by(name, age) |> 
+  summarize(chunk_structure = str_c(chunk_structure, collapse = " ")) |> 
+  ungroup() |> 
+  mutate(chunk_structure_old = chunk_structure, 
+         chunk_structure = str_remove_all(chunk_structure, "(?<=\\]).*?(?=\\[)"), 
+         chunk_structure = str_remove_all(chunk_structure, "<.*?>"),
+         chunk_structure = str_remove_all(chunk_structure, "(NP)|(CR)|(SR)|(FRENCH)|(ONOMAT)|(SG)|(SC)|(NMLZ)|(\\.\\.\\.)"),
+         chunk_structure = str_remove_all(chunk_structure, "[^A-Z_\\.\\]\\[]"),
          #chunk_structure = str_remove_all(chunk_structure, not_french),
-         chunk_structure = str_remove_all(chunk_structure, "(NP)|(CR)|(SR)|(ONOMAT)|(NMLZ)|(\\.\\.\\.)"),
-         chunk_structure = str_split(chunk_structure, "\\] \\[")) |> 
+         chunk_structure = str_split(chunk_structure, "\\]\\[")) |> 
   unnest_longer(chunk_structure) |> 
-  mutate(chunk_structure = str_remove_all(chunk_structure, "[\\]\\[]"),
-         chunk_structure = str_remove_all(chunk_structure, "^_{1,}")) |> 
-  count(chunk_structure, sort = TRUE) |> 
-  filter(chunk_structure != "") 
+  mutate(chunk_structure = str_remove_all(chunk_structure, "[\\]\\}\\[\\{]"),
+         chunk_structure = str_remove_all(chunk_structure, "^[_\\.]{1,}")) |> 
+  count(name, age, chunk_structure, sort = TRUE) |> 
+  filter(chunk_structure != "") |> 
+  pivot_wider(names_from = chunk_structure, values_from = n, values_fill = 0)
 ```
 
+К сожалению, это о-о-о-о-о-очень сложно вынимать, так что проверь пожалуйста, все столбцы, где видны косяки.
