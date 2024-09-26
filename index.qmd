@@ -19,16 +19,19 @@ editor_options:
 ```{r}
 #| message: false
 
-# setwd("/home/agricolamz/work/articles/2025_kirikou")
+# setwd("/home/agricolamz/work/articles/2025_kirikou/repo/")
 library(tidyverse)
 theme_set(theme_minimal()+theme(text = element_text(size = 16)))
 library(tidytext)
 readxl::read_xlsx("kirikou_annotations.xlsx", sheet = "kirikou Mano") |>
-  bind_rows(readxl::read_xlsx("kirikou_annotations.xlsx", sheet = "folktales Mano children")) |> 
+  select(-elicitation_date) |> 
+  mutate(text_type = "kirikou") |>
+  bind_rows(readxl::read_xlsx("kirikou_annotations.xlsx", sheet = "folktales Mano children") |> 
+              mutate(text_type = "folktales")) |> 
   mutate(txenfant = str_remove_all(txenfant , "[/+]"),
          txenfant = str_remove_all(txenfant, "\\[.*?\\]")) |>
   filter(!is.na(txenfant)) |> 
-  group_by(name, age, socio_family_adoptive, residence_place) |> 
+  group_by(name, age, socio_family_adoptive, text_type, residence_place) |> 
   summarize(text = str_c(txenfant, collapse = " ")) |> 
   ungroup() |> 
   mutate(soc = str_c(socio_family_adoptive, " (", residence_place, ")"),
@@ -37,7 +40,7 @@ readxl::read_xlsx("kirikou_annotations.xlsx", sheet = "kirikou Mano") |>
   corpus
 
 readxl::read_xlsx("kirikou_annotations.xlsx", sheet = "folktales Mano adults") |> 
-  mutate(age = 35) |> 
+  mutate(age = 100) |> 
   rename(txenfant = `txenfant = tx`) |> 
   filter(!is.na(txenfant)) |> 
   mutate(txenfant = str_remove_all(txenfant , "[/+]"),
@@ -47,7 +50,8 @@ readxl::read_xlsx("kirikou_annotations.xlsx", sheet = "folktales Mano adults") |
   ungroup() |> 
   mutate(soc = str_c(socio_family_adoptive, " (", residence_place, ")"),
          soc = factor(soc, levels = c("Mano (Bossou)", "Mano (Nzerekore)", "Bilingual (Le Teil)")),
-         age_group = "adolts") ->
+         age_group = "adults",
+         text_type = "folktales") ->
   corpus_ad
 
 corpus |> 
@@ -408,8 +412,10 @@ for_visualization |>
 
 ```{r}
 corpus |> 
+  bind_rows(corpus_ad) |> 
   unnest_tokens(input = "text", output = "word", token = "words") |> 
-  count(word, sort = TRUE) |> 
+  count(word, sort = TRUE) |>
+  filter(!(word %in% c("kirikou", "karaba", "làà", "mɔ̀ɔ̀", "dàā", "yíí", "zíé", "wìì", "lòkóò"))) |> 
   slice_max(order_by = n, n = 50) |> 
   pull(word) ->
   freq_words
@@ -418,6 +424,17 @@ library(dendextend)
 par(mar=c(2,0,0,18))
 
 corpus |> 
+  bind_rows(corpus_ad) |> 
+  mutate(name = str_c(name, " (", age, "): ", soc),
+         soc = str_extract(soc, "\\w{1,}"),
+         color = c("tomato", "darkgreen")[factor(soc)]) |> 
+  distinct(name, color) ->
+  colors
+
+library(ape)
+
+corpus |> 
+  bind_rows(corpus_ad) |> 
   mutate(name = str_c(name, " (", age, "): ", soc)) |> 
   unnest_tokens(input = text, output = word, token = "words") |> 
   count(name, word)  |> 
@@ -431,10 +448,9 @@ corpus |>
   column_to_rownames("name") |>  
   dist(method = "manhattan") |> 
   hclust(method = "complete") |> 
-  as.dendrogram() |> 
-  set("branches_k_color", k = 3) |>
-  set("labels_col", k = 3) |> 
-  plot(horiz = TRUE, cex = 3) 
+  as.phylo() %>%
+  plot(tip.color = colors$color[match(.$tip.label, colors$name)],
+       font = 2) 
 ```
 
 Я попробовал разные количества слов (20-30-40-50, больше тупо брать --- совсем много пропусков буедт), но красные билингвы из Нзерекоре устойчивы, а синие-зеленые манцы перемешиваются, что в принципе подтверждает, что билингвы немного другие.
@@ -531,6 +547,8 @@ corpus |>
   count(word, sort = TRUE)
 ```
 
+Я забыл задачу, для которой мы это делали, если мы хотим что-то узнать про тексты, то тогда нужно грамматические, а не лексические, а если мы хотим по ним кластеризовать людей, то тогда лексические.
+
 ## Количество фр. заимствований
 
 Я буду считать, что ниже представлен список французского. Если я не прав, то скажи, я исключу что-то из списка.
@@ -554,6 +572,10 @@ corpus |>
   filter(str_detect(word, non_french, negate = TRUE)) |> 
   pull(word) ->
   french_words
+
+french_words <- french_words[!(french_words %in% c("unp", "kirikou", "kiriki", "sociere", "sorc", "kiri", "kris", "sorciere", "singing", "onomat", "a", "eee", "__", "g", "hes", "kirikou", "karaba", "keelee", "mbe", "hesitation", "pascale", "s", "ts", "zi", "z", "e", "es", "we", "he̋"))] 
+
+french_words
 ```
 
 Значение по людям:
@@ -563,22 +585,28 @@ corpus |>
   unnest_tokens(input = text, output = word) |> 
   mutate(french = if_else(word %in% french_words, "french", "non_french"),
          name = str_c(name, " (", age, ")")) |> 
-  count(name, french) |> 
+  count(name, soc, french) |> 
   pivot_wider(names_from = french, values_from = n, values_fill = 0) 
 
 corpus |> 
+  bind_rows(corpus_ad) |> 
   unnest_tokens(input = text, output = word) |> 
   mutate(french = if_else(word %in% french_words, "french", "non_french"),
-         name = str_c(name, " (", age, ")")) |> 
-  count(name, french) |> 
+         name = str_c(name, " (", age, ")"),
+         soc = str_extract(soc, "\\w{1,}")) |> 
+  count(name, age_group, text_type, residence_place, soc, french) |>
+  mutate(residence_place_nz = if_else(residence_place == "Nzerekore", "Nzerekore", "other"),
+         variable = str_c(text_type, " (", residence_place_nz, ")")) |> 
   pivot_wider(names_from = french, values_from = n, values_fill = 0) |> 
-  ggplot(aes(non_french, french))+
+  mutate(french = if_else(french == 0, 0.5, french),
+         non_french = if_else(non_french == 0, 0.5, non_french)) |>  
+  ggplot(aes(non_french, french, color = variable))+
   scale_x_log10()+
   scale_y_log10()+
   geom_smooth(method = "lm", se = FALSE, color = "grey60", linetype = 2)+
   geom_point()+
   ggrepel::geom_text_repel(aes(label = name))+
-  coord_fixed()+
+  coord_fixed()+ 
   labs(x = "non french lexicon (log scaled)",
        y = "french lexicon (log scaled)")
 ```
@@ -587,23 +615,39 @@ corpus |>
 
 ```{r}
 readxl::read_xlsx("kirikou_annotations.xlsx", sheet = "kirikou Mano") |>
-  bind_rows(readxl::read_xlsx("kirikou_annotations.xlsx", sheet = "folktales Mano children")) |> 
+  select(-elicitation_date) |> 
+  mutate(text_type = "kirikou") |>
+  bind_rows(readxl::read_xlsx("kirikou_annotations.xlsx", sheet = "folktales Mano children") |> 
+              mutate(text_type = "folktales")) |> 
+  select(-elicitation_date) |> 
+  bind_rows(readxl::read_xlsx("kirikou_annotations.xlsx", sheet = "folktales Mano adults") |>
+              mutate(text_type = "folktales",
+                     age = 100)) |>
+  filter(!is.na(ft)) |> 
   mutate(onomatopoeia = str_extract_all(ft, "ONOMAT")) |>
-  select(name, age, onomatopoeia) |> 
+  select(name, age, text_type, onomatopoeia) |> 
   unnest_longer(onomatopoeia) |> 
   na.omit() |> 
-  count(name, age)
+  count(name, age, text_type)
 ```
 
-Что-то они всего у четырех людей...
+Что-то они всего у шесть людей...
 
 ## Diversity of tense marking
 
 ```{r}
 readxl::read_xlsx("kirikou_annotations.xlsx", sheet = "kirikou Mano") |>
-  bind_rows(readxl::read_xlsx("kirikou_annotations.xlsx", sheet = "folktales Mano children")) |> 
+  select(-elicitation_date) |> 
+  mutate(text_type = "kirikou") |>
+  bind_rows(readxl::read_xlsx("kirikou_annotations.xlsx", sheet = "folktales Mano children") |> 
+              mutate(text_type = "folktales")) |> 
+  select(-elicitation_date) |> 
+  bind_rows(readxl::read_xlsx("kirikou_annotations.xlsx", sheet = "folktales Mano adults") |>
+              mutate(text_type = "folktales",
+                     age = 100)) |> 
   rename(chunk_structure = `chunk structure`) |> 
-  group_by(name, age) |> 
+  filter(!is.na(chunk_structure)) |> 
+  group_by(name, age, text_type) |> 
   summarize(chunk_structure = str_c(chunk_structure, collapse = " ")) |> 
   ungroup() |> 
   mutate(chunk_structure_old = chunk_structure, 
@@ -612,13 +656,221 @@ readxl::read_xlsx("kirikou_annotations.xlsx", sheet = "kirikou Mano") |>
          chunk_structure = str_remove_all(chunk_structure, "(NP)|(CR)|(SR)|(FRENCH)|(ONOMAT)|(SG)|(SC)|(NMLZ)|(\\.\\.\\.)"),
          chunk_structure = str_remove_all(chunk_structure, "[^A-Z_\\.\\]\\[]"),
          #chunk_structure = str_remove_all(chunk_structure, not_french),
+         chunk_structure = str_replace_all(chunk_structure, "IPFVPP", "IPFV"),
+         chunk_structure = str_replace_all(chunk_structure, "PRFPP", "PRF"),
+         chunk_structure = str_replace_all(chunk_structure, "PSTPP", "PST"),
+         chunk_structure = str_replace_all(chunk_structure, "PSTADV", "PST"),
+         chunk_structure = str_replace_all(chunk_structure, "JNTPP", "JNT"),
+         chunk_structure = str_replace_all(chunk_structure, "JNTADV", "JNT"),
+         chunk_structure = str_replace_all(chunk_structure, "JNTPP", "JNT"),
+         chunk_structure = str_replace_all(chunk_structure, "EXI\\.\\.PP", "EXI"),
+         chunk_structure = str_replace_all(chunk_structure, "EXIPP", "EXI"),
+         chunk_structure = str_replace_all(chunk_structure, "PSTPP\\.", "PST"),
+         chunk_structure = str_replace_all(chunk_structure, "CONJ\\.", "CONJ"),
+         chunk_structure = str_replace_all(chunk_structure, "EXI\\.DUR", "EXI"),
+         chunk_structure = str_replace_all(chunk_structure, "EXIDUR", "EXI"),
+         chunk_structure = str_replace_all(chunk_structure, "PST\\.DURADV", "PST"),
+          chunk_structure = str_replace_all(chunk_structure, "PSTPP..ADV", "PST"),
+         chunk_structure = str_replace_all(chunk_structure, "PSTPP.PP", "PST"),
+         chunk_structure = str_replace_all(chunk_structure, "CONJPP", "CONJ"),
+         chunk_structure = str_replace_all(chunk_structure, "CONJPP", "CONJ"),
+         chunk_structure = str_replace_all(chunk_structure, "PSTPST", "PSTPST"),
+         chunk_structure = str_replace_all(chunk_structure, "CONJADV", "CONJ"),
+         chunk_structure = str_replace_all(chunk_structure, "PSTPHASPP", "PSTP"),
+         chunk_structure = str_replace_all(chunk_structure, "PST\\.DURPP\\.", "PST"),
+         chunk_structure = str_replace_all(chunk_structure, "PST\\.DURPP\\.", "PST"),
+         chunk_structure = str_replace_all(chunk_structure, "PST\\.", "PST"),
+         chunk_structure = str_replace_all(chunk_structure, "PST\\.", "PST"),
+         chunk_structure = str_replace_all(chunk_structure, "PSTDUR", "PST"),
+         chunk_structure = str_replace_all(chunk_structure, "PSTADV", "PST"),
+         chunk_structure = str_replace_all(chunk_structure, "PSTPP", "PST"),
+                  chunk_structure = str_replace_all(chunk_structure, "PSTPST", "PST"),
+         chunk_structure = str_replace_all(chunk_structure, "PSTP", "PST"),
+         chunk_structure = str_replace_all(chunk_structure, "PSTSAY", "PST\\.SAY"),
+         chunk_structure = str_replace_all(chunk_structure, "JNT.SAYPP", "JNT.SAY"),
+         chunk_structure = str_replace_all(chunk_structure, "JNT.SAYPP", "JNT.SAY"),
+         chunk_structure = str_replace_all(chunk_structure, "IMPPP", "IMP"),
+         chunk_structure = str_replace_all(chunk_structure, "JNTJNT", "JNT"),
+         chunk_structure = str_replace_all(chunk_structure, "PST.NEG", "NEG"),
+         chunk_structure = str_replace_all(chunk_structure, "PST.SAYPP", "PST.SAY"),
+         chunk_structure = str_replace_all(chunk_structure, "PRF\\.\\.", "PRF"),
+         chunk_structure = str_replace_all(chunk_structure, "PRF\\.\\.", "PRF"),
          chunk_structure = str_split(chunk_structure, "\\]\\[")) |> 
   unnest_longer(chunk_structure) |> 
   mutate(chunk_structure = str_remove_all(chunk_structure, "[\\]\\}\\[\\{]"),
          chunk_structure = str_remove_all(chunk_structure, "^[_\\.]{1,}")) |> 
-  count(name, age, chunk_structure, sort = TRUE) |> 
-  filter(chunk_structure != "") |> 
-  pivot_wider(names_from = chunk_structure, values_from = n, values_fill = 0)
+  mutate(chunk_structure = str_remove(chunk_structure, "\\_.*")) |> 
+  filter(chunk_structure != "",
+         chunk_structure != "PP",
+         chunk_structure != "NP",
+         chunk_structure != "R",
+         chunk_structure != "SAY") ->
+  tense_marking
 ```
 
-К сожалению, это о-о-о-о-о-очень сложно вынимать, так что проверь пожалуйста, все столбцы, где видны косяки.
+Вот какие получились столбцы:
+
+```{r}
+tense_marking |> 
+  distinct(chunk_structure) |> 
+  pull(chunk_structure)
+```
+
+Вот финальная таблица:
+
+```{r}
+tense_marking |> 
+  mutate(chunk_structure = str_remove(chunk_structure, "\\.SAY")) |> 
+  count(name, age, text_type, chunk_structure, sort = TRUE) |> 
+  pivot_wider(names_from = chunk_structure, values_from = n, values_fill = 0) 
+```
+
+График соотношения количества JNT и PST
+
+```{r}
+tense_marking |> 
+  mutate(chunk_structure = str_remove(chunk_structure, "\\.SAY")) |> 
+  count(name, age, text_type, chunk_structure, sort = TRUE)  |> 
+  pivot_wider(names_from = chunk_structure, values_from = n, values_fill = 0) |> 
+  mutate(PST = if_else(PST == 0, 0.9, PST),
+         JNT = if_else(JNT == 0, 0.9, JNT)) |> 
+  select(name, age, text_type, PST, JNT) |> 
+  mutate(ratio = PST/(PST+JNT)) |> 
+  arrange(-ratio)
+
+tense_marking |> 
+  mutate(chunk_structure = str_remove(chunk_structure, "\\.SAY")) |> 
+  count(name, age, text_type, chunk_structure, sort = TRUE)  |> 
+  pivot_wider(names_from = chunk_structure, values_from = n, values_fill = 0) |> 
+  mutate(PST = if_else(PST == 0, 0.9, PST),
+         JNT = if_else(JNT == 0, 0.9, JNT)) |> 
+  select(name, age, text_type, PST, JNT) |> 
+  mutate(ratio = PST/(PST+JNT),
+         name = str_c(name, " (", age, ")")) |> 
+  ggplot(aes(PST, JNT, color = text_type))+
+  geom_smooth(method = "lm", se = FALSE, color = "grey60", linetype = 2)+
+  geom_point()+
+  scale_x_log10()+
+  scale_y_log10()+
+  ggrepel::geom_text_repel(aes(label = name))
+```
+
+JNT.SAY vs JNT без SAY
+
+```{r}
+tense_marking |> 
+  filter(str_detect(chunk_structure, "JNT")) |> 
+  count(name, age, text_type, chunk_structure, sort = TRUE) |> 
+  pivot_wider(names_from = chunk_structure, values_from = n, values_fill = 0) |> 
+  mutate(ratio = JNT/(JNT+JNT.SAY)) |> 
+  arrange(-ratio)
+
+tense_marking |> 
+  filter(str_detect(chunk_structure, "JNT")) |> 
+  count(name, age, text_type, chunk_structure, sort = TRUE) |> 
+  pivot_wider(names_from = chunk_structure, values_from = n, values_fill = 0) |> 
+  mutate(JNT = if_else(JNT == 0, 0.9, JNT),
+         JNT.SAY = if_else(JNT.SAY == 0, 0.9, JNT.SAY)) |> 
+  select(name, age, text_type, JNT, JNT.SAY) |> 
+  mutate(name = str_c(name, " (", age, ")")) |> 
+  ggplot(aes(JNT, JNT.SAY, color = text_type))+
+  geom_smooth(method = "lm", se = FALSE, color = "grey60", linetype = 2)+
+  geom_point()+
+  scale_x_log10()+
+  scale_y_log10()+
+  ggrepel::geom_text_repel(aes(label = name))
+```
+
+PST + JNT vs other
+
+```{r}
+tense_marking |> 
+  mutate(pst_jnt_other = if_else(str_detect(chunk_structure, "(PST)|(JNT)"), 
+                                 "PST_or_JNT",
+                                 "other")) |> 
+  count(name, age, text_type, pst_jnt_other, sort = TRUE) |> 
+  pivot_wider(names_from = pst_jnt_other, values_from = n, values_fill = 0) |> 
+  mutate(ratio = PST_or_JNT/(PST_or_JNT+other)) |> 
+  arrange(-ratio)
+
+tense_marking |> 
+  mutate(pst_jnt_other = if_else(str_detect(chunk_structure, "(PST)|(JNT)"), 
+                                 "PST_or_JNT",
+                                 "other")) |> 
+  count(name, age, text_type, pst_jnt_other, sort = TRUE) |> 
+  pivot_wider(names_from = pst_jnt_other, values_from = n, values_fill = 0) |> 
+  mutate(PST_or_JNT = if_else(PST_or_JNT == 0, 0.9, PST_or_JNT),
+         other = if_else(other == 0, 0.9, other)) |> 
+  select(name, age, text_type, PST_or_JNT, other) |> 
+  mutate(name = str_c(name, " (", age, ")")) |> 
+  ggplot(aes(PST_or_JNT, other, color = text_type))+
+  geom_smooth(method = "lm", se = FALSE, color = "grey60", linetype = 2)+
+  geom_point()+
+  scale_x_log10()+
+  scale_y_log10()+
+  ggrepel::geom_text_repel(aes(label = name))
+```
+
+## сложный синтаксис
+
+обсчитать префиксы маленькими перед квадратными, треугольными и фигурными скобками
+
+```{r}
+readxl::read_xlsx("kirikou_annotations.xlsx", sheet = "kirikou Mano") |>
+  select(-elicitation_date) |> 
+  mutate(text_type = "kirikou") |>
+  bind_rows(readxl::read_xlsx("kirikou_annotations.xlsx", sheet = "folktales Mano children") |> 
+              mutate(text_type = "folktales")) |> 
+  select(-elicitation_date) |> 
+  bind_rows(readxl::read_xlsx("kirikou_annotations.xlsx", sheet = "folktales Mano adults") |>
+              mutate(text_type = "folktales",
+                     age = 100)) |> 
+  rename(chunk_structure = `chunk structure`) |> 
+  filter(!is.na(chunk_structure)) |> 
+  group_by(name, age, text_type) |> 
+  summarize(chunk_structure = str_c(chunk_structure, collapse = " ")) |> 
+  ungroup() |> 
+  mutate(foc = str_count(chunk_structure, "foc"),
+         rel = str_count(chunk_structure, "rel"),
+         temp = str_count(chunk_structure, "temp"),
+         cond = str_count(chunk_structure, "cond"),
+         purp = str_count(chunk_structure, "purp"),
+         prec = str_count(chunk_structure, "prec"),
+         compar = str_count(chunk_structure, "compar"),
+         mod = str_count(chunk_structure, "mod"),
+         sa = str_count(chunk_structure, "sa"),
+         le = str_count(chunk_structure, "le"),
+         ht = str_count(chunk_structure, "ht"),
+         at = str_count(chunk_structure, "at"),
+         top = str_count(chunk_structure, "top"),
+         voc = str_count(chunk_structure, "voc")) |> 
+  select(-chunk_structure)
+```
+
+## reference tracking 
+
+обсчитать, сколько CR vs SR в NP и в pro
+
+```{r}
+readxl::read_xlsx("kirikou_annotations.xlsx", sheet = "kirikou Mano") |>
+  select(-elicitation_date) |> 
+  mutate(text_type = "kirikou") |>
+  bind_rows(readxl::read_xlsx("kirikou_annotations.xlsx", sheet = "folktales Mano children") |> 
+              mutate(text_type = "folktales")) |> 
+  select(-elicitation_date) |> 
+  bind_rows(readxl::read_xlsx("kirikou_annotations.xlsx", sheet = "folktales Mano adults") |>
+              mutate(text_type = "folktales",
+                     age = 100)) |> 
+  rename(chunk_structure = `chunk structure`) |> 
+  filter(!is.na(chunk_structure)) |> 
+  group_by(name, age, text_type) |> 
+  summarize(chunk_structure = str_c(chunk_structure, collapse = " ")) |> 
+  ungroup() |> 
+  mutate(pro_CR = str_count(chunk_structure, "pro\\(CR\\)"),
+         NP_CR = str_count(chunk_structure, "NP\\(CR\\)"),
+         pro_SR = str_count(chunk_structure, "pro\\(SR\\)"),
+         NP_SR = str_count(chunk_structure, "NP\\(SR\\)")) |> 
+  select(-chunk_structure)
+```
+
+
