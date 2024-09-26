@@ -898,6 +898,16 @@ readxl::read_xlsx("kirikou_annotations.xlsx", sheet = "kirikou Mano") |>
 
 ## Уменьшение размерности
 
+Я сделал мега-таблицу, с 
+
+- 50 самых частотных слов
+- количество французских заимствований
+- время (таблица выше)
+- синтаксис
+- reference_tracking
+
+Итого 92 переменных.
+
 ```{r}
 tense_marking |> 
   mutate(chunk_structure = str_remove(chunk_structure, "\\.SAY")) |> 
@@ -965,10 +975,20 @@ corpus |>
   pivot_wider(names_from = word, values_from = n, values_fill = 0)  ->
   lexicon
 
+corpus |> 
+  unnest_tokens(input = text, output = word) |> 
+  mutate(french = if_else(word %in% french_words, "french", "non_french")) |> 
+  count(name, age, text_type, french) |> 
+  pivot_wider(names_from = french, values_from = n, values_fill = 0) |> 
+  select(-non_french) ->
+  french
+
 syntax |> 
   full_join(tense) |> 
   full_join(lexicon) |> 
   full_join(reference_tracking) |>  
+  full_join((french)) |> 
+  mutate(french = if_else(is.na(french), 0, french)) |> 
   mutate(across(-c(name, age, text_type), function(x) scale(x))) |> 
   select(-c(name, age, text_type)) |> 
   prcomp() ->
