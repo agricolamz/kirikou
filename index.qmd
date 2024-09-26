@@ -873,4 +873,112 @@ readxl::read_xlsx("kirikou_annotations.xlsx", sheet = "kirikou Mano") |>
   select(-chunk_structure)
 ```
 
+## Сколько всего?
+
+```{r}
+readxl::read_xlsx("kirikou_annotations.xlsx", sheet = "kirikou Mano") |>
+  select(-elicitation_date) |> 
+  mutate(text_type = "kirikou") |>
+  bind_rows(readxl::read_xlsx("kirikou_annotations.xlsx", sheet = "folktales Mano children") |> 
+              mutate(text_type = "folktales")) |> 
+  select(-elicitation_date) |> 
+  bind_rows(readxl::read_xlsx("kirikou_annotations.xlsx", sheet = "folktales Mano adults") |>
+              mutate(text_type = "folktales",
+                     age = 100)) |>
+  rename(chunk_structure = `chunk structure`) |> 
+  filter(!is.na(chunk_structure)) |> 
+  add_count(name, age) |> 
+  rename(n_chunks = n) |> 
+  group_by(name, age, text_type, n_chunks) |> 
+  summarize(chunk_structure = str_c(chunk_structure, collapse = " ")) |> 
+  ungroup() |> 
+  mutate(n_predecations = str_count(chunk_structure, "\\[")) |> 
+  select(-chunk_structure)
+```
+
+## Уменьшение размерности
+
+```{r}
+tense_marking |> 
+  mutate(chunk_structure = str_remove(chunk_structure, "\\.SAY")) |> 
+  count(name, age, text_type, chunk_structure, sort = TRUE) |> 
+  pivot_wider(names_from = chunk_structure, values_from = n, values_fill = 0) ->
+  tense
+
+readxl::read_xlsx("kirikou_annotations.xlsx", sheet = "kirikou Mano") |>
+  select(-elicitation_date) |> 
+  mutate(text_type = "kirikou") |>
+  bind_rows(readxl::read_xlsx("kirikou_annotations.xlsx", sheet = "folktales Mano children") |> 
+              mutate(text_type = "folktales")) |> 
+  select(-elicitation_date) |> 
+  bind_rows(readxl::read_xlsx("kirikou_annotations.xlsx", sheet = "folktales Mano adults") |>
+              mutate(text_type = "folktales",
+                     age = 100)) |> 
+  rename(chunk_structure = `chunk structure`) |> 
+  filter(!is.na(chunk_structure)) |> 
+  group_by(name, age, text_type) |> 
+  summarize(chunk_structure = str_c(chunk_structure, collapse = " ")) |> 
+  ungroup() |> 
+  mutate(foc = str_count(chunk_structure, "foc"),
+         rel = str_count(chunk_structure, "rel"),
+         temp = str_count(chunk_structure, "temp"),
+         cond = str_count(chunk_structure, "cond"),
+         purp = str_count(chunk_structure, "purp"),
+         prec = str_count(chunk_structure, "prec"),
+         compar = str_count(chunk_structure, "compar"),
+         mod = str_count(chunk_structure, "mod"),
+         sa = str_count(chunk_structure, "sa"),
+         le = str_count(chunk_structure, "le"),
+         ht = str_count(chunk_structure, "ht"),
+         at = str_count(chunk_structure, "at"),
+         top = str_count(chunk_structure, "top"),
+         voc = str_count(chunk_structure, "voc")) |> 
+  select(-chunk_structure) ->
+  syntax
+
+readxl::read_xlsx("kirikou_annotations.xlsx", sheet = "kirikou Mano") |>
+  select(-elicitation_date) |> 
+  mutate(text_type = "kirikou") |>
+  bind_rows(readxl::read_xlsx("kirikou_annotations.xlsx", sheet = "folktales Mano children") |> 
+              mutate(text_type = "folktales")) |> 
+  select(-elicitation_date) |> 
+  bind_rows(readxl::read_xlsx("kirikou_annotations.xlsx", sheet = "folktales Mano adults") |>
+              mutate(text_type = "folktales",
+                     age = 100)) |> 
+  rename(chunk_structure = `chunk structure`) |> 
+  filter(!is.na(chunk_structure)) |> 
+  group_by(name, age, text_type) |> 
+  summarize(chunk_structure = str_c(chunk_structure, collapse = " ")) |> 
+  ungroup() |> 
+  mutate(pro_CR = str_count(chunk_structure, "pro\\(CR\\)"),
+         NP_CR = str_count(chunk_structure, "NP\\(CR\\)"),
+         pro_SR = str_count(chunk_structure, "pro\\(SR\\)"),
+         NP_SR = str_count(chunk_structure, "NP\\(SR\\)")) |> 
+  select(-chunk_structure) ->
+  reference_tracking
+
+corpus |> 
+  bind_rows(corpus_ad) |> 
+  unnest_tokens(input = text, output = word, token = "words") |> 
+  count(name, age, text_type, word)  |> 
+  filter(word %in% freq_words) |> 
+  pivot_wider(names_from = word, values_from = n, values_fill = 0)  ->
+  lexicon
+
+syntax |> 
+  full_join(tense) |> 
+  full_join(lexicon) |> 
+  full_join(reference_tracking) |>  
+  mutate(across(-c(name, age, text_type), function(x) scale(x))) |> 
+  select(-c(name, age, text_type)) |> 
+  prcomp() ->
+  pca
+
+syntax |> 
+  select(name, age, text_type) |> 
+  bind_cols(pca$x) |> 
+  ggplot(aes(PC1, PC2, color = text_type))+
+  geom_point()+
+  ggrepel::geom_text_repel(aes(label = str_c(name, " (", age, ")")), max.overlaps = 100)
+```
 
