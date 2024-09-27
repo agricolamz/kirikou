@@ -23,46 +23,66 @@ editor_options:
 library(tidyverse)
 theme_set(theme_minimal()+theme(text = element_text(size = 16)))
 library(tidytext)
+
 readxl::read_xlsx("kirikou_annotations.xlsx", sheet = "kirikou Mano") |>
   select(-elicitation_date) |> 
   mutate(text_type = "kirikou") |>
   bind_rows(readxl::read_xlsx("kirikou_annotations.xlsx", sheet = "folktales Mano children") |> 
               mutate(text_type = "folktales")) |> 
+  rename(chunk_structure = `chunk structure`) |> 
   mutate(txenfant = str_remove_all(txenfant , "[/+]"),
-         txenfant = str_remove_all(txenfant, "\\[.*?\\]")) |>
-  filter(!is.na(txenfant)) |> 
-  group_by(name, age, socio_family_adoptive, text_type, residence_place) |> 
-  summarize(text = str_c(txenfant, collapse = " ")) |> 
-  ungroup() |> 
-  mutate(soc = str_c(socio_family_adoptive, " (", residence_place, ")"),
-         soc = factor(soc, levels = c("Mano (Gody)", "Mano (Nzerekore)", "Bilingual (Nzerekore)")),
-         age_group = "children") ->
-  corpus
+         txenfant = str_remove_all(txenfant, "\\[.*?\\]"),
+         txenfant = if_else(is.na(txenfant), "", txenfant),
+         ft = if_else(is.na(ft), "", ft),
+         chunk_structure = if_else(is.na(chunk_structure), "", chunk_structure)) |>
+  add_count(name, age) |> 
+  rename(n_chunks = n) |> 
+  group_by(name, age, socio_family_adoptive, text_type, residence_place, n_chunks) |> 
+  summarize(text = str_c(txenfant, collapse = " "),
+            chunk_structure = str_c(chunk_structure, collapse = " "),
+            ft = str_c(ft, collapse = " ")) |> 
+  mutate(age_group = "children") |> 
+  ungroup() ->
+  mano_chi_corpus
 
 readxl::read_xlsx("kirikou_annotations.xlsx", sheet = "folktales Mano adults") |> 
-  mutate(age = 100) |> 
-  rename(txenfant = `txenfant = tx`) |> 
-  filter(!is.na(txenfant)) |> 
+  mutate(age = 100,
+         text_type = "folktales") |> 
+  rename(txenfant = `txenfant = tx`,
+         chunk_structure = `chunk structure`) |> 
   mutate(txenfant = str_remove_all(txenfant , "[/+]"),
-         txenfant = str_remove_all(txenfant, "\\[.*?\\]")) |>
-  group_by(name, age, socio_family_adoptive, residence_place) |> 
-  summarize(text = str_c(txenfant, collapse = " ")) |> 
-  ungroup() |> 
-  mutate(soc = str_c(socio_family_adoptive, " (", residence_place, ")"),
-         soc = factor(soc, levels = c("Mano (Bossou)", "Mano (Nzerekore)", "Bilingual (Le Teil)")),
-         age_group = "adults",
-         text_type = "folktales") ->
-  corpus_ad
+         txenfant = str_remove_all(txenfant, "\\[.*?\\]"),
+         txenfant = if_else(is.na(txenfant), "", txenfant),
+         ft = if_else(is.na(ft), "", ft),
+         chunk_structure = if_else(is.na(chunk_structure), "", chunk_structure)) |>
+  add_count(name, age) |> 
+  rename(n_chunks = n) |> 
+  group_by(name, age, socio_family_adoptive, text_type, residence_place, n_chunks) |> 
+  summarize(text = str_c(txenfant, collapse = " "),
+            chunk_structure = str_c(chunk_structure, collapse = " "),
+            ft = str_c(ft, collapse = " ")) |> 
+  mutate(age_group = "adults") |> 
+  bind_rows(mano_chi_corpus) |> 
+  mutate(group_var = case_when(text_type == "kirikou" & residence_place == "Nzerekore" ~ "Kirikou (Nzerekore)",
+                               text_type == "kirikou" & residence_place != "Nzerekore" ~ "Kirikou (other)",
+                               text_type == "folktales" & age_group == "children" ~ "folktales (children)",
+                               text_type == "folktales" & age_group == "adults" ~ "folktales (adults)")) |> 
+  ungroup() -> 
+  mano_corpus
 
-corpus |> 
+rm(mano_chi_corpus)
+```
+
+```{r}
+mano_corpus |> 
   unnest_tokens(input = text, output = word) |> 
-  count(soc, word) |> 
-  group_by(soc) |> 
+  count(group_var, word) |> 
+  group_by(group_var) |> 
   slice_max(n, n = 20) |> 
-  mutate(word = reorder_within(word, by = n, within = soc)) |>  
+  mutate(word = reorder_within(word, by = n, within = group_var)) |>  
   ggplot(aes(n, word))+
   geom_col()+
-  facet_wrap(~soc, scales = "free")+
+  facet_wrap(~group_var, scales = "free", nrow = 1)+
   scale_y_reordered()+
   labs(x = NULL, y = NULL)
 ```
@@ -70,7 +90,7 @@ corpus |>
 Из странного я вижу два разных gbaa, которые видимо, по разному набраны. Посмотрим на все символы, которые используются в тексте:
 
 ```{r}
-corpus |> 
+mano_corpus |> 
   unnest_tokens(input = text, output = characters, token = "characters") |> 
   distinct(characters) |> 
   pull(characters) |> 
@@ -80,7 +100,7 @@ corpus |>
 Видимо, проблема с символами, которые записаны по-французски и в МФА, а также с некоторыми символами: исправим.
 
 ```{r}
-corpus |> 
+mano_corpus |> 
   mutate(text = str_replace_all(text, "á", "á"),
          text = str_replace_all(text, "á", "á"),
          text = str_replace_all(text, "à", "à"),
@@ -147,103 +167,33 @@ corpus |>
          text = str_replace_all(text, "ṵ̄", "ṵ̄"),
          text = str_replace_all(text, "ṵ̄", "ṵ̄"),
          text = str_remove_all(text, "[123¹]")) ->
-  corpus
-
-corpus_ad |> 
-  mutate(text = str_replace_all(text, "á", "á"),
-         text = str_replace_all(text, "á", "á"),
-         text = str_replace_all(text, "à", "à"),
-         text = str_replace_all(text, "à", "à"),
-         text = str_replace_all(text, "á̰", "á̰"),
-         text = str_replace_all(text, "á̰", "á̰"),
-         text = str_replace_all(text, "à̰", "à̰"),
-         text = str_replace_all(text, "à̰", "à̰"),         
-         text = str_replace_all(text, "ā", "ā"),
-         text = str_replace_all(text, "ā", "ā"),
-         text = str_replace_all(text, "ā̰", "ā̰"),
-         text = str_replace_all(text, "ā̰", "á̰"),
-         text = str_replace_all(text, "a̰", "a̰"),
-         text = str_replace_all(text, "é", "é"),
-         text = str_replace_all(text, "é", "é"),
-         text = str_replace_all(text, "è", "è"),
-         text = str_replace_all(text, "è", "è"),
-         text = str_replace_all(text, "è", "è"),
-         text = str_replace_all(text, "ē", "ē"),
-         text = str_replace_all(text, "ē", "ē"),   
-         text = str_replace_all(text, "ɛ̄", "ɛ̄"), 
-         text = str_replace_all(text, "ɛ̰̀", "ɛ̰̀"),
-         text = str_replace_all(text, "ɛ̰̀", "ɛ̰̀"),
-         text = str_replace_all(text, "ɛ̰́", "ɛ̰́"),
-         text = str_replace_all(text, "ɛ̰́", "ɛ̰́"),
-         text = str_replace_all(text, "ɛ̰̄", "ɛ̰̄"),  
-         text = str_replace_all(text, "ɛ̰̄", "ɛ̰̄"),         
-         text = str_replace_all(text, "ɛ̰̄", "ɛ̰̄"),         
-         text = str_replace_all(text, "í", "í"),
-         text = str_replace_all(text, "í", "í"),
-         text = str_replace_all(text, "ì", "ì"),
-         text = str_replace_all(text, "ì", "ì"),
-         text = str_replace_all(text, "ī", "ī"),
-         text = str_replace_all(text, "ī", "ī"),
-         text = str_replace_all(text, "ī", "ī"),
-         text = str_replace_all(text, "ḭ̄", "ḭ̄"),
-         text = str_replace_all(text, "ḭ̄", "ḭ̄"),
-         text = str_replace_all(text, "ḭ̄", "ḭ̄"),
-         text = str_replace_all(text, "ḭ̄", "ḭ̄"),
-         text = str_replace_all(text, "ḭ́", "ḭ́"),
-         text = str_replace_all(text, "ḭ̀", "ḭ̀"),
-         text = str_replace_all(text, "ḭ̀", "ḭ̀"),
-         text = str_replace_all(text, "ɩ̀", "ì"),
-         text = str_replace_all(text, "ó", "ó"),
-         text = str_replace_all(text, "ó", "ó"),
-         text = str_replace_all(text, "ò", "ò"),
-         text = str_replace_all(text, "ò", "ò"),
-         text = str_replace_all(text, "ō", "ō"),
-         text = str_replace_all(text, "ō", "ō"),
-         text = str_replace_all(text, "ɔ̰́", "ɔ̰́"),
-         text = str_replace_all(text, "ɔ̰́", "ɔ̰́"),
-         text = str_replace_all(text, "ɔ̰̀", "ɔ̰̀"),
-         text = str_replace_all(text, "ɔ̰̀", "ɔ̰̀"),
-         text = str_replace_all(text, "ɔ̰̄", "ɔ̰̄"),
-         text = str_replace_all(text, "ɔ̰̄", "ɔ̰̄"),
-         text = str_replace_all(text, "ú", "ú"),
-         text = str_replace_all(text, "ú", "ú"),
-         text = str_replace_all(text, "ù", "ù"),
-         text = str_replace_all(text, "ù", "ù"),
-         text = str_replace_all(text, "ū", "ū"),
-         text = str_replace_all(text, "ū", "ū"),
-         text = str_replace_all(text, "ṵ́", "ṵ́"),
-         text = str_replace_all(text, "ṵ́", "ṵ́"),
-         text = str_replace_all(text, "ṵ̄", "ṵ̄"),
-         text = str_replace_all(text, "ṵ̄", "ṵ̄"),
-         text = str_remove_all(text, "[123¹]")) ->
-  corpus_ad
+  mano_corpus
 ```
 
 Вот что получается после преобразования:
 
 ```{r}
-corpus |> 
+mano_corpus |> 
   unnest_tokens(input = text, output = characters, token = "characters") |> 
   distinct(characters) |> 
   pull(characters) |> 
   sort()
 ```
 
-
 ### Частотность
 
 Теперь мы можем снова нарисовать наш график:
 
 ```{r}
-corpus |> 
+mano_corpus |> 
   unnest_tokens(input = text, output = word) |> 
-  count(soc, word) |> 
-  group_by(soc) |> 
+  count(group_var, word) |> 
+  group_by(group_var) |> 
   slice_max(n, n = 20) |> 
-  mutate(word = reorder_within(word, by = n, within = soc)) |> 
+  mutate(word = reorder_within(word, by = n, within = group_var)) |> 
   ggplot(aes(n, word))+
   geom_col()+
-  facet_wrap(~soc, scales = "free")+
+  facet_wrap(~group_var, scales = "free", nrow = 1)+
   scale_y_reordered()+
   labs(x = NULL, y = NULL)
 ```
@@ -251,15 +201,15 @@ corpus |>
 Посмотрим на биграммы
 
 ```{r}
-corpus |> 
+mano_corpus |> 
   unnest_tokens(input = text, output = ngram, token = "ngrams", n = 2) |> 
-  count(soc, ngram) |> 
-  group_by(soc) |> 
+  count(group_var, ngram) |> 
+  group_by(group_var) |> 
   slice_max(n, n = 20) |> 
-  mutate(ngram = reorder_within(ngram, by = n, within = soc)) |> 
+  mutate(ngram = reorder_within(ngram, by = n, within = group_var)) |> 
   ggplot(aes(n, ngram))+
   geom_col()+
-  facet_wrap(~soc, scales = "free")+
+  facet_wrap(~group_var, scales = "free", nrow = 1)+
   scale_y_reordered()+
   labs(x = NULL, y = NULL)
 ```
@@ -267,15 +217,15 @@ corpus |>
 Посмотрим на трииграммы
 
 ```{r}
-corpus |> 
+mano_corpus |> 
   unnest_tokens(input = text, output = ngram, token = "ngrams", n = 3) |> 
-  count(soc, ngram) |> 
-  group_by(soc) |> 
+  count(group_var, ngram) |> 
+  group_by(group_var) |> 
   slice_max(n, n = 20) |> 
-  mutate(ngram = reorder_within(ngram, by = n, within = soc)) |> 
+  mutate(ngram = reorder_within(ngram, by = n, within = group_var)) |> 
   ggplot(aes(n, ngram))+
   geom_col()+
-  facet_wrap(~soc, scales = "free")+
+  facet_wrap(~group_var, scales = "free", nrow = 1)+
   scale_y_reordered()+
   labs(x = NULL, y = NULL)
 ```
@@ -285,47 +235,47 @@ corpus |>
 Посчитаем меру tf-idf для униграм, биграм и триграм
 
 ```{r}
-corpus |> 
+mano_corpus |> 
   unnest_tokens(input = "text", output = "word", token = "words") |>
-  count(soc, word, sort = TRUE) |> 
-  bind_tf_idf(word, soc, n) |> 
+  count(group_var, word, sort = TRUE) |> 
+  bind_tf_idf(word, group_var, n) |> 
   arrange(desc(tf_idf)) |> 
-  group_by(soc) |> 
+  group_by(group_var) |> 
   slice_max(order_by = tf_idf, n = 10) |> 
-  mutate(word = reorder_within(word, n, soc)) |> 
+  mutate(word = reorder_within(word, n, group_var)) |> 
   ggplot(aes(word, n)) +
   geom_bar(stat="identity") +
-  facet_wrap(~ soc, scales = "free") +
+  facet_wrap(~ group_var, scales = "free", nrow = 1) +
   coord_flip() +
   scale_x_reordered() +
   labs(x = NULL, y = NULL)
 
-corpus |> 
+mano_corpus |> 
   unnest_tokens(input = "text", output = "ngram", token = "ngrams", n = 2) |>
-  count(soc, ngram, sort = TRUE) |> 
-  bind_tf_idf(ngram, soc, n) |> 
+  count(group_var, ngram, sort = TRUE) |> 
+  bind_tf_idf(ngram, group_var, n) |> 
   arrange(desc(tf_idf)) |> 
-  group_by(soc) |> 
+  group_by(group_var) |> 
   slice_max(order_by = tf_idf, n = 10) |> 
-  mutate(ngram = reorder_within(ngram, n, soc)) |> 
+  mutate(ngram = reorder_within(ngram, n, group_var)) |> 
   ggplot(aes(ngram, n)) +
   geom_bar(stat="identity") +
-  facet_wrap(~ soc, scales = "free") +
+  facet_wrap(~ group_var, scales = "free", nrow = 1) +
   coord_flip() +
   scale_x_reordered() +
   labs(x = NULL, y = NULL)
 
-corpus |> 
+mano_corpus |> 
   unnest_tokens(input = "text", output = "ngram", token = "ngrams", n = 3) |>
-  count(soc, ngram, sort = TRUE) |> 
-  bind_tf_idf(ngram, soc, n) |> 
+  count(group_var, ngram, sort = TRUE) |> 
+  bind_tf_idf(ngram, group_var, n) |> 
   arrange(desc(tf_idf)) |> 
-  group_by(soc) |> 
+  group_by(group_var) |> 
   slice_max(order_by = tf_idf, n = 10) |> 
-  mutate(ngram = reorder_within(ngram, n, soc)) |> 
+  mutate(ngram = reorder_within(ngram, n, group_var)) |> 
   ggplot(aes(ngram, n)) +
   geom_bar(stat="identity") +
-  facet_wrap(~ soc, scales = "free") +
+  facet_wrap(~ group_var, scales = "free", nrow = 1) +
   coord_flip() +
   scale_x_reordered() +
   labs(x = NULL, y = NULL)
@@ -340,14 +290,15 @@ corpus |>
 Доля уникальных слов из всех слов. Размер --- количество слов в тексте. 
 
 ```{r}
-corpus |> 
+mano_corpus |> 
+  filter(age != 100) |> 
   unnest_tokens(input = "text", output = "word", token = "words") |> 
-  count(name, age, soc, word) |> 
-  group_by(name, age, soc) |> 
+  count(name, age, group_var, word) |> 
+  group_by(name, age, group_var) |> 
   summarise(size = sum(n),
             richness = n(),
             TTR = richness/size) |> 
-  ggplot(aes(age, TTR, color = soc, label = name))+
+  ggplot(aes(age, TTR, color = group_var, label = name))+
   geom_point(aes(size = size))+
   ggrepel::geom_text_repel()+
   labs(size = NULL, color = NULL)
@@ -356,15 +307,16 @@ corpus |>
 Энтропия текстов (чуть больше верю этой мере разнообразия).
 
 ```{r}
-corpus |> 
+mano_corpus |> 
+  filter(age != 100) |> 
   unnest_tokens(input = "text", output = "word", token = "words") |> 
-  count(name, age, soc, word) |> 
-  group_by(name, age, soc) |> 
+  count(name, age, group_var, word) |> 
+  group_by(name, age, group_var) |> 
   summarise(size = sum(n),
             richness = n(),
             TTR = richness/size,
             entropy = -sum(TTR*log2(TTR))) |> 
-  ggplot(aes(age, entropy, color = soc, label = name))+
+  ggplot(aes(age, entropy, color = group_var, label = name))+
   geom_point(aes(size = size))+
   ggrepel::geom_text_repel()+
   labs(size = NULL, color = NULL)
@@ -373,46 +325,37 @@ corpus |>
 Оказывается (Baayen 2008, 222–36) исследовал меры разнообразия и написал несколько интересных мыслей.
 
 ```{r}
-corpus |> 
-  bind_rows(corpus_ad) |> 
+mano_corpus |> 
   unnest_tokens(input = "text", output = "word", token = "words") |> 
-  group_by(name, age, socio_family_adoptive, residence_place, soc) |> 
+  group_by(name, age, group_var) |> 
   mutate(id = 1:n(),
          word_id = as.factor(word) |> fct_inorder() |>  as.double(),
          max = cummax(word_id),
          coord_max = max(max)) |> 
+  ungroup() |> 
+  mutate(name = str_c(name, " (", age, ")")) |> 
+  group_by(name, group_var, coord_max) |>
+  summarise(id = max(id)) |> 
   ungroup() ->
-  for_visualization
+  lexical_diversity
 
-for_visualization |>
-  mutate(name = str_replace(name, "_", " "),
-         name = str_c(name, " (", age, ")"),
-         name = str_replace(name, "\\(35\\)", "\\(adult\\)")) |> 
-  group_by(name, age, socio_family_adoptive, residence_place, soc, coord_max) |> 
-  summarise(id = max(id)) ->
-  labels
-
-for_visualization |> 
-  mutate(socio_family_adoptive = factor(socio_family_adoptive, levels = c("Mano", "Bilingual"))) |> 
-  ggplot(aes(id, max, group = name))+
-  geom_line(data = for_visualization |> select(-soc), color = "grey80")+
-  geom_line(aes(color = residence_place))+
-  geom_point(aes(id, coord_max), data = labels)+
-  ggrepel::geom_text_repel(aes(id, coord_max, label = name), data = labels)+
-  facet_wrap(~socio_family_adoptive)+
+lexical_diversity |> 
+  ggplot(aes(id, coord_max, group = name, label = name)) +
+  geom_point(data = lexical_diversity |> select(-group_var), color = "grey80")+
+  geom_point()+
+  ggrepel::geom_label_repel()+
+  facet_wrap(~group_var)+
   theme(legend.position = "bottom")+
   labs(x = "tokens",
        y = "types")
 ```
-
 
 ### Кластеризация людей
 
 Я взял частотные 50 слов и кластеризовал людей на основе нормализованной частотности слов в текстах людей:
 
 ```{r}
-corpus |> 
-  bind_rows(corpus_ad) |> 
+mano_corpus |> 
   unnest_tokens(input = "text", output = "word", token = "words") |> 
   count(word, sort = TRUE) |>
   filter(!(word %in% c("kirikou", "karaba", "làà", "mɔ̀ɔ̀", "dàā", "yíí", "zíé", "wìì", "lòkóò"))) |> 
@@ -421,21 +364,15 @@ corpus |>
   freq_words
 
 library(dendextend)
-par(mar=c(2,0,0,18))
 
-corpus |> 
-  bind_rows(corpus_ad) |> 
-  mutate(name = str_c(name, " (", age, "): ", soc),
-         soc = str_extract(soc, "\\w{1,}"),
-         color = c("tomato", "darkgreen")[factor(soc)]) |> 
+mano_corpus |> 
+  mutate(name = str_c(name, " (", age, "):\t", group_var),
+         color = scales::hue_pal()(4)[factor(group_var)]) |> 
   distinct(name, color) ->
   colors
 
-library(ape)
-
-corpus |> 
-  bind_rows(corpus_ad) |> 
-  mutate(name = str_c(name, " (", age, "): ", soc)) |> 
+mano_corpus |> 
+  mutate(name = str_c(name, " (", age, "):\t", group_var)) |> 
   unnest_tokens(input = text, output = word, token = "words") |> 
   count(name, word)  |> 
   group_by(name) |> 
@@ -448,9 +385,13 @@ corpus |>
   column_to_rownames("name") |>  
   dist(method = "manhattan") |> 
   hclust(method = "complete") |> 
-  as.phylo() %>%
-  plot(tip.color = colors$color[match(.$tip.label, colors$name)],
-       font = 2) 
+  as.dendrogram() ->
+  dend
+
+par(mar=c(2,0,0,18))
+dend |> 
+  set("labels_col", colors$color[match(labels(dend), colors$name)]) |> 
+  plot(horiz = TRUE)
 ```
 
 Я попробовал разные количества слов (20-30-40-50, больше тупо брать --- совсем много пропусков буедт), но красные билингвы из Нзерекоре устойчивы, а синие-зеленые манцы перемешиваются, что в принципе подтверждает, что билингвы немного другие.
@@ -466,7 +407,7 @@ corpus |>
 library(word2vec)
 
 set.seed(42) 
-model <- word2vec(x = corpus$text, 
+model <- word2vec(x = mano_corpus$text, 
                   type = "skip-gram",
                   dim = 50,
                   window = 5,
@@ -494,7 +435,7 @@ tibble(word = rownames(emb),
 Две меры коллокационности, посмотри верхушку списков:
 
 ```{r}
-corpus |> 
+mano_corpus |> 
   unnest_tokens(input = "text", output = "ngram", token = "ngrams", n = 2) |> 
   separate(ngram, into = c("word1", "word2"), sep = " ") |>
   count(word1, word2) |> 
@@ -542,7 +483,7 @@ collacations |>
 Можно идти по этому списку, листая страницы и выписывать стопслова. Пожалуйста, копирую отсюда написание --- я вносил правки в орфографию.
 
 ```{r}
-corpus |> 
+mano_corpus |> 
   unnest_tokens(input = text, output = word) |> 
   count(word, sort = TRUE)
 ```
@@ -561,12 +502,12 @@ corpus |>
 
 non_french <- str_c("[", non_french)
 
-corpus |> 
+mano_corpus |> 
   unnest_tokens(input = text, output = word) |> 
   count(word, sort = TRUE) |> 
   filter(str_detect(word, non_french, negate = TRUE))
 
-corpus |> 
+mano_corpus |> 
   unnest_tokens(input = text, output = word) |> 
   count(word, sort = TRUE) |> 
   filter(str_detect(word, non_french, negate = TRUE)) |> 
@@ -581,26 +522,18 @@ french_words
 Значение по людям:
 
 ```{r}
-corpus |> 
+mano_corpus |> 
   unnest_tokens(input = text, output = word) |> 
-  mutate(french = if_else(word %in% french_words, "french", "non_french"),
-         name = str_c(name, " (", age, ")")) |> 
-  count(name, soc, french) |> 
-  pivot_wider(names_from = french, values_from = n, values_fill = 0) 
+  mutate(french = if_else(word %in% french_words, "french", "non_french")) |> 
+  count(name, age, group_var, french) |> 
+  pivot_wider(names_from = french, values_from = n, values_fill = 0) ->
+  french
 
-corpus |> 
-  bind_rows(corpus_ad) |> 
-  unnest_tokens(input = text, output = word) |> 
-  mutate(french = if_else(word %in% french_words, "french", "non_french"),
-         name = str_c(name, " (", age, ")"),
-         soc = str_extract(soc, "\\w{1,}")) |> 
-  count(name, age_group, text_type, residence_place, soc, french) |>
-  mutate(residence_place_nz = if_else(residence_place == "Nzerekore", "Nzerekore", "other"),
-         variable = str_c(text_type, " (", residence_place_nz, ")")) |> 
-  pivot_wider(names_from = french, values_from = n, values_fill = 0) |> 
-  mutate(french = if_else(french == 0, 0.5, french),
-         non_french = if_else(non_french == 0, 0.5, non_french)) |>  
-  ggplot(aes(non_french, french, color = variable))+
+french
+
+french |> 
+  mutate(name = str_c(name, " (", age, ")")) |> 
+  ggplot(aes(non_french, french, color = group_var))+
   scale_x_log10()+
   scale_y_log10()+
   geom_smooth(method = "lm", se = FALSE, color = "grey60", linetype = 2)+
@@ -614,42 +547,20 @@ corpus |>
 ## Количество ономатопей
 
 ```{r}
-readxl::read_xlsx("kirikou_annotations.xlsx", sheet = "kirikou Mano") |>
-  select(-elicitation_date) |> 
-  mutate(text_type = "kirikou") |>
-  bind_rows(readxl::read_xlsx("kirikou_annotations.xlsx", sheet = "folktales Mano children") |> 
-              mutate(text_type = "folktales")) |> 
-  select(-elicitation_date) |> 
-  bind_rows(readxl::read_xlsx("kirikou_annotations.xlsx", sheet = "folktales Mano adults") |>
-              mutate(text_type = "folktales",
-                     age = 100)) |>
-  filter(!is.na(ft)) |> 
+mano_corpus |> 
   mutate(onomatopoeia = str_extract_all(ft, "ONOMAT")) |>
-  select(name, age, text_type, onomatopoeia) |> 
-  unnest_longer(onomatopoeia) |> 
+  unnest_longer(onomatopoeia) |>
+  select(name, age, group_var, onomatopoeia) |> 
   na.omit() |> 
-  count(name, age, text_type)
+  count(name, age, group_var)
 ```
 
-Что-то они всего у шесть людей...
+Что-то они всего у семи людей...
 
 ## Diversity of tense marking
 
 ```{r}
-readxl::read_xlsx("kirikou_annotations.xlsx", sheet = "kirikou Mano") |>
-  select(-elicitation_date) |> 
-  mutate(text_type = "kirikou") |>
-  bind_rows(readxl::read_xlsx("kirikou_annotations.xlsx", sheet = "folktales Mano children") |> 
-              mutate(text_type = "folktales")) |> 
-  select(-elicitation_date) |> 
-  bind_rows(readxl::read_xlsx("kirikou_annotations.xlsx", sheet = "folktales Mano adults") |>
-              mutate(text_type = "folktales",
-                     age = 100)) |> 
-  rename(chunk_structure = `chunk structure`) |> 
-  filter(!is.na(chunk_structure)) |> 
-  group_by(name, age, text_type) |> 
-  summarize(chunk_structure = str_c(chunk_structure, collapse = " ")) |> 
-  ungroup() |> 
+mano_corpus |> 
   mutate(chunk_structure_old = chunk_structure, 
          chunk_structure = str_remove_all(chunk_structure, "(?<=\\]).*?(?=\\[)"), 
          chunk_structure = str_remove_all(chunk_structure, "<.*?>"),
@@ -721,8 +632,11 @@ tense_marking |>
 ```{r}
 tense_marking |> 
   mutate(chunk_structure = str_remove(chunk_structure, "\\.SAY")) |> 
-  count(name, age, text_type, chunk_structure, sort = TRUE) |> 
-  pivot_wider(names_from = chunk_structure, values_from = n, values_fill = 0) 
+  count(name, age, group_var, chunk_structure, sort = TRUE) |> 
+  pivot_wider(names_from = chunk_structure, values_from = n, values_fill = 0)  ->
+  tense
+
+tense
 ```
 
 График соотношения количества JNT и PST
@@ -730,24 +644,24 @@ tense_marking |>
 ```{r}
 tense_marking |> 
   mutate(chunk_structure = str_remove(chunk_structure, "\\.SAY")) |> 
-  count(name, age, text_type, chunk_structure, sort = TRUE)  |> 
+  count(name, age, group_var, chunk_structure, sort = TRUE)  |> 
   pivot_wider(names_from = chunk_structure, values_from = n, values_fill = 0) |> 
   mutate(PST = if_else(PST == 0, 0.9, PST),
          JNT = if_else(JNT == 0, 0.9, JNT)) |> 
-  select(name, age, text_type, PST, JNT) |> 
+  select(name, age, group_var, PST, JNT) |> 
   mutate(ratio = PST/(PST+JNT)) |> 
   arrange(-ratio)
 
 tense_marking |> 
   mutate(chunk_structure = str_remove(chunk_structure, "\\.SAY")) |> 
-  count(name, age, text_type, chunk_structure, sort = TRUE)  |> 
+  count(name, age, group_var, chunk_structure, sort = TRUE)  |> 
   pivot_wider(names_from = chunk_structure, values_from = n, values_fill = 0) |> 
   mutate(PST = if_else(PST == 0, 0.9, PST),
          JNT = if_else(JNT == 0, 0.9, JNT)) |> 
-  select(name, age, text_type, PST, JNT) |> 
+  select(name, age, group_var, PST, JNT) |> 
   mutate(ratio = PST/(PST+JNT),
          name = str_c(name, " (", age, ")")) |> 
-  ggplot(aes(PST, JNT, color = text_type))+
+  ggplot(aes(PST, JNT, color = group_var))+
   geom_smooth(method = "lm", se = FALSE, color = "grey60", linetype = 2)+
   geom_point()+
   scale_x_log10()+
@@ -760,20 +674,19 @@ JNT.SAY vs JNT без SAY
 ```{r}
 tense_marking |> 
   filter(str_detect(chunk_structure, "JNT")) |> 
-  count(name, age, text_type, chunk_structure, sort = TRUE) |> 
+  count(name, age, group_var, chunk_structure, sort = TRUE) |> 
   pivot_wider(names_from = chunk_structure, values_from = n, values_fill = 0) |> 
   mutate(ratio = JNT/(JNT+JNT.SAY)) |> 
   arrange(-ratio)
 
 tense_marking |> 
   filter(str_detect(chunk_structure, "JNT")) |> 
-  count(name, age, text_type, chunk_structure, sort = TRUE) |> 
+  count(name, age, group_var, chunk_structure, sort = TRUE) |> 
   pivot_wider(names_from = chunk_structure, values_from = n, values_fill = 0) |> 
   mutate(JNT = if_else(JNT == 0, 0.9, JNT),
          JNT.SAY = if_else(JNT.SAY == 0, 0.9, JNT.SAY)) |> 
-  select(name, age, text_type, JNT, JNT.SAY) |> 
   mutate(name = str_c(name, " (", age, ")")) |> 
-  ggplot(aes(JNT, JNT.SAY, color = text_type))+
+  ggplot(aes(JNT, JNT.SAY, color = group_var))+
   geom_smooth(method = "lm", se = FALSE, color = "grey60", linetype = 2)+
   geom_point()+
   scale_x_log10()+
@@ -788,7 +701,7 @@ tense_marking |>
   mutate(pst_jnt_other = if_else(str_detect(chunk_structure, "(PST)|(JNT)"), 
                                  "PST_or_JNT",
                                  "other")) |> 
-  count(name, age, text_type, pst_jnt_other, sort = TRUE) |> 
+  count(name, age, group_var, pst_jnt_other, sort = TRUE) |> 
   pivot_wider(names_from = pst_jnt_other, values_from = n, values_fill = 0) |> 
   mutate(ratio = PST_or_JNT/(PST_or_JNT+other)) |> 
   arrange(-ratio)
@@ -797,13 +710,12 @@ tense_marking |>
   mutate(pst_jnt_other = if_else(str_detect(chunk_structure, "(PST)|(JNT)"), 
                                  "PST_or_JNT",
                                  "other")) |> 
-  count(name, age, text_type, pst_jnt_other, sort = TRUE) |> 
+  count(name, age, group_var, pst_jnt_other, sort = TRUE) |> 
   pivot_wider(names_from = pst_jnt_other, values_from = n, values_fill = 0) |> 
   mutate(PST_or_JNT = if_else(PST_or_JNT == 0, 0.9, PST_or_JNT),
          other = if_else(other == 0, 0.9, other)) |> 
-  select(name, age, text_type, PST_or_JNT, other) |> 
   mutate(name = str_c(name, " (", age, ")")) |> 
-  ggplot(aes(PST_or_JNT, other, color = text_type))+
+  ggplot(aes(PST_or_JNT, other, color = group_var))+
   geom_smooth(method = "lm", se = FALSE, color = "grey60", linetype = 2)+
   geom_point()+
   scale_x_log10()+
@@ -816,119 +728,8 @@ tense_marking |>
 обсчитать префиксы маленькими перед квадратными, треугольными и фигурными скобками
 
 ```{r}
-readxl::read_xlsx("kirikou_annotations.xlsx", sheet = "kirikou Mano") |>
-  select(-elicitation_date) |> 
-  mutate(text_type = "kirikou") |>
-  bind_rows(readxl::read_xlsx("kirikou_annotations.xlsx", sheet = "folktales Mano children") |> 
-              mutate(text_type = "folktales")) |> 
-  select(-elicitation_date) |> 
-  bind_rows(readxl::read_xlsx("kirikou_annotations.xlsx", sheet = "folktales Mano adults") |>
-              mutate(text_type = "folktales",
-                     age = 100)) |> 
-  rename(chunk_structure = `chunk structure`) |> 
-  filter(!is.na(chunk_structure)) |> 
-  group_by(name, age, text_type) |> 
-  summarize(chunk_structure = str_c(chunk_structure, collapse = " ")) |> 
-  ungroup() |> 
-  mutate(foc = str_count(chunk_structure, "foc"),
-         rel = str_count(chunk_structure, "rel"),
-         temp = str_count(chunk_structure, "temp"),
-         cond = str_count(chunk_structure, "cond"),
-         purp = str_count(chunk_structure, "purp"),
-         prec = str_count(chunk_structure, "prec"),
-         compar = str_count(chunk_structure, "compar"),
-         mod = str_count(chunk_structure, "mod"),
-         sa = str_count(chunk_structure, "sa"),
-         le = str_count(chunk_structure, "le"),
-         ht = str_count(chunk_structure, "ht"),
-         at = str_count(chunk_structure, "at"),
-         top = str_count(chunk_structure, "top"),
-         voc = str_count(chunk_structure, "voc")) |> 
-  select(-chunk_structure)
-```
-
-## reference tracking 
-
-обсчитать, сколько CR vs SR в NP и в pro
-
-```{r}
-readxl::read_xlsx("kirikou_annotations.xlsx", sheet = "kirikou Mano") |>
-  select(-elicitation_date) |> 
-  mutate(text_type = "kirikou") |>
-  bind_rows(readxl::read_xlsx("kirikou_annotations.xlsx", sheet = "folktales Mano children") |> 
-              mutate(text_type = "folktales")) |> 
-  select(-elicitation_date) |> 
-  bind_rows(readxl::read_xlsx("kirikou_annotations.xlsx", sheet = "folktales Mano adults") |>
-              mutate(text_type = "folktales",
-                     age = 100)) |> 
-  rename(chunk_structure = `chunk structure`) |> 
-  filter(!is.na(chunk_structure)) |> 
-  group_by(name, age, text_type) |> 
-  summarize(chunk_structure = str_c(chunk_structure, collapse = " ")) |> 
-  ungroup() |> 
-  mutate(pro_CR = str_count(chunk_structure, "pro\\(CR\\)"),
-         NP_CR = str_count(chunk_structure, "NP\\(CR\\)"),
-         pro_SR = str_count(chunk_structure, "pro\\(SR\\)"),
-         NP_SR = str_count(chunk_structure, "NP\\(SR\\)")) |> 
-  select(-chunk_structure)
-```
-
-## Сколько всего?
-
-```{r}
-readxl::read_xlsx("kirikou_annotations.xlsx", sheet = "kirikou Mano") |>
-  select(-elicitation_date) |> 
-  mutate(text_type = "kirikou") |>
-  bind_rows(readxl::read_xlsx("kirikou_annotations.xlsx", sheet = "folktales Mano children") |> 
-              mutate(text_type = "folktales")) |> 
-  select(-elicitation_date) |> 
-  bind_rows(readxl::read_xlsx("kirikou_annotations.xlsx", sheet = "folktales Mano adults") |>
-              mutate(text_type = "folktales",
-                     age = 100)) |>
-  rename(chunk_structure = `chunk structure`) |> 
-  filter(!is.na(chunk_structure)) |> 
-  add_count(name, age) |> 
-  rename(n_chunks = n) |> 
-  group_by(name, age, text_type, n_chunks) |> 
-  summarize(chunk_structure = str_c(chunk_structure, collapse = " ")) |> 
-  ungroup() |> 
-  mutate(n_predecations = str_count(chunk_structure, "\\[")) |> 
-  select(-chunk_structure)
-```
-
-## Уменьшение размерности
-
-Я сделал мега-таблицу, с 
-
-- 50 самых частотных слов
-- количество французских заимствований
-- время (таблица выше)
-- синтаксис
-- reference_tracking
-
-Итого 92 переменных.
-
-```{r}
-tense_marking |> 
-  mutate(chunk_structure = str_remove(chunk_structure, "\\.SAY")) |> 
-  count(name, age, text_type, chunk_structure, sort = TRUE) |> 
-  pivot_wider(names_from = chunk_structure, values_from = n, values_fill = 0) ->
-  tense
-
-readxl::read_xlsx("kirikou_annotations.xlsx", sheet = "kirikou Mano") |>
-  select(-elicitation_date) |> 
-  mutate(text_type = "kirikou") |>
-  bind_rows(readxl::read_xlsx("kirikou_annotations.xlsx", sheet = "folktales Mano children") |> 
-              mutate(text_type = "folktales")) |> 
-  select(-elicitation_date) |> 
-  bind_rows(readxl::read_xlsx("kirikou_annotations.xlsx", sheet = "folktales Mano adults") |>
-              mutate(text_type = "folktales",
-                     age = 100)) |> 
-  rename(chunk_structure = `chunk structure`) |> 
-  filter(!is.na(chunk_structure)) |> 
-  group_by(name, age, text_type) |> 
-  summarize(chunk_structure = str_c(chunk_structure, collapse = " ")) |> 
-  ungroup() |> 
+mano_corpus |> 
+  select(name, age, group_var, chunk_structure) |> 
   mutate(foc = str_count(chunk_structure, "foc"),
          rel = str_count(chunk_structure, "rel"),
          temp = str_count(chunk_structure, "temp"),
@@ -946,20 +747,16 @@ readxl::read_xlsx("kirikou_annotations.xlsx", sheet = "kirikou Mano") |>
   select(-chunk_structure) ->
   syntax
 
-readxl::read_xlsx("kirikou_annotations.xlsx", sheet = "kirikou Mano") |>
-  select(-elicitation_date) |> 
-  mutate(text_type = "kirikou") |>
-  bind_rows(readxl::read_xlsx("kirikou_annotations.xlsx", sheet = "folktales Mano children") |> 
-              mutate(text_type = "folktales")) |> 
-  select(-elicitation_date) |> 
-  bind_rows(readxl::read_xlsx("kirikou_annotations.xlsx", sheet = "folktales Mano adults") |>
-              mutate(text_type = "folktales",
-                     age = 100)) |> 
-  rename(chunk_structure = `chunk structure`) |> 
-  filter(!is.na(chunk_structure)) |> 
-  group_by(name, age, text_type) |> 
-  summarize(chunk_structure = str_c(chunk_structure, collapse = " ")) |> 
-  ungroup() |> 
+syntax
+```
+
+## reference tracking 
+
+обсчитать, сколько CR vs SR в NP и в pro
+
+```{r}
+mano_corpus |> 
+  select(name, age, group_var, chunk_structure) |> 
   mutate(pro_CR = str_count(chunk_structure, "pro\\(CR\\)"),
          NP_CR = str_count(chunk_structure, "NP\\(CR\\)"),
          pro_SR = str_count(chunk_structure, "pro\\(SR\\)"),
@@ -967,38 +764,55 @@ readxl::read_xlsx("kirikou_annotations.xlsx", sheet = "kirikou Mano") |>
   select(-chunk_structure) ->
   reference_tracking
 
-corpus |> 
-  bind_rows(corpus_ad) |> 
+reference_tracking
+```
+
+## Сколько всего?
+
+```{r}
+mano_corpus |> 
+  mutate(n_predecations = str_count(chunk_structure, "\\[")) |> 
+  select(name, age, group_var, n_chunks, n_predecations) |> 
+  arrange(-n_predecations)
+```
+
+## Уменьшение размерности
+
+Я сделал мега-таблицу, с 
+
+- 50 самых частотных слов
+- количество французских заимствований
+- время (таблица выше)
+- синтаксис
+- reference_tracking
+
+Итого 95 переменных.
+
+```{r}
+mano_corpus |> 
   unnest_tokens(input = text, output = word, token = "words") |> 
-  count(name, age, text_type, word)  |> 
+  count(name, age, group_var, word)  |> 
   filter(word %in% freq_words) |> 
   pivot_wider(names_from = word, values_from = n, values_fill = 0)  ->
   lexicon
-
-corpus |> 
-  unnest_tokens(input = text, output = word) |> 
-  mutate(french = if_else(word %in% french_words, "french", "non_french")) |> 
-  count(name, age, text_type, french) |> 
-  pivot_wider(names_from = french, values_from = n, values_fill = 0) |> 
-  select(-non_french) ->
-  french
 
 syntax |> 
   full_join(tense) |> 
   full_join(lexicon) |> 
   full_join(reference_tracking) |>  
-  full_join((french)) |> 
+  full_join(french) |> 
   mutate(french = if_else(is.na(french), 0, french)) |> 
-  mutate(across(-c(name, age, text_type), function(x) scale(x))) |> 
-  select(-c(name, age, text_type)) |> 
+  mutate(across(-c(name, age, group_var), function(x) scale(x))) |> 
+  select(-c(name, age, group_var)) |> 
   prcomp() ->
   pca
 
 syntax |> 
-  select(name, age, text_type) |> 
+  select(name, age, group_var) |> 
   bind_cols(pca$x) |> 
-  ggplot(aes(PC1, PC2, color = text_type))+
+  ggplot(aes(PC1, PC2, color = group_var))+
   geom_point()+
   ggrepel::geom_text_repel(aes(label = str_c(name, " (", age, ")")), max.overlaps = 100)
 ```
 
+Вроде CS, Cecile_Mamy 12, и Michel_Sonomy -- авторы текстов, где больше всего предикаций...
