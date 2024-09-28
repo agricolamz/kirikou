@@ -864,7 +864,130 @@ tense_rs |>
   scale_x_continuous(label = scales::percent)+
   labs(x = NULL, y = NULL,
        caption = "within the reported speech")
+```
 
+Выкидываем JNT и PST
+
+```{r}
+tense_rs |> 
+  pivot_longer(names_to = "tense", values_to = "n", -c(name, age, group_var)) |> 
+  mutate(tense = case_when(tense %in% c("COND", "IRR", "PROT.IRR", "APOD.IRR", "NEG.COND") ~ "CONDs",
+                           tense %in% c("PROH", "IMP") ~ "PROH or IMP",
+                           tense %in% c("EXI", "PRED", "IPFV", "FUT", "PROSP") ~ "non-past",
+                           TRUE ~ tense)) |> 
+  filter(!(tense %in% c("JNT", "PST"))) |> 
+  group_by(name, age, group_var, tense) |>
+  summarise(n = sum(n)) |> 
+  group_by(name, age, group_var) |> 
+  mutate(total = sum(n),
+         ratio = n/total) |> 
+  select(-n, -total) |> 
+  ungroup() |> 
+  mutate(name = str_c(name, " (", age, ")"),
+         name = fct_reorder(name, age),
+         tense = factor(tense, levels = c("CONDs", "PROH or IMP",
+                                          "non-past","NEG", "CONJ",
+                                          "PRF", "JNT", "PST")),
+         label = str_c(round(ratio * 100), "%")) |>
+  filter(ratio > 0) |>
+  ggplot(aes(x = ratio, y = name, label = label, color = tense))+
+  geom_col(aes(fill = tense))+
+  geom_label(position = position_fill(vjust = 0.5), fill = "white")+
+  scale_x_continuous(label = scales::percent)+
+  labs(x = NULL, y = NULL,
+       caption = "within the reported speech")
+```
+
+График соотношения количества JNT и PST
+
+```{r}
+tense_rs |> 
+  mutate(PST = if_else(PST == 0, 0.9, PST),
+         JNT = if_else(JNT == 0, 0.9, JNT)) |> 
+  select(name, age, group_var, PST, JNT) |> 
+  mutate(ratio = PST/(PST+JNT)) |> 
+  arrange(-ratio)
+
+tense_rs |> 
+  mutate(PST = if_else(PST == 0, 0.9, PST),
+         JNT = if_else(JNT == 0, 0.9, JNT)) |> 
+  select(name, age, group_var, PST, JNT) |> 
+  mutate(ratio = PST/(PST+JNT),
+         name = str_c(name, " (", age, ")")) |> 
+  ggplot(aes(PST, JNT, color = group_var))+
+  geom_smooth(method = "lm", se = FALSE, color = "grey60", linetype = 2)+
+  geom_point()+
+  scale_x_log10()+
+  scale_y_log10()+
+  ggrepel::geom_text_repel(aes(label = name))+
+  labs(caption = "within the reported speech")
+```
+
+JNT.SAY vs JNT без SAY
+
+```{r}
+mano_corpus |> 
+  select(name, age, group_var, chunk_structure) |> 
+  mutate(chunk_structure = map_chr(mano_corpus$chunk_structure, extract_and_concatenate_rs),
+         JNT.SAY = str_count(chunk_structure, "JNT.SAY"),
+         JNT = str_count(chunk_structure, "JNT") - JNT.SAY,
+         ratio = JNT/(JNT+JNT.SAY)) |> 
+  select(-chunk_structure) |>
+  arrange(-ratio)
+
+mano_corpus |> 
+  select(name, age, group_var, chunk_structure) |> 
+  mutate(chunk_structure = map_chr(mano_corpus$chunk_structure, extract_and_concatenate_rs),
+         JNT.SAY = str_count(chunk_structure, "JNT.SAY"),
+         JNT = str_count(chunk_structure, "JNT") - JNT.SAY,
+         JNT.SAY = if_else(JNT.SAY == 0, 0.9, JNT.SAY),
+         JNT = if_else(JNT == 0, 0.9, JNT),
+         name = str_c(name, " (", age, ")")) |> 
+  select(-chunk_structure) |>
+  ggplot(aes(JNT, JNT.SAY, color = group_var))+
+  geom_smooth(method = "lm", se = FALSE, color = "grey60", linetype = 2)+
+  geom_point()+
+  scale_x_log10()+
+  scale_y_log10()+
+  ggrepel::geom_text_repel(aes(label = name))+
+  labs(caption = "within the reported speech")
+```
+
+PST + JNT vs other
+
+```{r}
+tense_rs |> 
+  pivot_longer(names_to = "tense", values_to = "n", -c(name, age, group_var)) |> 
+  mutate(pst_jnt_other = if_else(str_detect(tense, "(PST)|(JNT)"), 
+                                 "PST_or_JNT",
+                                 "other")) |> 
+  group_by(name, age, group_var, pst_jnt_other) |> 
+  summarise(n = sum(n)) |> 
+  pivot_wider(names_from = pst_jnt_other, values_from = n, values_fill = 0) |> 
+  mutate(ratio = PST_or_JNT/(PST_or_JNT+other)) |> 
+  arrange(-ratio)
+
+tense_rs |> 
+  pivot_longer(names_to = "tense", values_to = "n", -c(name, age, group_var)) |> 
+  mutate(pst_jnt_other = if_else(str_detect(tense, "(PST)|(JNT)"), 
+                                 "PST_or_JNT",
+                                 "other")) |> 
+  group_by(name, age, group_var, pst_jnt_other) |> 
+  summarise(n = sum(n)) |> 
+  pivot_wider(names_from = pst_jnt_other, values_from = n, values_fill = 0) |> 
+  mutate(PST_or_JNT = if_else(PST_or_JNT == 0, 0.9, PST_or_JNT),
+         other = if_else(other == 0, 0.9, other),
+         name = str_c(name, " (", age, ")")) |> 
+  ggplot(aes(PST_or_JNT, other, color = group_var))+
+  geom_smooth(method = "lm", se = FALSE, color = "grey60", linetype = 2)+
+  geom_point()+
+  scale_x_log10()+
+  scale_y_log10()+
+  ggrepel::geom_text_repel(aes(label = name))+
+  labs(caption = "within the reported speech")
+```
+
+```{r}
 mano_corpus |> 
   select(name, age, group_var, chunk_structure) |> 
   mutate(ors = str_remove_all(chunk_structure, "rs%.*?%"),
@@ -916,6 +1039,126 @@ tense_ors |>
        caption = "without chunks of the reported speech")
 ```
 
+Выкидываем JNT и PST
+
+```{r}
+tense_ors |> 
+  pivot_longer(names_to = "tense", values_to = "n", -c(name, age, group_var)) |> 
+  mutate(tense = case_when(tense %in% c("COND", "IRR", "PROT.IRR", "APOD.IRR", "NEG.COND") ~ "CONDs",
+                           tense %in% c("PROH", "IMP") ~ "PROH or IMP",
+                           tense %in% c("EXI", "PRED", "IPFV", "FUT", "PROSP") ~ "non-past",
+                           TRUE ~ tense)) |> 
+  filter(!(tense %in% c("JNT", "PST"))) |> 
+  group_by(name, age, group_var, tense) |>
+  summarise(n = sum(n)) |> 
+  group_by(name, age, group_var) |> 
+  mutate(total = sum(n),
+         ratio = n/total) |> 
+  select(-n, -total) |> 
+  ungroup() |> 
+  mutate(name = str_c(name, " (", age, ")"),
+         name = fct_reorder(name, age),
+         tense = factor(tense, levels = c("CONDs", "PROH or IMP",
+                                          "non-past","NEG", "CONJ",
+                                          "PRF", "JNT", "PST")),
+         label = str_c(round(ratio * 100), "%")) |>
+  filter(ratio > 0) |>
+  ggplot(aes(x = ratio, y = name, label = label, color = tense))+
+  geom_col(aes(fill = tense))+
+  geom_label(position = position_fill(vjust = 0.5), fill = "white")+
+  scale_x_continuous(label = scales::percent)+
+  labs(x = NULL, y = NULL,
+       caption = "without chunks of the reported speech")
+```
+
+График соотношения количества JNT и PST
+
+```{r}
+tense_ors |> 
+  mutate(PST = if_else(PST == 0, 0.9, PST),
+         JNT = if_else(JNT == 0, 0.9, JNT)) |> 
+  select(name, age, group_var, PST, JNT) |> 
+  mutate(ratio = PST/(PST+JNT)) |> 
+  arrange(-ratio)
+
+tense_ors |> 
+  mutate(PST = if_else(PST == 0, 0.9, PST),
+         JNT = if_else(JNT == 0, 0.9, JNT)) |> 
+  select(name, age, group_var, PST, JNT) |> 
+  mutate(ratio = PST/(PST+JNT),
+         name = str_c(name, " (", age, ")")) |> 
+  ggplot(aes(PST, JNT, color = group_var))+
+  geom_smooth(method = "lm", se = FALSE, color = "grey60", linetype = 2)+
+  geom_point()+
+  scale_x_log10()+
+  scale_y_log10()+
+  ggrepel::geom_text_repel(aes(label = name))+
+  labs(caption = "without chunks of the reported speech")
+```
+
+JNT.SAY vs JNT без SAY
+
+```{r}
+mano_corpus |> 
+  select(name, age, group_var, chunk_structure) |> 
+  mutate(chunk_structure = str_remove_all(chunk_structure, "rs%.*?%"),
+         JNT.SAY = str_count(chunk_structure, "JNT.SAY"),
+         JNT = str_count(chunk_structure, "JNT") - JNT.SAY,
+         ratio = JNT/(JNT+JNT.SAY)) |> 
+  select(-chunk_structure) |>
+  arrange(-ratio)
+
+mano_corpus |> 
+  select(name, age, group_var, chunk_structure) |> 
+  mutate(chunk_structure = str_remove_all(chunk_structure, "rs%.*?%"),
+         JNT.SAY = str_count(chunk_structure, "JNT.SAY"),
+         JNT = str_count(chunk_structure, "JNT") - JNT.SAY,
+         JNT.SAY = if_else(JNT.SAY == 0, 0.9, JNT.SAY),
+         JNT = if_else(JNT == 0, 0.9, JNT),
+         name = str_c(name, " (", age, ")")) |> 
+  select(-chunk_structure) |>
+  ggplot(aes(JNT, JNT.SAY, color = group_var))+
+  geom_smooth(method = "lm", se = FALSE, color = "grey60", linetype = 2)+
+  geom_point()+
+  scale_x_log10()+
+  scale_y_log10()+
+  ggrepel::geom_text_repel(aes(label = name))+
+  labs(caption = "without chunks of the reported speech")
+```
+
+PST + JNT vs other
+
+```{r}
+tense_ors |> 
+  pivot_longer(names_to = "tense", values_to = "n", -c(name, age, group_var)) |> 
+  mutate(pst_jnt_other = if_else(str_detect(tense, "(PST)|(JNT)"), 
+                                 "PST_or_JNT",
+                                 "other")) |> 
+  group_by(name, age, group_var, pst_jnt_other) |> 
+  summarise(n = sum(n)) |> 
+  pivot_wider(names_from = pst_jnt_other, values_from = n, values_fill = 0) |> 
+  mutate(ratio = PST_or_JNT/(PST_or_JNT+other)) |> 
+  arrange(-ratio)
+
+tense_ors |> 
+  pivot_longer(names_to = "tense", values_to = "n", -c(name, age, group_var)) |> 
+  mutate(pst_jnt_other = if_else(str_detect(tense, "(PST)|(JNT)"), 
+                                 "PST_or_JNT",
+                                 "other")) |> 
+  group_by(name, age, group_var, pst_jnt_other) |> 
+  summarise(n = sum(n)) |> 
+  pivot_wider(names_from = pst_jnt_other, values_from = n, values_fill = 0) |> 
+  mutate(PST_or_JNT = if_else(PST_or_JNT == 0, 0.9, PST_or_JNT),
+         other = if_else(other == 0, 0.9, other),
+         name = str_c(name, " (", age, ")")) |> 
+  ggplot(aes(PST_or_JNT, other, color = group_var))+
+  geom_smooth(method = "lm", se = FALSE, color = "grey60", linetype = 2)+
+  geom_point()+
+  scale_x_log10()+
+  scale_y_log10()+
+  ggrepel::geom_text_repel(aes(label = name))+
+  labs(caption = "without chunks of the reported speech")
+```
 
 ## сложный синтаксис
 
