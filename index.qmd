@@ -667,7 +667,8 @@ tense |>
   geom_point()+
   scale_x_log10()+
   scale_y_log10()+
-  ggrepel::geom_text_repel(aes(label = name))
+  ggrepel::geom_text_repel(aes(label = name))+
+  coord_fixed()
 ```
 
 JNT.SAY vs JNT без SAY
@@ -694,6 +695,7 @@ mano_corpus |>
   geom_point()+
   scale_x_log10()+
   scale_y_log10()+
+  coord_fixed()+
   ggrepel::geom_text_repel(aes(label = name))
 ```
 
@@ -727,6 +729,7 @@ tense |>
   geom_point()+
   scale_x_log10()+
   scale_y_log10()+
+  coord_fixed()+
   ggrepel::geom_text_repel(aes(label = name))
 ```
 
@@ -919,6 +922,7 @@ tense_rs |>
   geom_point()+
   scale_x_log10()+
   scale_y_log10()+
+  coord_fixed()+
   ggrepel::geom_text_repel(aes(label = name))+
   labs(caption = "within the reported speech")
 ```
@@ -949,6 +953,7 @@ mano_corpus |>
   geom_point()+
   scale_x_log10()+
   scale_y_log10()+
+  coord_fixed()+
   ggrepel::geom_text_repel(aes(label = name))+
   labs(caption = "within the reported speech")
 ```
@@ -983,6 +988,7 @@ tense_rs |>
   geom_point()+
   scale_x_log10()+
   scale_y_log10()+
+  coord_fixed()+
   ggrepel::geom_text_repel(aes(label = name))+
   labs(caption = "within the reported speech")
 ```
@@ -1092,6 +1098,7 @@ tense_ors |>
   geom_point()+
   scale_x_log10()+
   scale_y_log10()+
+  coord_fixed()+
   ggrepel::geom_text_repel(aes(label = name))+
   labs(caption = "without chunks of the reported speech")
 ```
@@ -1122,6 +1129,7 @@ mano_corpus |>
   geom_point()+
   scale_x_log10()+
   scale_y_log10()+
+  coord_fixed()+
   ggrepel::geom_text_repel(aes(label = name))+
   labs(caption = "without chunks of the reported speech")
 ```
@@ -1156,6 +1164,7 @@ tense_ors |>
   geom_point()+
   scale_x_log10()+
   scale_y_log10()+
+  coord_fixed()+
   ggrepel::geom_text_repel(aes(label = name))+
   labs(caption = "without chunks of the reported speech")
 ```
