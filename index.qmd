@@ -989,6 +989,7 @@ tense_rs |>
   scale_x_log10()+
   scale_y_log10()+
   coord_fixed()+
+  coord_fixed() +
   ggrepel::geom_text_repel(aes(label = name))+
   labs(caption = "within the reported speech")
 ```
