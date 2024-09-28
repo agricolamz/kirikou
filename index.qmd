@@ -730,6 +730,77 @@ tense |>
   ggrepel::geom_text_repel(aes(label = name))
 ```
 
+
+```{r}
+#| include: false
+
+library(tidyverse)
+library(ggrepel)
+
+tense |> 
+  mutate(name = str_c(name, " (", age, ")")) |> 
+  pivot_longer(names_to = "tense", values_to = "value", -c(name, age, group_var)) |>  
+  mutate(tense = case_when(tense %in% c("COND", "IRR", "PROT.IRR", "APOD.IRR", "NEG.COND") ~ "CONDs",
+                           tense %in% c("PROH", "IMP") ~ "PROH or IMP",
+                           tense %in% c("EXI", "PRED", "IPFV", "FUT", "PROSP") ~ "non-past",
+                           TRUE ~ tense)) |> 
+  group_by(name, age, group_var, tense) |>
+  summarise(value = sum(value)) |> 
+  #  select(name, PST, JNT, IPFV, PRED) |> 
+  #  mutate(across(where(is.integer), scales::rescale)) |> 
+  group_by(name) |>  
+  mutate(label = if_else(tense == "PST", name, NA),
+         value = if_else(value == 0, 0.9, value)) |> 
+  ungroup() |> 
+  mutate(tense = fct_reorder(tense, value)) |> 
+  ggplot(aes(tense, value, group = name, label = label, color = group_var))+
+  geom_point()+
+  geom_line(alpha = 0.5)+
+  geom_text_repel(nudge_x = 2,
+                  segment.color = "gray80",
+                  force = 5,
+                  max.overlaps = 40,
+                  point.padding = 0.2,
+                  na.rm = TRUE)+
+  theme(legend.position = "bottom")+
+  labs(x = NULL, y = "ratio")
+
+tense |> 
+  mutate(name = str_c(name, " (", age, ")")) |> 
+  pivot_longer(names_to = "tense", values_to = "value", -c(name, age, group_var)) |>  
+  mutate(tense = case_when(tense %in% c("COND", "IRR", "PROT.IRR", "APOD.IRR", "NEG.COND") ~ "CONDs",
+                           tense %in% c("PROH", "IMP") ~ "PROH or IMP",
+                           tense %in% c("EXI", "PRED", "IPFV", "FUT", "PROSP") ~ "non-past",
+                           TRUE ~ tense)) |> 
+  group_by(name, age, group_var, tense) |>
+  summarise(value = sum(value)) |> 
+  group_by(name, age, group_var) |> 
+  mutate(total = sum(value),
+         ratio = value/total) |> 
+  select(-value, -total) |> 
+  rename(value = ratio) |> 
+#  select(name, PST, JNT, IPFV, PRED) |> 
+#  mutate(across(where(is.integer), scales::rescale)) |> 
+  group_by(name) |>  
+  mutate(label = if_else(tense == "PST", name, NA),
+         value = if_else(value == 0, 0.9, value)) |> 
+  ungroup() |> 
+  mutate(tense = fct_reorder(tense, value)) |> 
+  ggplot(aes(tense, value, group = name, label = label, color = group_var))+
+  geom_point()+
+  geom_line(alpha = 0.5)+
+  geom_text_repel(nudge_x = 2,
+                  segment.color = "gray80",
+                  force = 5,
+                  max.overlaps = 40,
+                  point.padding = 0.2,
+                  na.rm = TRUE)+
+  theme(legend.position = "bottom")+
+  labs(x = NULL, y = "ratio") # + 
+  # coord_polar()
+```
+
+
 ## Diversity of tense marking in rs
 
 ```{r}
@@ -755,11 +826,9 @@ mano_corpus |>
          FUT = str_count(rs, "FUT"),
          NEG.COND = str_count(rs, "NEG.COND"),
          NEG = str_count(rs, "NEG") - NEG.COND,
-         RES = str_count(rs, "RES"),
          COND = str_count(rs, "COND"),
          IMP = str_count(rs, "IMP"),
          PROSP = str_count(rs, "PROSP"),
-         ADV = str_count(rs, "ADV"),
          PROT.IRR = str_count(rs, "PROT.IRR"),
          APOD.IRR = str_count(rs, "APOD.IRR"),
          IRR = str_count(rs, "APOD.IRR"),
@@ -768,18 +837,85 @@ mano_corpus |>
   tense_rs
 
 tense_rs
-```
 
-В RS не у кого не встретилась следующая категория
-
-```{r}
 tense_rs |> 
   pivot_longer(names_to = "tense", values_to = "n", -c(name, age, group_var)) |> 
-  group_by(tense) |> 
+  mutate(tense = case_when(tense %in% c("COND", "IRR", "PROT.IRR", "APOD.IRR", "NEG.COND") ~ "CONDs",
+                           tense %in% c("PROH", "IMP") ~ "PROH or IMP",
+                           tense %in% c("EXI", "PRED", "IPFV", "FUT", "PROSP") ~ "non-past",
+                           TRUE ~ tense)) |> 
+  group_by(name, age, group_var, tense) |>
   summarise(n = sum(n)) |> 
-  filter(n == 0) |> 
-  pull(tense)
+  group_by(name, age, group_var) |> 
+  mutate(total = sum(n),
+         ratio = n/total) |> 
+  select(-n, -total) |> 
+  ungroup() |> 
+  mutate(name = str_c(name, " (", age, ")"),
+         name = fct_reorder(name, age),
+         tense = factor(tense, levels = c("CONDs", "PROH or IMP",
+                                          "non-past","NEG", "CONJ",
+                                          "PRF", "JNT", "PST")),
+         label = str_c(round(ratio * 100), "%")) |>
+  filter(ratio > 0) |>
+  ggplot(aes(x = ratio, y = name, label = label, color = tense))+
+  geom_col(aes(fill = tense))+
+  geom_label(position = position_fill(vjust = 0.5), fill = "white")+
+  scale_x_continuous(label = scales::percent)+
+  labs(x = NULL, y = NULL,
+       caption = "within the reported speech")
+
+mano_corpus |> 
+  select(name, age, group_var, chunk_structure) |> 
+  mutate(ors = str_remove_all(chunk_structure, "rs%.*?%"),
+         PST = str_count(ors, "PST"),
+         JNT = str_count(ors, "JNT"),
+         IPFV = str_count(ors, "IPFV"),
+         PRED = str_count(ors, "PRED"),
+         EXI = str_count(ors, "EXI"),
+         CONJ = str_count(ors, "CONJ"),
+         PRF = str_count(ors, "PRF"),
+         FUT = str_count(ors, "FUT"),
+         NEG.COND = str_count(ors, "NEG.COND"),
+         NEG = str_count(ors, "NEG") - NEG.COND,
+         COND = str_count(ors, "COND"),
+         IMP = str_count(ors, "IMP"),
+         PROSP = str_count(ors, "PROSP"),
+         PROT.IRR = str_count(ors, "PROT.IRR"),
+         APOD.IRR = str_count(ors, "APOD.IRR"),
+         IRR = str_count(ors, "APOD.IRR"),
+         PROH = str_count(ors, "PROH")) |> 
+  select(-chunk_structure, -ors) ->
+  tense_ors
+
+tense_ors |> 
+  pivot_longer(names_to = "tense", values_to = "n", -c(name, age, group_var)) |> 
+  mutate(tense = case_when(tense %in% c("COND", "IRR", "PROT.IRR", "APOD.IRR", "NEG.COND") ~ "CONDs",
+                           tense %in% c("PROH", "IMP") ~ "PROH or IMP",
+                           tense %in% c("EXI", "PRED", "IPFV", "FUT", "PROSP") ~ "non-past",
+                           TRUE ~ tense)) |> 
+  group_by(name, age, group_var, tense) |>
+  summarise(n = sum(n)) |> 
+  group_by(name, age, group_var) |> 
+  mutate(total = sum(n),
+         ratio = n/total) |> 
+  select(-n, -total) |> 
+  ungroup() |> 
+  mutate(name = str_c(name, " (", age, ")"),
+         name = fct_reorder(name, age),
+         tense = factor(tense, levels = c("CONDs", "PROH or IMP",
+                                          "non-past","NEG", "CONJ",
+                                          "PRF", "JNT", "PST")),
+         label = str_c(round(ratio * 100), "%")) |>
+  filter(ratio > 0) |>
+  ggplot(aes(x = ratio, y = name, label = label, color = tense))+
+  geom_col(aes(fill = tense))+
+  geom_label(position = position_fill(vjust = 0.5), fill = "white")+
+  scale_x_continuous(label = scales::percent)+
+  labs(x = NULL, y = NULL,
+       caption = "without chunks of the reported speech")
 ```
+
 
 ## сложный синтаксис
 
