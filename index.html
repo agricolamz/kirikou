@@ -886,32 +886,110 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb28-10"><a href="#cb28-10" aria-hidden="true" tabindex="-1"></a>         <span class="at">FUT =</span> <span class="fu">str_count</span>(chunk_structure, <span class="st">"FUT"</span>),</span>
 <span id="cb28-11"><a href="#cb28-11" aria-hidden="true" tabindex="-1"></a>         <span class="at">NEG.COND =</span> <span class="fu">str_count</span>(chunk_structure, <span class="st">"NEG.COND"</span>),</span>
 <span id="cb28-12"><a href="#cb28-12" aria-hidden="true" tabindex="-1"></a>         <span class="at">NEG =</span> <span class="fu">str_count</span>(chunk_structure, <span class="st">"NEG"</span>) <span class="sc">-</span> NEG.COND,</span>
-<span id="cb28-13"><a href="#cb28-13" aria-hidden="true" tabindex="-1"></a>         <span class="at">RES =</span> <span class="fu">str_count</span>(chunk_structure, <span class="st">"RES"</span>),</span>
-<span id="cb28-14"><a href="#cb28-14" aria-hidden="true" tabindex="-1"></a>         <span class="at">COND =</span> <span class="fu">str_count</span>(chunk_structure, <span class="st">"COND"</span>),</span>
-<span id="cb28-15"><a href="#cb28-15" aria-hidden="true" tabindex="-1"></a>         <span class="at">IMP =</span> <span class="fu">str_count</span>(chunk_structure, <span class="st">"IMP"</span>),</span>
-<span id="cb28-16"><a href="#cb28-16" aria-hidden="true" tabindex="-1"></a>         <span class="at">PROSP =</span> <span class="fu">str_count</span>(chunk_structure, <span class="st">"PROSP"</span>),</span>
-<span id="cb28-17"><a href="#cb28-17" aria-hidden="true" tabindex="-1"></a>         <span class="at">ADV =</span> <span class="fu">str_count</span>(chunk_structure, <span class="st">"ADV"</span>),</span>
-<span id="cb28-18"><a href="#cb28-18" aria-hidden="true" tabindex="-1"></a>         <span class="at">PROT.IRR =</span> <span class="fu">str_count</span>(chunk_structure, <span class="st">"PROT.IRR"</span>),</span>
-<span id="cb28-19"><a href="#cb28-19" aria-hidden="true" tabindex="-1"></a>         <span class="at">APOD.IRR =</span> <span class="fu">str_count</span>(chunk_structure, <span class="st">"APOD.IRR"</span>),</span>
-<span id="cb28-20"><a href="#cb28-20" aria-hidden="true" tabindex="-1"></a>         <span class="at">IRR =</span> <span class="fu">str_count</span>(chunk_structure, <span class="st">"APOD.IRR"</span>),</span>
-<span id="cb28-21"><a href="#cb28-21" aria-hidden="true" tabindex="-1"></a>         <span class="at">PROH =</span> <span class="fu">str_count</span>(chunk_structure, <span class="st">"PROH"</span>),</span>
-<span id="cb28-22"><a href="#cb28-22" aria-hidden="true" tabindex="-1"></a>         <span class="at">PURP =</span> <span class="fu">str_count</span>(chunk_structure, <span class="st">"PURP"</span>),</span>
-<span id="cb28-23"><a href="#cb28-23" aria-hidden="true" tabindex="-1"></a>         <span class="at">PS =</span> <span class="fu">str_count</span>(chunk_structure, <span class="st">"PS"</span>) <span class="sc">-</span> PST,</span>
-<span id="cb28-24"><a href="#cb28-24" aria-hidden="true" tabindex="-1"></a>         <span class="at">FUR =</span> <span class="fu">str_count</span>(chunk_structure, <span class="st">"FUR"</span>)) <span class="sc">|&gt;</span> </span>
-<span id="cb28-25"><a href="#cb28-25" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="sc">-</span>chunk_structure) <span class="ot">-&gt;</span></span>
-<span id="cb28-26"><a href="#cb28-26" aria-hidden="true" tabindex="-1"></a>  tense</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb28-13"><a href="#cb28-13" aria-hidden="true" tabindex="-1"></a>         <span class="at">COND =</span> <span class="fu">str_count</span>(chunk_structure, <span class="st">"COND"</span>),</span>
+<span id="cb28-14"><a href="#cb28-14" aria-hidden="true" tabindex="-1"></a>         <span class="at">IMP =</span> <span class="fu">str_count</span>(chunk_structure, <span class="st">"IMP"</span>),</span>
+<span id="cb28-15"><a href="#cb28-15" aria-hidden="true" tabindex="-1"></a>         <span class="at">PROSP =</span> <span class="fu">str_count</span>(chunk_structure, <span class="st">"PROSP"</span>),</span>
+<span id="cb28-16"><a href="#cb28-16" aria-hidden="true" tabindex="-1"></a>         <span class="at">PROT.IRR =</span> <span class="fu">str_count</span>(chunk_structure, <span class="st">"PROT.IRR"</span>),</span>
+<span id="cb28-17"><a href="#cb28-17" aria-hidden="true" tabindex="-1"></a>         <span class="at">APOD.IRR =</span> <span class="fu">str_count</span>(chunk_structure, <span class="st">"APOD.IRR"</span>),</span>
+<span id="cb28-18"><a href="#cb28-18" aria-hidden="true" tabindex="-1"></a>         <span class="at">IRR =</span> <span class="fu">str_count</span>(chunk_structure, <span class="st">"APOD.IRR"</span>),</span>
+<span id="cb28-19"><a href="#cb28-19" aria-hidden="true" tabindex="-1"></a>         <span class="at">PROH =</span> <span class="fu">str_count</span>(chunk_structure, <span class="st">"PROH"</span>)) <span class="sc">|&gt;</span> </span>
+<span id="cb28-20"><a href="#cb28-20" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="sc">-</span>chunk_structure) <span class="ot">-&gt;</span></span>
+<span id="cb28-21"><a href="#cb28-21" aria-hidden="true" tabindex="-1"></a>  tense</span>
+<span id="cb28-22"><a href="#cb28-22" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-23"><a href="#cb28-23" aria-hidden="true" tabindex="-1"></a>tense</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
+<div class="cell-output-display">
+<div data-pagedtable="false">
+  <script data-pagedtable-source="" type="application/json">
+{"columns":[{"label":["name"],"name":[1],"type":["chr"],"align":["left"]},{"label":["age"],"name":[2],"type":["dbl"],"align":["right"]},{"label":["group_var"],"name":[3],"type":["chr"],"align":["left"]},{"label":["PST"],"name":[4],"type":["int"],"align":["right"]},{"label":["JNT"],"name":[5],"type":["int"],"align":["right"]},{"label":["IPFV"],"name":[6],"type":["int"],"align":["right"]},{"label":["PRED"],"name":[7],"type":["int"],"align":["right"]},{"label":["EXI"],"name":[8],"type":["int"],"align":["right"]},{"label":["CONJ"],"name":[9],"type":["int"],"align":["right"]},{"label":["PRF"],"name":[10],"type":["int"],"align":["right"]},{"label":["FUT"],"name":[11],"type":["int"],"align":["right"]},{"label":["NEG.COND"],"name":[12],"type":["int"],"align":["right"]},{"label":["NEG"],"name":[13],"type":["int"],"align":["right"]},{"label":["COND"],"name":[14],"type":["int"],"align":["right"]},{"label":["IMP"],"name":[15],"type":["int"],"align":["right"]},{"label":["PROSP"],"name":[16],"type":["int"],"align":["right"]},{"label":["PROT.IRR"],"name":[17],"type":["int"],"align":["right"]},{"label":["APOD.IRR"],"name":[18],"type":["int"],"align":["right"]},{"label":["IRR"],"name":[19],"type":["int"],"align":["right"]},{"label":["PROH"],"name":[20],"type":["int"],"align":["right"]}],"data":[{"1":"AD","2":"100","3":"folktales (adults)","4":"7","5":"0","6":"3","7":"3","8":"6","9":"2","10":"2","11":"0","12":"0","13":"0","14":"0","15":"0","16":"1","17":"0","18":"0","19":"0","20":"0"},{"1":"CS","2":"100","3":"folktales (adults)","4":"195","5":"64","6":"27","7":"29","8":"27","9":"40","10":"36","11":"16","12":"0","13":"5","14":"9","15":"9","16":"0","17":"0","18":"0","19":"0","20":"0"},{"1":"EL","2":"100","3":"folktales (adults)","4":"83","5":"17","6":"10","7":"11","8":"9","9":"15","10":"7","11":"1","12":"0","13":"7","14":"3","15":"3","16":"2","17":"0","18":"0","19":"0","20":"0"},{"1":"PM","2":"100","3":"folktales (adults)","4":"28","5":"11","6":"4","7":"5","8":"2","9":"10","10":"8","11":"2","12":"0","13":"4","14":"0","15":"1","16":"0","17":"1","18":"1","19":"1","20":"0"},{"1":"Andrey_Mamy","2":"4","3":"Kirikou (Nzerekore): Bilingual","4":"1","5":"1","6":"0","7":"0","8":"0","9":"0","10":"8","11":"0","12":"0","13":"0","14":"0","15":"0","16":"0","17":"0","18":"0","19":"0","20":"0"},{"1":"Cecile_Mamy","2":"9","3":"folktales (children)","4":"129","5":"38","6":"8","7":"5","8":"6","9":"29","10":"0","11":"0","12":"0","13":"5","14":"4","15":"26","16":"0","17":"0","18":"0","19":"0","20":"1"},{"1":"Cecile_Mamy","2":"10","3":"folktales (children)","4":"34","5":"13","6":"1","7":"1","8":"4","9":"6","10":"0","11":"0","12":"0","13":"1","14":"3","15":"8","16":"0","17":"0","18":"0","19":"0","20":"0"},{"1":"Cecile_Mamy","2":"12","3":"Kirikou (Nzerekore): Bilingual","4":"395","5":"236","6":"11","7":"34","8":"39","9":"51","10":"17","11":"3","12":"0","13":"15","14":"7","15":"19","16":"7","17":"0","18":"0","19":"0","20":"0"},{"1":"Christine","2":"9","3":"Kirikou (Nzerekore): Mano","4":"170","5":"77","6":"10","7":"8","8":"10","9":"15","10":"17","11":"0","12":"0","13":"7","14":"3","15":"10","16":"3","17":"0","18":"0","19":"0","20":"0"},{"1":"Etienne_Mamy","2":"9","3":"Kirikou (other)","4":"129","5":"32","6":"5","7":"11","8":"8","9":"12","10":"1","11":"2","12":"0","13":"2","14":"5","15":"5","16":"1","17":"0","18":"0","19":"0","20":"0"},{"1":"Eugenie_Mamy","2":"10","3":"Kirikou (Nzerekore): Bilingual","4":"37","5":"12","6":"0","7":"4","8":"2","9":"5","10":"0","11":"0","12":"0","13":"0","14":"0","15":"1","16":"0","17":"0","18":"0","19":"0","20":"0"},{"1":"Gbamon_Kpomy","2":"10","3":"Kirikou (Nzerekore): Mano","4":"140","5":"34","6":"4","7":"8","8":"1","9":"1","10":"0","11":"0","12":"0","13":"0","14":"2","15":"3","16":"1","17":"0","18":"0","19":"0","20":"1"},{"1":"Gilbert_Kolie","2":"8","3":"Kirikou (Nzerekore): Mano","4":"49","5":"11","6":"3","7":"3","8":"1","9":"1","10":"0","11":"0","12":"0","13":"0","14":"0","15":"4","16":"0","17":"0","18":"0","19":"0","20":"0"},{"1":"Jean-Pierre_Mamy","2":"12","3":"Kirikou (Nzerekore): Bilingual","4":"185","5":"78","6":"19","7":"10","8":"19","9":"31","10":"4","11":"0","12":"0","13":"5","14":"3","15":"11","16":"4","17":"0","18":"0","19":"0","20":"0"},{"1":"Jean_Mamy","2":"16","3":"Kirikou (other)","4":"108","5":"39","6":"21","7":"15","8":"8","9":"19","10":"1","11":"1","12":"0","13":"2","14":"2","15":"7","16":"1","17":"0","18":"0","19":"0","20":"0"},{"1":"Josephine","2":"15","3":"folktales (children)","4":"86","5":"56","6":"39","7":"11","8":"27","9":"41","10":"14","11":"1","12":"0","13":"25","14":"14","15":"9","16":"5","17":"0","18":"0","19":"0","20":"1"},{"1":"Kala_Mamy","2":"7","3":"Kirikou (Nzerekore): Bilingual","4":"24","5":"12","6":"0","7":"2","8":"1","9":"1","10":"1","11":"0","12":"0","13":"0","14":"2","15":"1","16":"0","17":"0","18":"0","19":"0","20":"0"},{"1":"Marie_mamy","2":"13","3":"Kirikou (other)","4":"40","5":"17","6":"4","7":"2","8":"3","9":"3","10":"0","11":"0","12":"0","13":"1","14":"0","15":"2","16":"0","17":"0","18":"0","19":"0","20":"0"},{"1":"Michel_Sonomy","2":"15","3":"Kirikou (Nzerekore): Mano","4":"280","5":"100","6":"44","7":"49","8":"55","9":"46","10":"28","11":"10","12":"0","13":"7","14":"6","15":"10","16":"2","17":"0","18":"0","19":"0","20":"2"},{"1":"Nestor_Mamy","2":"10","3":"Kirikou (other)","4":"96","5":"48","6":"5","7":"4","8":"9","9":"7","10":"7","11":"1","12":"0","13":"4","14":"1","15":"10","16":"0","17":"0","18":"0","19":"0","20":"0"},{"1":"Prospere_Mamy","2":"11","3":"Kirikou (Nzerekore): Bilingual","4":"23","5":"16","6":"3","7":"2","8":"6","9":"15","10":"1","11":"0","12":"0","13":"0","14":"2","15":"3","16":"0","17":"0","18":"0","19":"0","20":"0"},{"1":"To","2":"19","3":"folktales (children)","4":"26","5":"9","6":"1","7":"3","8":"7","9":"6","10":"1","11":"0","12":"1","13":"0","14":"2","15":"2","16":"0","17":"0","18":"0","19":"0","20":"1"},{"1":"angeline","2":"4","3":"Kirikou (other)","4":"14","5":"9","6":"2","7":"2","8":"1","9":"1","10":"0","11":"0","12":"0","13":"1","14":"0","15":"2","16":"1","17":"0","18":"0","19":"0","20":"0"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
+  </script>
+</div>
+</div>
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb29"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a>tense <span class="sc">|&gt;</span> </span>
+<span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_longer</span>(<span class="at">names_to =</span> <span class="st">"tense"</span>, <span class="at">values_to =</span> <span class="st">"n"</span>, <span class="sc">-</span><span class="fu">c</span>(name, age, group_var)) <span class="sc">|&gt;</span> </span>
+<span id="cb29-3"><a href="#cb29-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">tense =</span> <span class="fu">case_when</span>(tense <span class="sc">%in%</span> <span class="fu">c</span>(<span class="st">"COND"</span>, <span class="st">"IRR"</span>, <span class="st">"PROT.IRR"</span>, <span class="st">"APOD.IRR"</span>, <span class="st">"NEG.COND"</span>) <span class="sc">~</span> <span class="st">"CONDs"</span>,</span>
+<span id="cb29-4"><a href="#cb29-4" aria-hidden="true" tabindex="-1"></a>                           tense <span class="sc">%in%</span> <span class="fu">c</span>(<span class="st">"PROH"</span>, <span class="st">"IMP"</span>) <span class="sc">~</span> <span class="st">"PROH or IMP"</span>,</span>
+<span id="cb29-5"><a href="#cb29-5" aria-hidden="true" tabindex="-1"></a>                           tense <span class="sc">%in%</span> <span class="fu">c</span>(<span class="st">"EXI"</span>, <span class="st">"PRED"</span>, <span class="st">"IPFV"</span>, <span class="st">"FUT"</span>, <span class="st">"PROSP"</span>) <span class="sc">~</span> <span class="st">"non-past"</span>,</span>
+<span id="cb29-6"><a href="#cb29-6" aria-hidden="true" tabindex="-1"></a>                           <span class="cn">TRUE</span> <span class="sc">~</span> tense)) <span class="sc">|&gt;</span> </span>
+<span id="cb29-7"><a href="#cb29-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(name, age, group_var, tense) <span class="sc">|&gt;</span></span>
+<span id="cb29-8"><a href="#cb29-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">n =</span> <span class="fu">sum</span>(n)) <span class="sc">|&gt;</span> </span>
+<span id="cb29-9"><a href="#cb29-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(name, age, group_var) <span class="sc">|&gt;</span> </span>
+<span id="cb29-10"><a href="#cb29-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">total =</span> <span class="fu">sum</span>(n),</span>
+<span id="cb29-11"><a href="#cb29-11" aria-hidden="true" tabindex="-1"></a>         <span class="at">ratio =</span> n<span class="sc">/</span>total) <span class="sc">|&gt;</span> </span>
+<span id="cb29-12"><a href="#cb29-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="sc">-</span>n, <span class="sc">-</span>total) <span class="sc">|&gt;</span> </span>
+<span id="cb29-13"><a href="#cb29-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ungroup</span>() <span class="sc">|&gt;</span> </span>
+<span id="cb29-14"><a href="#cb29-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">name =</span> <span class="fu">str_c</span>(name, <span class="st">" ("</span>, age, <span class="st">")"</span>),</span>
+<span id="cb29-15"><a href="#cb29-15" aria-hidden="true" tabindex="-1"></a>         <span class="at">name =</span> <span class="fu">fct_reorder</span>(name, age),</span>
+<span id="cb29-16"><a href="#cb29-16" aria-hidden="true" tabindex="-1"></a>         <span class="at">tense =</span> <span class="fu">factor</span>(tense, <span class="at">levels =</span> <span class="fu">c</span>(<span class="st">"CONDs"</span>, <span class="st">"PROH or IMP"</span>,</span>
+<span id="cb29-17"><a href="#cb29-17" aria-hidden="true" tabindex="-1"></a>                                          <span class="st">"non-past"</span>,<span class="st">"NEG"</span>, <span class="st">"CONJ"</span>,</span>
+<span id="cb29-18"><a href="#cb29-18" aria-hidden="true" tabindex="-1"></a>                                          <span class="st">"PRF"</span>, <span class="st">"JNT"</span>, <span class="st">"PST"</span>)),</span>
+<span id="cb29-19"><a href="#cb29-19" aria-hidden="true" tabindex="-1"></a>         <span class="at">label =</span> <span class="fu">str_c</span>(<span class="fu">round</span>(ratio <span class="sc">*</span> <span class="dv">100</span>), <span class="st">"%"</span>)) <span class="sc">|&gt;</span></span>
+<span id="cb29-20"><a href="#cb29-20" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(ratio <span class="sc">&gt;</span> <span class="dv">0</span>) <span class="sc">|&gt;</span></span>
+<span id="cb29-21"><a href="#cb29-21" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> ratio, <span class="at">y =</span> name, <span class="at">label =</span> label, <span class="at">color =</span> tense))<span class="sc">+</span></span>
+<span id="cb29-22"><a href="#cb29-22" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_col</span>(<span class="fu">aes</span>(<span class="at">fill =</span> tense))<span class="sc">+</span></span>
+<span id="cb29-23"><a href="#cb29-23" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_label</span>(<span class="at">position =</span> <span class="fu">position_fill</span>(<span class="at">vjust =</span> <span class="fl">0.5</span>), <span class="at">fill =</span> <span class="st">"white"</span>)<span class="sc">+</span></span>
+<span id="cb29-24"><a href="#cb29-24" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_x_continuous</span>(<span class="at">label =</span> scales<span class="sc">::</span>percent)<span class="sc">+</span></span>
+<span id="cb29-25"><a href="#cb29-25" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="cn">NULL</span>, <span class="at">y =</span> <span class="cn">NULL</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="index_files/figure-html/unnamed-chunk-20-1.png" class="img-fluid figure-img" width="960"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>Выкидываем JNT и PST</p>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb30"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a>tense <span class="sc">|&gt;</span> </span>
+<span id="cb30-2"><a href="#cb30-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_longer</span>(<span class="at">names_to =</span> <span class="st">"tense"</span>, <span class="at">values_to =</span> <span class="st">"n"</span>, <span class="sc">-</span><span class="fu">c</span>(name, age, group_var)) <span class="sc">|&gt;</span> </span>
+<span id="cb30-3"><a href="#cb30-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">tense =</span> <span class="fu">case_when</span>(tense <span class="sc">%in%</span> <span class="fu">c</span>(<span class="st">"COND"</span>, <span class="st">"IRR"</span>, <span class="st">"PROT.IRR"</span>, <span class="st">"APOD.IRR"</span>, <span class="st">"NEG.COND"</span>) <span class="sc">~</span> <span class="st">"CONDs"</span>,</span>
+<span id="cb30-4"><a href="#cb30-4" aria-hidden="true" tabindex="-1"></a>                           tense <span class="sc">%in%</span> <span class="fu">c</span>(<span class="st">"PROH"</span>, <span class="st">"IMP"</span>) <span class="sc">~</span> <span class="st">"PROH or IMP"</span>,</span>
+<span id="cb30-5"><a href="#cb30-5" aria-hidden="true" tabindex="-1"></a>                           tense <span class="sc">%in%</span> <span class="fu">c</span>(<span class="st">"EXI"</span>, <span class="st">"PRED"</span>, <span class="st">"IPFV"</span>, <span class="st">"FUT"</span>, <span class="st">"PROSP"</span>) <span class="sc">~</span> <span class="st">"non-past"</span>,</span>
+<span id="cb30-6"><a href="#cb30-6" aria-hidden="true" tabindex="-1"></a>                           <span class="cn">TRUE</span> <span class="sc">~</span> tense)) <span class="sc">|&gt;</span> </span>
+<span id="cb30-7"><a href="#cb30-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="sc">!</span>(tense <span class="sc">%in%</span> <span class="fu">c</span>(<span class="st">"JNT"</span>, <span class="st">"PST"</span>))) <span class="sc">|&gt;</span> </span>
+<span id="cb30-8"><a href="#cb30-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(name, age, group_var, tense) <span class="sc">|&gt;</span></span>
+<span id="cb30-9"><a href="#cb30-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">n =</span> <span class="fu">sum</span>(n)) <span class="sc">|&gt;</span> </span>
+<span id="cb30-10"><a href="#cb30-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(name, age, group_var) <span class="sc">|&gt;</span> </span>
+<span id="cb30-11"><a href="#cb30-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">total =</span> <span class="fu">sum</span>(n),</span>
+<span id="cb30-12"><a href="#cb30-12" aria-hidden="true" tabindex="-1"></a>         <span class="at">ratio =</span> n<span class="sc">/</span>total) <span class="sc">|&gt;</span> </span>
+<span id="cb30-13"><a href="#cb30-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="sc">-</span>n, <span class="sc">-</span>total) <span class="sc">|&gt;</span> </span>
+<span id="cb30-14"><a href="#cb30-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ungroup</span>() <span class="sc">|&gt;</span> </span>
+<span id="cb30-15"><a href="#cb30-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">name =</span> <span class="fu">str_c</span>(name, <span class="st">" ("</span>, age, <span class="st">")"</span>),</span>
+<span id="cb30-16"><a href="#cb30-16" aria-hidden="true" tabindex="-1"></a>         <span class="at">name =</span> <span class="fu">fct_reorder</span>(name, age),</span>
+<span id="cb30-17"><a href="#cb30-17" aria-hidden="true" tabindex="-1"></a>         <span class="at">tense =</span> <span class="fu">factor</span>(tense, <span class="at">levels =</span> <span class="fu">c</span>(<span class="st">"CONDs"</span>, <span class="st">"PROH or IMP"</span>,</span>
+<span id="cb30-18"><a href="#cb30-18" aria-hidden="true" tabindex="-1"></a>                                          <span class="st">"non-past"</span>,<span class="st">"NEG"</span>, <span class="st">"CONJ"</span>,</span>
+<span id="cb30-19"><a href="#cb30-19" aria-hidden="true" tabindex="-1"></a>                                          <span class="st">"PRF"</span>, <span class="st">"JNT"</span>, <span class="st">"PST"</span>)),</span>
+<span id="cb30-20"><a href="#cb30-20" aria-hidden="true" tabindex="-1"></a>         <span class="at">label =</span> <span class="fu">str_c</span>(<span class="fu">round</span>(ratio <span class="sc">*</span> <span class="dv">100</span>), <span class="st">"%"</span>)) <span class="sc">|&gt;</span></span>
+<span id="cb30-21"><a href="#cb30-21" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(ratio <span class="sc">&gt;</span> <span class="dv">0</span>) <span class="sc">|&gt;</span></span>
+<span id="cb30-22"><a href="#cb30-22" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> ratio, <span class="at">y =</span> name, <span class="at">label =</span> label, <span class="at">color =</span> tense))<span class="sc">+</span></span>
+<span id="cb30-23"><a href="#cb30-23" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_col</span>(<span class="fu">aes</span>(<span class="at">fill =</span> tense))<span class="sc">+</span></span>
+<span id="cb30-24"><a href="#cb30-24" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_label</span>(<span class="at">position =</span> <span class="fu">position_fill</span>(<span class="at">vjust =</span> <span class="fl">0.5</span>), <span class="at">fill =</span> <span class="st">"white"</span>)<span class="sc">+</span></span>
+<span id="cb30-25"><a href="#cb30-25" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_x_continuous</span>(<span class="at">label =</span> scales<span class="sc">::</span>percent)<span class="sc">+</span></span>
+<span id="cb30-26"><a href="#cb30-26" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="cn">NULL</span>, <span class="at">y =</span> <span class="cn">NULL</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="index_files/figure-html/unnamed-chunk-21-1.png" class="img-fluid figure-img" width="960"></p>
+</figure>
+</div>
+</div>
 </div>
 <p>График соотношения количества JNT и PST</p>
 <div class="cell">
 <details class="code-fold">
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb29"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a>tense <span class="sc">|&gt;</span> </span>
-<span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">PST =</span> <span class="fu">if_else</span>(PST <span class="sc">==</span> <span class="dv">0</span>, <span class="fl">0.9</span>, PST),</span>
-<span id="cb29-3"><a href="#cb29-3" aria-hidden="true" tabindex="-1"></a>         <span class="at">JNT =</span> <span class="fu">if_else</span>(JNT <span class="sc">==</span> <span class="dv">0</span>, <span class="fl">0.9</span>, JNT)) <span class="sc">|&gt;</span> </span>
-<span id="cb29-4"><a href="#cb29-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(name, age, group_var, PST, JNT) <span class="sc">|&gt;</span> </span>
-<span id="cb29-5"><a href="#cb29-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">ratio =</span> PST<span class="sc">/</span>(PST<span class="sc">+</span>JNT)) <span class="sc">|&gt;</span> </span>
-<span id="cb29-6"><a href="#cb29-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(<span class="sc">-</span>ratio)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb31"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a>tense <span class="sc">|&gt;</span> </span>
+<span id="cb31-2"><a href="#cb31-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">PST =</span> <span class="fu">if_else</span>(PST <span class="sc">==</span> <span class="dv">0</span>, <span class="fl">0.9</span>, PST),</span>
+<span id="cb31-3"><a href="#cb31-3" aria-hidden="true" tabindex="-1"></a>         <span class="at">JNT =</span> <span class="fu">if_else</span>(JNT <span class="sc">==</span> <span class="dv">0</span>, <span class="fl">0.9</span>, JNT)) <span class="sc">|&gt;</span> </span>
+<span id="cb31-4"><a href="#cb31-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(name, age, group_var, PST, JNT) <span class="sc">|&gt;</span> </span>
+<span id="cb31-5"><a href="#cb31-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">ratio =</span> PST<span class="sc">/</span>(PST<span class="sc">+</span>JNT)) <span class="sc">|&gt;</span> </span>
+<span id="cb31-6"><a href="#cb31-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(<span class="sc">-</span>ratio)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output-display">
 <div data-pagedtable="false">
@@ -922,23 +1000,23 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 <details class="code-fold">
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb30"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a>tense <span class="sc">|&gt;</span> </span>
-<span id="cb30-2"><a href="#cb30-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">PST =</span> <span class="fu">if_else</span>(PST <span class="sc">==</span> <span class="dv">0</span>, <span class="fl">0.9</span>, PST),</span>
-<span id="cb30-3"><a href="#cb30-3" aria-hidden="true" tabindex="-1"></a>         <span class="at">JNT =</span> <span class="fu">if_else</span>(JNT <span class="sc">==</span> <span class="dv">0</span>, <span class="fl">0.9</span>, JNT)) <span class="sc">|&gt;</span> </span>
-<span id="cb30-4"><a href="#cb30-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(name, age, group_var, PST, JNT) <span class="sc">|&gt;</span> </span>
-<span id="cb30-5"><a href="#cb30-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">ratio =</span> PST<span class="sc">/</span>(PST<span class="sc">+</span>JNT),</span>
-<span id="cb30-6"><a href="#cb30-6" aria-hidden="true" tabindex="-1"></a>         <span class="at">name =</span> <span class="fu">str_c</span>(name, <span class="st">" ("</span>, age, <span class="st">")"</span>)) <span class="sc">|&gt;</span> </span>
-<span id="cb30-7"><a href="#cb30-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(PST, JNT, <span class="at">color =</span> group_var))<span class="sc">+</span></span>
-<span id="cb30-8"><a href="#cb30-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_smooth</span>(<span class="at">method =</span> <span class="st">"lm"</span>, <span class="at">se =</span> <span class="cn">FALSE</span>, <span class="at">color =</span> <span class="st">"grey60"</span>, <span class="at">linetype =</span> <span class="dv">2</span>)<span class="sc">+</span></span>
-<span id="cb30-9"><a href="#cb30-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>()<span class="sc">+</span></span>
-<span id="cb30-10"><a href="#cb30-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_x_log10</span>()<span class="sc">+</span></span>
-<span id="cb30-11"><a href="#cb30-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_y_log10</span>()<span class="sc">+</span></span>
-<span id="cb30-12"><a href="#cb30-12" aria-hidden="true" tabindex="-1"></a>  ggrepel<span class="sc">::</span><span class="fu">geom_text_repel</span>(<span class="fu">aes</span>(<span class="at">label =</span> name))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb32"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a>tense <span class="sc">|&gt;</span> </span>
+<span id="cb32-2"><a href="#cb32-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">PST =</span> <span class="fu">if_else</span>(PST <span class="sc">==</span> <span class="dv">0</span>, <span class="fl">0.9</span>, PST),</span>
+<span id="cb32-3"><a href="#cb32-3" aria-hidden="true" tabindex="-1"></a>         <span class="at">JNT =</span> <span class="fu">if_else</span>(JNT <span class="sc">==</span> <span class="dv">0</span>, <span class="fl">0.9</span>, JNT)) <span class="sc">|&gt;</span> </span>
+<span id="cb32-4"><a href="#cb32-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(name, age, group_var, PST, JNT) <span class="sc">|&gt;</span> </span>
+<span id="cb32-5"><a href="#cb32-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">ratio =</span> PST<span class="sc">/</span>(PST<span class="sc">+</span>JNT),</span>
+<span id="cb32-6"><a href="#cb32-6" aria-hidden="true" tabindex="-1"></a>         <span class="at">name =</span> <span class="fu">str_c</span>(name, <span class="st">" ("</span>, age, <span class="st">")"</span>)) <span class="sc">|&gt;</span> </span>
+<span id="cb32-7"><a href="#cb32-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(PST, JNT, <span class="at">color =</span> group_var))<span class="sc">+</span></span>
+<span id="cb32-8"><a href="#cb32-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_smooth</span>(<span class="at">method =</span> <span class="st">"lm"</span>, <span class="at">se =</span> <span class="cn">FALSE</span>, <span class="at">color =</span> <span class="st">"grey60"</span>, <span class="at">linetype =</span> <span class="dv">2</span>)<span class="sc">+</span></span>
+<span id="cb32-9"><a href="#cb32-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>()<span class="sc">+</span></span>
+<span id="cb32-10"><a href="#cb32-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_x_log10</span>()<span class="sc">+</span></span>
+<span id="cb32-11"><a href="#cb32-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_y_log10</span>()<span class="sc">+</span></span>
+<span id="cb32-12"><a href="#cb32-12" aria-hidden="true" tabindex="-1"></a>  ggrepel<span class="sc">::</span><span class="fu">geom_text_repel</span>(<span class="fu">aes</span>(<span class="at">label =</span> name))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="index_files/figure-html/unnamed-chunk-21-1.png" class="img-fluid figure-img" width="960"></p>
+<p><img src="index_files/figure-html/unnamed-chunk-22-1.png" class="img-fluid figure-img" width="960"></p>
 </figure>
 </div>
 </div>
@@ -947,13 +1025,13 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <div class="cell">
 <details class="code-fold">
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb31"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a>mano_corpus <span class="sc">|&gt;</span> </span>
-<span id="cb31-2"><a href="#cb31-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(name, age, group_var, chunk_structure) <span class="sc">|&gt;</span> </span>
-<span id="cb31-3"><a href="#cb31-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">JNT.SAY =</span> <span class="fu">str_count</span>(chunk_structure, <span class="st">"JNT.SAY"</span>),</span>
-<span id="cb31-4"><a href="#cb31-4" aria-hidden="true" tabindex="-1"></a>         <span class="at">JNT =</span> <span class="fu">str_count</span>(chunk_structure, <span class="st">"JNT"</span>) <span class="sc">-</span> JNT.SAY,</span>
-<span id="cb31-5"><a href="#cb31-5" aria-hidden="true" tabindex="-1"></a>         <span class="at">ratio =</span> JNT<span class="sc">/</span>(JNT<span class="sc">+</span>JNT.SAY)) <span class="sc">|&gt;</span> </span>
-<span id="cb31-6"><a href="#cb31-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="sc">-</span>chunk_structure) <span class="sc">|&gt;</span></span>
-<span id="cb31-7"><a href="#cb31-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(<span class="sc">-</span>ratio)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb33"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a>mano_corpus <span class="sc">|&gt;</span> </span>
+<span id="cb33-2"><a href="#cb33-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(name, age, group_var, chunk_structure) <span class="sc">|&gt;</span> </span>
+<span id="cb33-3"><a href="#cb33-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">JNT.SAY =</span> <span class="fu">str_count</span>(chunk_structure, <span class="st">"JNT.SAY"</span>),</span>
+<span id="cb33-4"><a href="#cb33-4" aria-hidden="true" tabindex="-1"></a>         <span class="at">JNT =</span> <span class="fu">str_count</span>(chunk_structure, <span class="st">"JNT"</span>) <span class="sc">-</span> JNT.SAY,</span>
+<span id="cb33-5"><a href="#cb33-5" aria-hidden="true" tabindex="-1"></a>         <span class="at">ratio =</span> JNT<span class="sc">/</span>(JNT<span class="sc">+</span>JNT.SAY)) <span class="sc">|&gt;</span> </span>
+<span id="cb33-6"><a href="#cb33-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="sc">-</span>chunk_structure) <span class="sc">|&gt;</span></span>
+<span id="cb33-7"><a href="#cb33-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(<span class="sc">-</span>ratio)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output-display">
 <div data-pagedtable="false">
@@ -964,25 +1042,25 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 <details class="code-fold">
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb32"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a>mano_corpus <span class="sc">|&gt;</span> </span>
-<span id="cb32-2"><a href="#cb32-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(name, age, group_var, chunk_structure) <span class="sc">|&gt;</span> </span>
-<span id="cb32-3"><a href="#cb32-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">JNT.SAY =</span> <span class="fu">str_count</span>(chunk_structure, <span class="st">"JNT.SAY"</span>),</span>
-<span id="cb32-4"><a href="#cb32-4" aria-hidden="true" tabindex="-1"></a>         <span class="at">JNT =</span> <span class="fu">str_count</span>(chunk_structure, <span class="st">"JNT"</span>) <span class="sc">-</span> JNT.SAY,</span>
-<span id="cb32-5"><a href="#cb32-5" aria-hidden="true" tabindex="-1"></a>         <span class="at">JNT.SAY =</span> <span class="fu">if_else</span>(JNT.SAY <span class="sc">==</span> <span class="dv">0</span>, <span class="fl">0.9</span>, JNT.SAY),</span>
-<span id="cb32-6"><a href="#cb32-6" aria-hidden="true" tabindex="-1"></a>         <span class="at">JNT =</span> <span class="fu">if_else</span>(JNT <span class="sc">==</span> <span class="dv">0</span>, <span class="fl">0.9</span>, JNT),</span>
-<span id="cb32-7"><a href="#cb32-7" aria-hidden="true" tabindex="-1"></a>         <span class="at">name =</span> <span class="fu">str_c</span>(name, <span class="st">" ("</span>, age, <span class="st">")"</span>)) <span class="sc">|&gt;</span> </span>
-<span id="cb32-8"><a href="#cb32-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="sc">-</span>chunk_structure) <span class="sc">|&gt;</span></span>
-<span id="cb32-9"><a href="#cb32-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(JNT, JNT.SAY, <span class="at">color =</span> group_var))<span class="sc">+</span></span>
-<span id="cb32-10"><a href="#cb32-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_smooth</span>(<span class="at">method =</span> <span class="st">"lm"</span>, <span class="at">se =</span> <span class="cn">FALSE</span>, <span class="at">color =</span> <span class="st">"grey60"</span>, <span class="at">linetype =</span> <span class="dv">2</span>)<span class="sc">+</span></span>
-<span id="cb32-11"><a href="#cb32-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>()<span class="sc">+</span></span>
-<span id="cb32-12"><a href="#cb32-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_x_log10</span>()<span class="sc">+</span></span>
-<span id="cb32-13"><a href="#cb32-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_y_log10</span>()<span class="sc">+</span></span>
-<span id="cb32-14"><a href="#cb32-14" aria-hidden="true" tabindex="-1"></a>  ggrepel<span class="sc">::</span><span class="fu">geom_text_repel</span>(<span class="fu">aes</span>(<span class="at">label =</span> name))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb34"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a>mano_corpus <span class="sc">|&gt;</span> </span>
+<span id="cb34-2"><a href="#cb34-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(name, age, group_var, chunk_structure) <span class="sc">|&gt;</span> </span>
+<span id="cb34-3"><a href="#cb34-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">JNT.SAY =</span> <span class="fu">str_count</span>(chunk_structure, <span class="st">"JNT.SAY"</span>),</span>
+<span id="cb34-4"><a href="#cb34-4" aria-hidden="true" tabindex="-1"></a>         <span class="at">JNT =</span> <span class="fu">str_count</span>(chunk_structure, <span class="st">"JNT"</span>) <span class="sc">-</span> JNT.SAY,</span>
+<span id="cb34-5"><a href="#cb34-5" aria-hidden="true" tabindex="-1"></a>         <span class="at">JNT.SAY =</span> <span class="fu">if_else</span>(JNT.SAY <span class="sc">==</span> <span class="dv">0</span>, <span class="fl">0.9</span>, JNT.SAY),</span>
+<span id="cb34-6"><a href="#cb34-6" aria-hidden="true" tabindex="-1"></a>         <span class="at">JNT =</span> <span class="fu">if_else</span>(JNT <span class="sc">==</span> <span class="dv">0</span>, <span class="fl">0.9</span>, JNT),</span>
+<span id="cb34-7"><a href="#cb34-7" aria-hidden="true" tabindex="-1"></a>         <span class="at">name =</span> <span class="fu">str_c</span>(name, <span class="st">" ("</span>, age, <span class="st">")"</span>)) <span class="sc">|&gt;</span> </span>
+<span id="cb34-8"><a href="#cb34-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="sc">-</span>chunk_structure) <span class="sc">|&gt;</span></span>
+<span id="cb34-9"><a href="#cb34-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(JNT, JNT.SAY, <span class="at">color =</span> group_var))<span class="sc">+</span></span>
+<span id="cb34-10"><a href="#cb34-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_smooth</span>(<span class="at">method =</span> <span class="st">"lm"</span>, <span class="at">se =</span> <span class="cn">FALSE</span>, <span class="at">color =</span> <span class="st">"grey60"</span>, <span class="at">linetype =</span> <span class="dv">2</span>)<span class="sc">+</span></span>
+<span id="cb34-11"><a href="#cb34-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>()<span class="sc">+</span></span>
+<span id="cb34-12"><a href="#cb34-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_x_log10</span>()<span class="sc">+</span></span>
+<span id="cb34-13"><a href="#cb34-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_y_log10</span>()<span class="sc">+</span></span>
+<span id="cb34-14"><a href="#cb34-14" aria-hidden="true" tabindex="-1"></a>  ggrepel<span class="sc">::</span><span class="fu">geom_text_repel</span>(<span class="fu">aes</span>(<span class="at">label =</span> name))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="index_files/figure-html/unnamed-chunk-22-1.png" class="img-fluid figure-img" width="960"></p>
+<p><img src="index_files/figure-html/unnamed-chunk-23-1.png" class="img-fluid figure-img" width="960"></p>
 </figure>
 </div>
 </div>
@@ -991,48 +1069,48 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <div class="cell">
 <details class="code-fold">
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb33"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a>tense <span class="sc">|&gt;</span> </span>
-<span id="cb33-2"><a href="#cb33-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_longer</span>(<span class="at">names_to =</span> <span class="st">"tense"</span>, <span class="at">values_to =</span> <span class="st">"n"</span>, <span class="sc">-</span><span class="fu">c</span>(name, age, group_var)) <span class="sc">|&gt;</span> </span>
-<span id="cb33-3"><a href="#cb33-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">pst_jnt_other =</span> <span class="fu">if_else</span>(<span class="fu">str_detect</span>(tense, <span class="st">"(PST)|(JNT)"</span>), </span>
-<span id="cb33-4"><a href="#cb33-4" aria-hidden="true" tabindex="-1"></a>                                 <span class="st">"PST_or_JNT"</span>,</span>
-<span id="cb33-5"><a href="#cb33-5" aria-hidden="true" tabindex="-1"></a>                                 <span class="st">"other"</span>)) <span class="sc">|&gt;</span> </span>
-<span id="cb33-6"><a href="#cb33-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(name, age, group_var, pst_jnt_other) <span class="sc">|&gt;</span> </span>
-<span id="cb33-7"><a href="#cb33-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">n =</span> <span class="fu">sum</span>(n)) <span class="sc">|&gt;</span> </span>
-<span id="cb33-8"><a href="#cb33-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_wider</span>(<span class="at">names_from =</span> pst_jnt_other, <span class="at">values_from =</span> n, <span class="at">values_fill =</span> <span class="dv">0</span>) <span class="sc">|&gt;</span> </span>
-<span id="cb33-9"><a href="#cb33-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">ratio =</span> PST_or_JNT<span class="sc">/</span>(PST_or_JNT<span class="sc">+</span>other)) <span class="sc">|&gt;</span> </span>
-<span id="cb33-10"><a href="#cb33-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(<span class="sc">-</span>ratio)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb35"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a>tense <span class="sc">|&gt;</span> </span>
+<span id="cb35-2"><a href="#cb35-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_longer</span>(<span class="at">names_to =</span> <span class="st">"tense"</span>, <span class="at">values_to =</span> <span class="st">"n"</span>, <span class="sc">-</span><span class="fu">c</span>(name, age, group_var)) <span class="sc">|&gt;</span> </span>
+<span id="cb35-3"><a href="#cb35-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">pst_jnt_other =</span> <span class="fu">if_else</span>(<span class="fu">str_detect</span>(tense, <span class="st">"(PST)|(JNT)"</span>), </span>
+<span id="cb35-4"><a href="#cb35-4" aria-hidden="true" tabindex="-1"></a>                                 <span class="st">"PST_or_JNT"</span>,</span>
+<span id="cb35-5"><a href="#cb35-5" aria-hidden="true" tabindex="-1"></a>                                 <span class="st">"other"</span>)) <span class="sc">|&gt;</span> </span>
+<span id="cb35-6"><a href="#cb35-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(name, age, group_var, pst_jnt_other) <span class="sc">|&gt;</span> </span>
+<span id="cb35-7"><a href="#cb35-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">n =</span> <span class="fu">sum</span>(n)) <span class="sc">|&gt;</span> </span>
+<span id="cb35-8"><a href="#cb35-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_wider</span>(<span class="at">names_from =</span> pst_jnt_other, <span class="at">values_from =</span> n, <span class="at">values_fill =</span> <span class="dv">0</span>) <span class="sc">|&gt;</span> </span>
+<span id="cb35-9"><a href="#cb35-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">ratio =</span> PST_or_JNT<span class="sc">/</span>(PST_or_JNT<span class="sc">+</span>other)) <span class="sc">|&gt;</span> </span>
+<span id="cb35-10"><a href="#cb35-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(<span class="sc">-</span>ratio)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output-display">
 <div data-pagedtable="false">
   <script data-pagedtable-source="" type="application/json">
-{"columns":[{"label":["name"],"name":[1],"type":["chr"],"align":["left"]},{"label":["age"],"name":[2],"type":["dbl"],"align":["right"]},{"label":["group_var"],"name":[3],"type":["chr"],"align":["left"]},{"label":["PST_or_JNT"],"name":[4],"type":["int"],"align":["right"]},{"label":["other"],"name":[5],"type":["int"],"align":["right"]},{"label":["ratio"],"name":[6],"type":["dbl"],"align":["right"]}],"data":[{"1":"Gbamon_Kpomy","2":"10","3":"Kirikou (Nzerekore): Mano","4":"174","5":"26","6":"0.8700000"},{"1":"Gilbert_Kolie","2":"8","3":"Kirikou (Nzerekore): Mano","4":"60","5":"13","6":"0.8219178"},{"1":"Kala_Mamy","2":"7","3":"Kirikou (Nzerekore): Bilingual","4":"36","5":"9","6":"0.8000000"},{"1":"Eugenie_Mamy","2":"10","3":"Kirikou (Nzerekore): Bilingual","4":"49","5":"13","6":"0.7903226"},{"1":"Marie_mamy","2":"13","3":"Kirikou (other)","4":"57","5":"20","6":"0.7402597"},{"1":"Etienne_Mamy","2":"9","3":"Kirikou (other)","4":"161","5":"57","6":"0.7385321"},{"1":"Cecile_Mamy","2":"12","3":"Kirikou (Nzerekore): Bilingual","4":"631","5":"236","6":"0.7277970"},{"1":"Christine","2":"9","3":"Kirikou (Nzerekore): Mano","4":"247","5":"94","6":"0.7243402"},{"1":"Nestor_Mamy","2":"10","3":"Kirikou (other)","4":"144","5":"56","6":"0.7200000"},{"1":"angeline","2":"4","3":"Kirikou (other)","4":"23","5":"10","6":"0.6969697"},{"1":"Jean-Pierre_Mamy","2":"12","3":"Kirikou (Nzerekore): Bilingual","4":"263","5":"117","6":"0.6921053"},{"1":"Cecile_Mamy","2":"9","3":"folktales (children)","4":"167","5":"87","6":"0.6574803"},{"1":"Jean_Mamy","2":"16","3":"Kirikou (other)","4":"147","5":"91","6":"0.6176471"},{"1":"Cecile_Mamy","2":"10","3":"folktales (children)","4":"47","5":"30","6":"0.6103896"},{"1":"To","2":"19","3":"folktales (children)","4":"35","5":"25","6":"0.5833333"},{"1":"EL","2":"100","3":"folktales (adults)","4":"100","5":"75","6":"0.5714286"},{"1":"Michel_Sonomy","2":"15","3":"Kirikou (Nzerekore): Mano","4":"380","5":"301","6":"0.5580029"},{"1":"Prospere_Mamy","2":"11","3":"Kirikou (Nzerekore): Bilingual","4":"39","5":"33","6":"0.5416667"},{"1":"CS","2":"100","3":"folktales (adults)","4":"259","5":"236","6":"0.5232323"},{"1":"PM","2":"100","3":"folktales (adults)","4":"39","5":"43","6":"0.4756098"},{"1":"Josephine","2":"15","3":"folktales (children)","4":"142","5":"199","6":"0.4164223"},{"1":"AD","2":"100","3":"folktales (adults)","4":"7","5":"19","6":"0.2692308"},{"1":"Andrey_Mamy","2":"4","3":"Kirikou (Nzerekore): Bilingual","4":"2","5":"8","6":"0.2000000"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
+{"columns":[{"label":["name"],"name":[1],"type":["chr"],"align":["left"]},{"label":["age"],"name":[2],"type":["dbl"],"align":["right"]},{"label":["group_var"],"name":[3],"type":["chr"],"align":["left"]},{"label":["PST_or_JNT"],"name":[4],"type":["int"],"align":["right"]},{"label":["other"],"name":[5],"type":["int"],"align":["right"]},{"label":["ratio"],"name":[6],"type":["dbl"],"align":["right"]}],"data":[{"1":"Gbamon_Kpomy","2":"10","3":"Kirikou (Nzerekore): Mano","4":"174","5":"21","6":"0.8923077"},{"1":"Gilbert_Kolie","2":"8","3":"Kirikou (Nzerekore): Mano","4":"60","5":"12","6":"0.8333333"},{"1":"Kala_Mamy","2":"7","3":"Kirikou (Nzerekore): Bilingual","4":"36","5":"8","6":"0.8181818"},{"1":"Eugenie_Mamy","2":"10","3":"Kirikou (Nzerekore): Bilingual","4":"49","5":"12","6":"0.8032787"},{"1":"Marie_mamy","2":"13","3":"Kirikou (other)","4":"57","5":"15","6":"0.7916667"},{"1":"Cecile_Mamy","2":"12","3":"Kirikou (Nzerekore): Bilingual","4":"631","5":"203","6":"0.7565947"},{"1":"Etienne_Mamy","2":"9","3":"Kirikou (other)","4":"161","5":"52","6":"0.7558685"},{"1":"Nestor_Mamy","2":"10","3":"Kirikou (other)","4":"144","5":"48","6":"0.7500000"},{"1":"Christine","2":"9","3":"Kirikou (Nzerekore): Mano","4":"247","5":"83","6":"0.7484848"},{"1":"Jean-Pierre_Mamy","2":"12","3":"Kirikou (Nzerekore): Bilingual","4":"263","5":"106","6":"0.7127371"},{"1":"angeline","2":"4","3":"Kirikou (other)","4":"23","5":"10","6":"0.6969697"},{"1":"Cecile_Mamy","2":"9","3":"folktales (children)","4":"167","5":"84","6":"0.6653386"},{"1":"Cecile_Mamy","2":"10","3":"folktales (children)","4":"47","5":"24","6":"0.6619718"},{"1":"Jean_Mamy","2":"16","3":"Kirikou (other)","4":"147","5":"77","6":"0.6562500"},{"1":"EL","2":"100","3":"folktales (adults)","4":"100","5":"68","6":"0.5952381"},{"1":"Michel_Sonomy","2":"15","3":"Kirikou (Nzerekore): Mano","4":"380","5":"259","6":"0.5946792"},{"1":"To","2":"19","3":"folktales (children)","4":"35","5":"24","6":"0.5932203"},{"1":"CS","2":"100","3":"folktales (adults)","4":"259","5":"198","6":"0.5667396"},{"1":"Prospere_Mamy","2":"11","3":"Kirikou (Nzerekore): Bilingual","4":"39","5":"32","6":"0.5492958"},{"1":"PM","2":"100","3":"folktales (adults)","4":"39","5":"39","6":"0.5000000"},{"1":"Josephine","2":"15","3":"folktales (children)","4":"142","5":"187","6":"0.4316109"},{"1":"AD","2":"100","3":"folktales (adults)","4":"7","5":"17","6":"0.2916667"},{"1":"Andrey_Mamy","2":"4","3":"Kirikou (Nzerekore): Bilingual","4":"2","5":"8","6":"0.2000000"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
   </script>
 </div>
 </div>
 <details class="code-fold">
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb34"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a>tense <span class="sc">|&gt;</span> </span>
-<span id="cb34-2"><a href="#cb34-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_longer</span>(<span class="at">names_to =</span> <span class="st">"tense"</span>, <span class="at">values_to =</span> <span class="st">"n"</span>, <span class="sc">-</span><span class="fu">c</span>(name, age, group_var)) <span class="sc">|&gt;</span> </span>
-<span id="cb34-3"><a href="#cb34-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">pst_jnt_other =</span> <span class="fu">if_else</span>(<span class="fu">str_detect</span>(tense, <span class="st">"(PST)|(JNT)"</span>), </span>
-<span id="cb34-4"><a href="#cb34-4" aria-hidden="true" tabindex="-1"></a>                                 <span class="st">"PST_or_JNT"</span>,</span>
-<span id="cb34-5"><a href="#cb34-5" aria-hidden="true" tabindex="-1"></a>                                 <span class="st">"other"</span>)) <span class="sc">|&gt;</span> </span>
-<span id="cb34-6"><a href="#cb34-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(name, age, group_var, pst_jnt_other) <span class="sc">|&gt;</span> </span>
-<span id="cb34-7"><a href="#cb34-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">n =</span> <span class="fu">sum</span>(n)) <span class="sc">|&gt;</span> </span>
-<span id="cb34-8"><a href="#cb34-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_wider</span>(<span class="at">names_from =</span> pst_jnt_other, <span class="at">values_from =</span> n, <span class="at">values_fill =</span> <span class="dv">0</span>) <span class="sc">|&gt;</span> </span>
-<span id="cb34-9"><a href="#cb34-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">PST_or_JNT =</span> <span class="fu">if_else</span>(PST_or_JNT <span class="sc">==</span> <span class="dv">0</span>, <span class="fl">0.9</span>, PST_or_JNT),</span>
-<span id="cb34-10"><a href="#cb34-10" aria-hidden="true" tabindex="-1"></a>         <span class="at">other =</span> <span class="fu">if_else</span>(other <span class="sc">==</span> <span class="dv">0</span>, <span class="fl">0.9</span>, other),</span>
-<span id="cb34-11"><a href="#cb34-11" aria-hidden="true" tabindex="-1"></a>         <span class="at">name =</span> <span class="fu">str_c</span>(name, <span class="st">" ("</span>, age, <span class="st">")"</span>)) <span class="sc">|&gt;</span> </span>
-<span id="cb34-12"><a href="#cb34-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(PST_or_JNT, other, <span class="at">color =</span> group_var))<span class="sc">+</span></span>
-<span id="cb34-13"><a href="#cb34-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_smooth</span>(<span class="at">method =</span> <span class="st">"lm"</span>, <span class="at">se =</span> <span class="cn">FALSE</span>, <span class="at">color =</span> <span class="st">"grey60"</span>, <span class="at">linetype =</span> <span class="dv">2</span>)<span class="sc">+</span></span>
-<span id="cb34-14"><a href="#cb34-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>()<span class="sc">+</span></span>
-<span id="cb34-15"><a href="#cb34-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_x_log10</span>()<span class="sc">+</span></span>
-<span id="cb34-16"><a href="#cb34-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_y_log10</span>()<span class="sc">+</span></span>
-<span id="cb34-17"><a href="#cb34-17" aria-hidden="true" tabindex="-1"></a>  ggrepel<span class="sc">::</span><span class="fu">geom_text_repel</span>(<span class="fu">aes</span>(<span class="at">label =</span> name))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb36"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a>tense <span class="sc">|&gt;</span> </span>
+<span id="cb36-2"><a href="#cb36-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_longer</span>(<span class="at">names_to =</span> <span class="st">"tense"</span>, <span class="at">values_to =</span> <span class="st">"n"</span>, <span class="sc">-</span><span class="fu">c</span>(name, age, group_var)) <span class="sc">|&gt;</span> </span>
+<span id="cb36-3"><a href="#cb36-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">pst_jnt_other =</span> <span class="fu">if_else</span>(<span class="fu">str_detect</span>(tense, <span class="st">"(PST)|(JNT)"</span>), </span>
+<span id="cb36-4"><a href="#cb36-4" aria-hidden="true" tabindex="-1"></a>                                 <span class="st">"PST_or_JNT"</span>,</span>
+<span id="cb36-5"><a href="#cb36-5" aria-hidden="true" tabindex="-1"></a>                                 <span class="st">"other"</span>)) <span class="sc">|&gt;</span> </span>
+<span id="cb36-6"><a href="#cb36-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(name, age, group_var, pst_jnt_other) <span class="sc">|&gt;</span> </span>
+<span id="cb36-7"><a href="#cb36-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">n =</span> <span class="fu">sum</span>(n)) <span class="sc">|&gt;</span> </span>
+<span id="cb36-8"><a href="#cb36-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_wider</span>(<span class="at">names_from =</span> pst_jnt_other, <span class="at">values_from =</span> n, <span class="at">values_fill =</span> <span class="dv">0</span>) <span class="sc">|&gt;</span> </span>
+<span id="cb36-9"><a href="#cb36-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">PST_or_JNT =</span> <span class="fu">if_else</span>(PST_or_JNT <span class="sc">==</span> <span class="dv">0</span>, <span class="fl">0.9</span>, PST_or_JNT),</span>
+<span id="cb36-10"><a href="#cb36-10" aria-hidden="true" tabindex="-1"></a>         <span class="at">other =</span> <span class="fu">if_else</span>(other <span class="sc">==</span> <span class="dv">0</span>, <span class="fl">0.9</span>, other),</span>
+<span id="cb36-11"><a href="#cb36-11" aria-hidden="true" tabindex="-1"></a>         <span class="at">name =</span> <span class="fu">str_c</span>(name, <span class="st">" ("</span>, age, <span class="st">")"</span>)) <span class="sc">|&gt;</span> </span>
+<span id="cb36-12"><a href="#cb36-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(PST_or_JNT, other, <span class="at">color =</span> group_var))<span class="sc">+</span></span>
+<span id="cb36-13"><a href="#cb36-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_smooth</span>(<span class="at">method =</span> <span class="st">"lm"</span>, <span class="at">se =</span> <span class="cn">FALSE</span>, <span class="at">color =</span> <span class="st">"grey60"</span>, <span class="at">linetype =</span> <span class="dv">2</span>)<span class="sc">+</span></span>
+<span id="cb36-14"><a href="#cb36-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>()<span class="sc">+</span></span>
+<span id="cb36-15"><a href="#cb36-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_x_log10</span>()<span class="sc">+</span></span>
+<span id="cb36-16"><a href="#cb36-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_y_log10</span>()<span class="sc">+</span></span>
+<span id="cb36-17"><a href="#cb36-17" aria-hidden="true" tabindex="-1"></a>  ggrepel<span class="sc">::</span><span class="fu">geom_text_repel</span>(<span class="fu">aes</span>(<span class="at">label =</span> name))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="index_files/figure-html/unnamed-chunk-23-1.png" class="img-fluid figure-img" width="960"></p>
+<p><img src="index_files/figure-html/unnamed-chunk-24-1.png" class="img-fluid figure-img" width="960"></p>
 </figure>
 </div>
 </div>
@@ -1043,66 +1121,63 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <div class="cell">
 <details class="code-fold">
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb35"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a>extract_and_concatenate_rs <span class="ot">&lt;-</span> <span class="cf">function</span>(string){</span>
-<span id="cb35-2"><a href="#cb35-2" aria-hidden="true" tabindex="-1"></a>  string <span class="sc">|&gt;</span> </span>
-<span id="cb35-3"><a href="#cb35-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">str_extract_all</span>(<span class="st">"rs%.*?%"</span>) <span class="sc">|&gt;</span> </span>
-<span id="cb35-4"><a href="#cb35-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">unlist</span>() <span class="sc">|&gt;</span> </span>
-<span id="cb35-5"><a href="#cb35-5" aria-hidden="true" tabindex="-1"></a>    <span class="fu">str_remove_all</span>(<span class="st">"rs%"</span>) <span class="sc">|&gt;</span> </span>
-<span id="cb35-6"><a href="#cb35-6" aria-hidden="true" tabindex="-1"></a>    <span class="fu">str_remove_all</span>(<span class="st">"%"</span>) <span class="sc">|&gt;</span> </span>
-<span id="cb35-7"><a href="#cb35-7" aria-hidden="true" tabindex="-1"></a>    <span class="fu">str_c</span>(<span class="at">collapse =</span> <span class="st">" "</span>)</span>
-<span id="cb35-8"><a href="#cb35-8" aria-hidden="true" tabindex="-1"></a>}</span>
-<span id="cb35-9"><a href="#cb35-9" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb35-10"><a href="#cb35-10" aria-hidden="true" tabindex="-1"></a>mano_corpus <span class="sc">|&gt;</span> </span>
-<span id="cb35-11"><a href="#cb35-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(name, age, group_var, chunk_structure) <span class="sc">|&gt;</span> </span>
-<span id="cb35-12"><a href="#cb35-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">rs =</span> <span class="fu">map_chr</span>(mano_corpus<span class="sc">$</span>chunk_structure, extract_and_concatenate_rs),</span>
-<span id="cb35-13"><a href="#cb35-13" aria-hidden="true" tabindex="-1"></a>         <span class="at">PST =</span> <span class="fu">str_count</span>(rs, <span class="st">"PST"</span>),</span>
-<span id="cb35-14"><a href="#cb35-14" aria-hidden="true" tabindex="-1"></a>         <span class="at">JNT =</span> <span class="fu">str_count</span>(rs, <span class="st">"JNT"</span>),</span>
-<span id="cb35-15"><a href="#cb35-15" aria-hidden="true" tabindex="-1"></a>         <span class="at">IPFV =</span> <span class="fu">str_count</span>(rs, <span class="st">"IPFV"</span>),</span>
-<span id="cb35-16"><a href="#cb35-16" aria-hidden="true" tabindex="-1"></a>         <span class="at">PRED =</span> <span class="fu">str_count</span>(rs, <span class="st">"PRED"</span>),</span>
-<span id="cb35-17"><a href="#cb35-17" aria-hidden="true" tabindex="-1"></a>         <span class="at">EXI =</span> <span class="fu">str_count</span>(rs, <span class="st">"EXI"</span>),</span>
-<span id="cb35-18"><a href="#cb35-18" aria-hidden="true" tabindex="-1"></a>         <span class="at">CONJ =</span> <span class="fu">str_count</span>(rs, <span class="st">"CONJ"</span>),</span>
-<span id="cb35-19"><a href="#cb35-19" aria-hidden="true" tabindex="-1"></a>         <span class="at">PRF =</span> <span class="fu">str_count</span>(rs, <span class="st">"PRF"</span>),</span>
-<span id="cb35-20"><a href="#cb35-20" aria-hidden="true" tabindex="-1"></a>         <span class="at">FUT =</span> <span class="fu">str_count</span>(rs, <span class="st">"FUT"</span>),</span>
-<span id="cb35-21"><a href="#cb35-21" aria-hidden="true" tabindex="-1"></a>         <span class="at">NEG.COND =</span> <span class="fu">str_count</span>(rs, <span class="st">"NEG.COND"</span>),</span>
-<span id="cb35-22"><a href="#cb35-22" aria-hidden="true" tabindex="-1"></a>         <span class="at">NEG =</span> <span class="fu">str_count</span>(rs, <span class="st">"NEG"</span>) <span class="sc">-</span> NEG.COND,</span>
-<span id="cb35-23"><a href="#cb35-23" aria-hidden="true" tabindex="-1"></a>         <span class="at">RES =</span> <span class="fu">str_count</span>(rs, <span class="st">"RES"</span>),</span>
-<span id="cb35-24"><a href="#cb35-24" aria-hidden="true" tabindex="-1"></a>         <span class="at">COND =</span> <span class="fu">str_count</span>(rs, <span class="st">"COND"</span>),</span>
-<span id="cb35-25"><a href="#cb35-25" aria-hidden="true" tabindex="-1"></a>         <span class="at">IMP =</span> <span class="fu">str_count</span>(rs, <span class="st">"IMP"</span>),</span>
-<span id="cb35-26"><a href="#cb35-26" aria-hidden="true" tabindex="-1"></a>         <span class="at">PROSP =</span> <span class="fu">str_count</span>(rs, <span class="st">"PROSP"</span>),</span>
-<span id="cb35-27"><a href="#cb35-27" aria-hidden="true" tabindex="-1"></a>         <span class="at">ADV =</span> <span class="fu">str_count</span>(rs, <span class="st">"ADV"</span>),</span>
-<span id="cb35-28"><a href="#cb35-28" aria-hidden="true" tabindex="-1"></a>         <span class="at">PROT.IRR =</span> <span class="fu">str_count</span>(rs, <span class="st">"PROT.IRR"</span>),</span>
-<span id="cb35-29"><a href="#cb35-29" aria-hidden="true" tabindex="-1"></a>         <span class="at">APOD.IRR =</span> <span class="fu">str_count</span>(rs, <span class="st">"APOD.IRR"</span>),</span>
-<span id="cb35-30"><a href="#cb35-30" aria-hidden="true" tabindex="-1"></a>         <span class="at">IRR =</span> <span class="fu">str_count</span>(rs, <span class="st">"APOD.IRR"</span>),</span>
-<span id="cb35-31"><a href="#cb35-31" aria-hidden="true" tabindex="-1"></a>         <span class="at">PROH =</span> <span class="fu">str_count</span>(rs, <span class="st">"PROH"</span>),</span>
-<span id="cb35-32"><a href="#cb35-32" aria-hidden="true" tabindex="-1"></a>         <span class="at">PURP =</span> <span class="fu">str_count</span>(rs, <span class="st">"PURP"</span>),</span>
-<span id="cb35-33"><a href="#cb35-33" aria-hidden="true" tabindex="-1"></a>         <span class="at">PS =</span> <span class="fu">str_count</span>(rs, <span class="st">"PS"</span>) <span class="sc">-</span> PST,</span>
-<span id="cb35-34"><a href="#cb35-34" aria-hidden="true" tabindex="-1"></a>         <span class="at">FUR =</span> <span class="fu">str_count</span>(rs, <span class="st">"FUR"</span>)) <span class="sc">|&gt;</span> </span>
-<span id="cb35-35"><a href="#cb35-35" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="sc">-</span>chunk_structure, <span class="sc">-</span>rs) <span class="ot">-&gt;</span></span>
-<span id="cb35-36"><a href="#cb35-36" aria-hidden="true" tabindex="-1"></a>  tense_rs</span>
-<span id="cb35-37"><a href="#cb35-37" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb35-38"><a href="#cb35-38" aria-hidden="true" tabindex="-1"></a>tense_rs</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb37"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a>extract_and_concatenate_rs <span class="ot">&lt;-</span> <span class="cf">function</span>(string){</span>
+<span id="cb37-2"><a href="#cb37-2" aria-hidden="true" tabindex="-1"></a>  string <span class="sc">|&gt;</span> </span>
+<span id="cb37-3"><a href="#cb37-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">str_extract_all</span>(<span class="st">"rs%.*?%"</span>) <span class="sc">|&gt;</span> </span>
+<span id="cb37-4"><a href="#cb37-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">unlist</span>() <span class="sc">|&gt;</span> </span>
+<span id="cb37-5"><a href="#cb37-5" aria-hidden="true" tabindex="-1"></a>    <span class="fu">str_remove_all</span>(<span class="st">"rs%"</span>) <span class="sc">|&gt;</span> </span>
+<span id="cb37-6"><a href="#cb37-6" aria-hidden="true" tabindex="-1"></a>    <span class="fu">str_remove_all</span>(<span class="st">"%"</span>) <span class="sc">|&gt;</span> </span>
+<span id="cb37-7"><a href="#cb37-7" aria-hidden="true" tabindex="-1"></a>    <span class="fu">str_c</span>(<span class="at">collapse =</span> <span class="st">" "</span>)</span>
+<span id="cb37-8"><a href="#cb37-8" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb37-9"><a href="#cb37-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb37-10"><a href="#cb37-10" aria-hidden="true" tabindex="-1"></a>mano_corpus <span class="sc">|&gt;</span> </span>
+<span id="cb37-11"><a href="#cb37-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(name, age, group_var, chunk_structure) <span class="sc">|&gt;</span> </span>
+<span id="cb37-12"><a href="#cb37-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">rs =</span> <span class="fu">map_chr</span>(mano_corpus<span class="sc">$</span>chunk_structure, extract_and_concatenate_rs),</span>
+<span id="cb37-13"><a href="#cb37-13" aria-hidden="true" tabindex="-1"></a>         <span class="at">PST =</span> <span class="fu">str_count</span>(rs, <span class="st">"PST"</span>),</span>
+<span id="cb37-14"><a href="#cb37-14" aria-hidden="true" tabindex="-1"></a>         <span class="at">JNT =</span> <span class="fu">str_count</span>(rs, <span class="st">"JNT"</span>),</span>
+<span id="cb37-15"><a href="#cb37-15" aria-hidden="true" tabindex="-1"></a>         <span class="at">IPFV =</span> <span class="fu">str_count</span>(rs, <span class="st">"IPFV"</span>),</span>
+<span id="cb37-16"><a href="#cb37-16" aria-hidden="true" tabindex="-1"></a>         <span class="at">PRED =</span> <span class="fu">str_count</span>(rs, <span class="st">"PRED"</span>),</span>
+<span id="cb37-17"><a href="#cb37-17" aria-hidden="true" tabindex="-1"></a>         <span class="at">EXI =</span> <span class="fu">str_count</span>(rs, <span class="st">"EXI"</span>),</span>
+<span id="cb37-18"><a href="#cb37-18" aria-hidden="true" tabindex="-1"></a>         <span class="at">CONJ =</span> <span class="fu">str_count</span>(rs, <span class="st">"CONJ"</span>),</span>
+<span id="cb37-19"><a href="#cb37-19" aria-hidden="true" tabindex="-1"></a>         <span class="at">PRF =</span> <span class="fu">str_count</span>(rs, <span class="st">"PRF"</span>),</span>
+<span id="cb37-20"><a href="#cb37-20" aria-hidden="true" tabindex="-1"></a>         <span class="at">FUT =</span> <span class="fu">str_count</span>(rs, <span class="st">"FUT"</span>),</span>
+<span id="cb37-21"><a href="#cb37-21" aria-hidden="true" tabindex="-1"></a>         <span class="at">NEG.COND =</span> <span class="fu">str_count</span>(rs, <span class="st">"NEG.COND"</span>),</span>
+<span id="cb37-22"><a href="#cb37-22" aria-hidden="true" tabindex="-1"></a>         <span class="at">NEG =</span> <span class="fu">str_count</span>(rs, <span class="st">"NEG"</span>) <span class="sc">-</span> NEG.COND,</span>
+<span id="cb37-23"><a href="#cb37-23" aria-hidden="true" tabindex="-1"></a>         <span class="at">RES =</span> <span class="fu">str_count</span>(rs, <span class="st">"RES"</span>),</span>
+<span id="cb37-24"><a href="#cb37-24" aria-hidden="true" tabindex="-1"></a>         <span class="at">COND =</span> <span class="fu">str_count</span>(rs, <span class="st">"COND"</span>),</span>
+<span id="cb37-25"><a href="#cb37-25" aria-hidden="true" tabindex="-1"></a>         <span class="at">IMP =</span> <span class="fu">str_count</span>(rs, <span class="st">"IMP"</span>),</span>
+<span id="cb37-26"><a href="#cb37-26" aria-hidden="true" tabindex="-1"></a>         <span class="at">PROSP =</span> <span class="fu">str_count</span>(rs, <span class="st">"PROSP"</span>),</span>
+<span id="cb37-27"><a href="#cb37-27" aria-hidden="true" tabindex="-1"></a>         <span class="at">ADV =</span> <span class="fu">str_count</span>(rs, <span class="st">"ADV"</span>),</span>
+<span id="cb37-28"><a href="#cb37-28" aria-hidden="true" tabindex="-1"></a>         <span class="at">PROT.IRR =</span> <span class="fu">str_count</span>(rs, <span class="st">"PROT.IRR"</span>),</span>
+<span id="cb37-29"><a href="#cb37-29" aria-hidden="true" tabindex="-1"></a>         <span class="at">APOD.IRR =</span> <span class="fu">str_count</span>(rs, <span class="st">"APOD.IRR"</span>),</span>
+<span id="cb37-30"><a href="#cb37-30" aria-hidden="true" tabindex="-1"></a>         <span class="at">IRR =</span> <span class="fu">str_count</span>(rs, <span class="st">"APOD.IRR"</span>),</span>
+<span id="cb37-31"><a href="#cb37-31" aria-hidden="true" tabindex="-1"></a>         <span class="at">PROH =</span> <span class="fu">str_count</span>(rs, <span class="st">"PROH"</span>)) <span class="sc">|&gt;</span> </span>
+<span id="cb37-32"><a href="#cb37-32" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="sc">-</span>chunk_structure, <span class="sc">-</span>rs) <span class="ot">-&gt;</span></span>
+<span id="cb37-33"><a href="#cb37-33" aria-hidden="true" tabindex="-1"></a>  tense_rs</span>
+<span id="cb37-34"><a href="#cb37-34" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb37-35"><a href="#cb37-35" aria-hidden="true" tabindex="-1"></a>tense_rs</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output-display">
 <div data-pagedtable="false">
   <script data-pagedtable-source="" type="application/json">
-{"columns":[{"label":["name"],"name":[1],"type":["chr"],"align":["left"]},{"label":["age"],"name":[2],"type":["dbl"],"align":["right"]},{"label":["group_var"],"name":[3],"type":["chr"],"align":["left"]},{"label":["PST"],"name":[4],"type":["int"],"align":["right"]},{"label":["JNT"],"name":[5],"type":["int"],"align":["right"]},{"label":["IPFV"],"name":[6],"type":["int"],"align":["right"]},{"label":["PRED"],"name":[7],"type":["int"],"align":["right"]},{"label":["EXI"],"name":[8],"type":["int"],"align":["right"]},{"label":["CONJ"],"name":[9],"type":["int"],"align":["right"]},{"label":["PRF"],"name":[10],"type":["int"],"align":["right"]},{"label":["FUT"],"name":[11],"type":["int"],"align":["right"]},{"label":["NEG.COND"],"name":[12],"type":["int"],"align":["right"]},{"label":["NEG"],"name":[13],"type":["int"],"align":["right"]},{"label":["RES"],"name":[14],"type":["int"],"align":["right"]},{"label":["COND"],"name":[15],"type":["int"],"align":["right"]},{"label":["IMP"],"name":[16],"type":["int"],"align":["right"]},{"label":["PROSP"],"name":[17],"type":["int"],"align":["right"]},{"label":["ADV"],"name":[18],"type":["int"],"align":["right"]},{"label":["PROT.IRR"],"name":[19],"type":["int"],"align":["right"]},{"label":["APOD.IRR"],"name":[20],"type":["int"],"align":["right"]},{"label":["IRR"],"name":[21],"type":["int"],"align":["right"]},{"label":["PROH"],"name":[22],"type":["int"],"align":["right"]},{"label":["PURP"],"name":[23],"type":["int"],"align":["right"]},{"label":["PS"],"name":[24],"type":["int"],"align":["right"]},{"label":["FUR"],"name":[25],"type":["int"],"align":["right"]}],"data":[{"1":"AD","2":"100","3":"folktales (adults)","4":"0","5":"0","6":"0","7":"0","8":"0","9":"0","10":"0","11":"0","12":"0","13":"0","14":"0","15":"0","16":"0","17":"0","18":"0","19":"0","20":"0","21":"0","22":"0","23":"0","24":"0","25":"0"},{"1":"CS","2":"100","3":"folktales (adults)","4":"13","5":"5","6":"12","7":"11","8":"12","9":"33","10":"7","11":"12","12":"0","13":"2","14":"3","15":"5","16":"9","17":"0","18":"6","19":"0","20":"0","21":"0","22":"0","23":"1","24":"0","25":"0"},{"1":"EL","2":"100","3":"folktales (adults)","4":"16","5":"0","6":"4","7":"5","8":"6","9":"13","10":"6","11":"1","12":"0","13":"4","14":"0","15":"0","16":"3","17":"0","18":"4","19":"0","20":"0","21":"0","22":"0","23":"0","24":"0","25":"0"},{"1":"PM","2":"100","3":"folktales (adults)","4":"2","5":"0","6":"1","7":"1","8":"0","9":"3","10":"3","11":"1","12":"0","13":"0","14":"0","15":"0","16":"1","17":"0","18":"0","19":"1","20":"1","21":"1","22":"0","23":"0","24":"0","25":"0"},{"1":"Andrey_Mamy","2":"4","3":"Kirikou (Nzerekore): Bilingual","4":"0","5":"0","6":"0","7":"0","8":"0","9":"0","10":"0","11":"0","12":"0","13":"0","14":"0","15":"0","16":"0","17":"0","18":"0","19":"0","20":"0","21":"0","22":"0","23":"0","24":"0","25":"0"},{"1":"Cecile_Mamy","2":"9","3":"folktales (children)","4":"2","5":"0","6":"3","7":"4","8":"2","9":"23","10":"0","11":"0","12":"0","13":"2","14":"1","15":"1","16":"26","17":"0","18":"1","19":"0","20":"0","21":"0","22":"0","23":"0","24":"0","25":"0"},{"1":"Cecile_Mamy","2":"10","3":"folktales (children)","4":"1","5":"0","6":"0","7":"1","8":"3","9":"5","10":"0","11":"0","12":"0","13":"0","14":"0","15":"0","16":"6","17":"0","18":"0","19":"0","20":"0","21":"0","22":"0","23":"1","24":"0","25":"0"},{"1":"Cecile_Mamy","2":"12","3":"Kirikou (Nzerekore): Bilingual","4":"13","5":"4","6":"10","7":"27","8":"18","9":"40","10":"15","11":"3","12":"0","13":"12","14":"5","15":"3","16":"19","17":"6","18":"2","19":"0","20":"0","21":"0","22":"0","23":"2","24":"0","25":"0"},{"1":"Christine","2":"9","3":"Kirikou (Nzerekore): Mano","4":"6","5":"2","6":"9","7":"7","8":"7","9":"13","10":"6","11":"0","12":"0","13":"5","14":"0","15":"3","16":"10","17":"0","18":"3","19":"0","20":"0","21":"0","22":"0","23":"2","24":"0","25":"0"},{"1":"Etienne_Mamy","2":"9","3":"Kirikou (other)","4":"10","5":"0","6":"5","7":"8","8":"5","9":"7","10":"0","11":"2","12":"0","13":"2","14":"3","15":"5","16":"5","17":"1","18":"0","19":"0","20":"0","21":"0","22":"0","23":"0","24":"0","25":"0"},{"1":"Eugenie_Mamy","2":"10","3":"Kirikou (Nzerekore): Bilingual","4":"0","5":"0","6":"0","7":"3","8":"2","9":"5","10":"0","11":"0","12":"0","13":"0","14":"0","15":"0","16":"1","17":"0","18":"0","19":"0","20":"0","21":"0","22":"0","23":"0","24":"0","25":"0"},{"1":"Gbamon_Kpomy","2":"10","3":"Kirikou (Nzerekore): Mano","4":"1","5":"2","6":"3","7":"6","8":"0","9":"1","10":"0","11":"0","12":"0","13":"0","14":"0","15":"0","16":"2","17":"0","18":"0","19":"0","20":"0","21":"0","22":"1","23":"0","24":"0","25":"0"},{"1":"Gilbert_Kolie","2":"8","3":"Kirikou (Nzerekore): Mano","4":"0","5":"1","6":"3","7":"0","8":"0","9":"1","10":"0","11":"0","12":"0","13":"0","14":"0","15":"0","16":"4","17":"0","18":"0","19":"0","20":"0","21":"0","22":"0","23":"0","24":"0","25":"0"},{"1":"Jean-Pierre_Mamy","2":"12","3":"Kirikou (Nzerekore): Bilingual","4":"9","5":"0","6":"6","7":"7","8":"15","9":"20","10":"4","11":"0","12":"0","13":"2","14":"2","15":"3","16":"11","17":"4","18":"0","19":"0","20":"0","21":"0","22":"0","23":"3","24":"0","25":"0"},{"1":"Jean_Mamy","2":"16","3":"Kirikou (other)","4":"8","5":"2","6":"12","7":"9","8":"4","9":"13","10":"0","11":"1","12":"0","13":"2","14":"0","15":"2","16":"7","17":"1","18":"1","19":"0","20":"0","21":"0","22":"0","23":"3","24":"0","25":"0"},{"1":"Josephine","2":"15","3":"folktales (children)","4":"3","5":"3","6":"8","7":"3","8":"6","9":"20","10":"1","11":"1","12":"0","13":"5","14":"2","15":"4","16":"7","17":"1","18":"0","19":"0","20":"0","21":"0","22":"0","23":"3","24":"0","25":"0"},{"1":"Kala_Mamy","2":"7","3":"Kirikou (Nzerekore): Bilingual","4":"0","5":"0","6":"0","7":"1","8":"1","9":"1","10":"0","11":"0","12":"0","13":"0","14":"0","15":"2","16":"1","17":"0","18":"0","19":"0","20":"0","21":"0","22":"0","23":"0","24":"0","25":"0"},{"1":"Marie_mamy","2":"13","3":"Kirikou (other)","4":"3","5":"1","6":"4","7":"1","8":"3","9":"3","10":"0","11":"0","12":"0","13":"1","14":"0","15":"0","16":"1","17":"0","18":"1","19":"0","20":"0","21":"0","22":"0","23":"0","24":"0","25":"0"},{"1":"Michel_Sonomy","2":"15","3":"Kirikou (Nzerekore): Mano","4":"10","5":"2","6":"24","7":"23","8":"23","9":"23","10":"19","11":"8","12":"0","13":"4","14":"5","15":"2","16":"10","17":"1","18":"9","19":"0","20":"0","21":"0","22":"2","23":"2","24":"0","25":"1"},{"1":"Nestor_Mamy","2":"10","3":"Kirikou (other)","4":"4","5":"0","6":"5","7":"4","8":"6","9":"7","10":"6","11":"1","12":"0","13":"3","14":"1","15":"1","16":"10","17":"0","18":"0","19":"0","20":"0","21":"0","22":"0","23":"0","24":"0","25":"0"},{"1":"Prospere_Mamy","2":"11","3":"Kirikou (Nzerekore): Bilingual","4":"0","5":"0","6":"2","7":"1","8":"5","9":"15","10":"1","11":"0","12":"0","13":"0","14":"0","15":"2","16":"3","17":"0","18":"0","19":"0","20":"0","21":"0","22":"0","23":"0","24":"0","25":"0"},{"1":"To","2":"19","3":"folktales (children)","4":"9","5":"1","6":"1","7":"0","8":"7","9":"6","10":"0","11":"0","12":"1","13":"0","14":"0","15":"2","16":"2","17":"0","18":"0","19":"0","20":"0","21":"0","22":"1","23":"0","24":"0","25":"0"},{"1":"angeline","2":"4","3":"Kirikou (other)","4":"0","5":"0","6":"2","7":"1","8":"1","9":"1","10":"0","11":"0","12":"0","13":"1","14":"0","15":"0","16":"2","17":"1","18":"0","19":"0","20":"0","21":"0","22":"0","23":"0","24":"0","25":"0"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
+{"columns":[{"label":["name"],"name":[1],"type":["chr"],"align":["left"]},{"label":["age"],"name":[2],"type":["dbl"],"align":["right"]},{"label":["group_var"],"name":[3],"type":["chr"],"align":["left"]},{"label":["PST"],"name":[4],"type":["int"],"align":["right"]},{"label":["JNT"],"name":[5],"type":["int"],"align":["right"]},{"label":["IPFV"],"name":[6],"type":["int"],"align":["right"]},{"label":["PRED"],"name":[7],"type":["int"],"align":["right"]},{"label":["EXI"],"name":[8],"type":["int"],"align":["right"]},{"label":["CONJ"],"name":[9],"type":["int"],"align":["right"]},{"label":["PRF"],"name":[10],"type":["int"],"align":["right"]},{"label":["FUT"],"name":[11],"type":["int"],"align":["right"]},{"label":["NEG.COND"],"name":[12],"type":["int"],"align":["right"]},{"label":["NEG"],"name":[13],"type":["int"],"align":["right"]},{"label":["RES"],"name":[14],"type":["int"],"align":["right"]},{"label":["COND"],"name":[15],"type":["int"],"align":["right"]},{"label":["IMP"],"name":[16],"type":["int"],"align":["right"]},{"label":["PROSP"],"name":[17],"type":["int"],"align":["right"]},{"label":["ADV"],"name":[18],"type":["int"],"align":["right"]},{"label":["PROT.IRR"],"name":[19],"type":["int"],"align":["right"]},{"label":["APOD.IRR"],"name":[20],"type":["int"],"align":["right"]},{"label":["IRR"],"name":[21],"type":["int"],"align":["right"]},{"label":["PROH"],"name":[22],"type":["int"],"align":["right"]}],"data":[{"1":"AD","2":"100","3":"folktales (adults)","4":"0","5":"0","6":"0","7":"0","8":"0","9":"0","10":"0","11":"0","12":"0","13":"0","14":"0","15":"0","16":"0","17":"0","18":"0","19":"0","20":"0","21":"0","22":"0"},{"1":"CS","2":"100","3":"folktales (adults)","4":"13","5":"5","6":"12","7":"11","8":"12","9":"33","10":"7","11":"12","12":"0","13":"2","14":"3","15":"5","16":"9","17":"0","18":"6","19":"0","20":"0","21":"0","22":"0"},{"1":"EL","2":"100","3":"folktales (adults)","4":"16","5":"0","6":"4","7":"5","8":"6","9":"13","10":"6","11":"1","12":"0","13":"4","14":"0","15":"0","16":"3","17":"0","18":"4","19":"0","20":"0","21":"0","22":"0"},{"1":"PM","2":"100","3":"folktales (adults)","4":"2","5":"0","6":"1","7":"1","8":"0","9":"3","10":"3","11":"1","12":"0","13":"0","14":"0","15":"0","16":"1","17":"0","18":"0","19":"1","20":"1","21":"1","22":"0"},{"1":"Andrey_Mamy","2":"4","3":"Kirikou (Nzerekore): Bilingual","4":"0","5":"0","6":"0","7":"0","8":"0","9":"0","10":"0","11":"0","12":"0","13":"0","14":"0","15":"0","16":"0","17":"0","18":"0","19":"0","20":"0","21":"0","22":"0"},{"1":"Cecile_Mamy","2":"9","3":"folktales (children)","4":"2","5":"0","6":"3","7":"4","8":"2","9":"23","10":"0","11":"0","12":"0","13":"2","14":"1","15":"1","16":"26","17":"0","18":"1","19":"0","20":"0","21":"0","22":"0"},{"1":"Cecile_Mamy","2":"10","3":"folktales (children)","4":"1","5":"0","6":"0","7":"1","8":"3","9":"5","10":"0","11":"0","12":"0","13":"0","14":"0","15":"0","16":"6","17":"0","18":"0","19":"0","20":"0","21":"0","22":"0"},{"1":"Cecile_Mamy","2":"12","3":"Kirikou (Nzerekore): Bilingual","4":"13","5":"4","6":"10","7":"27","8":"18","9":"40","10":"15","11":"3","12":"0","13":"12","14":"5","15":"3","16":"19","17":"6","18":"2","19":"0","20":"0","21":"0","22":"0"},{"1":"Christine","2":"9","3":"Kirikou (Nzerekore): Mano","4":"6","5":"2","6":"9","7":"7","8":"7","9":"13","10":"6","11":"0","12":"0","13":"5","14":"0","15":"3","16":"10","17":"0","18":"3","19":"0","20":"0","21":"0","22":"0"},{"1":"Etienne_Mamy","2":"9","3":"Kirikou (other)","4":"10","5":"0","6":"5","7":"8","8":"5","9":"7","10":"0","11":"2","12":"0","13":"2","14":"3","15":"5","16":"5","17":"1","18":"0","19":"0","20":"0","21":"0","22":"0"},{"1":"Eugenie_Mamy","2":"10","3":"Kirikou (Nzerekore): Bilingual","4":"0","5":"0","6":"0","7":"3","8":"2","9":"5","10":"0","11":"0","12":"0","13":"0","14":"0","15":"0","16":"1","17":"0","18":"0","19":"0","20":"0","21":"0","22":"0"},{"1":"Gbamon_Kpomy","2":"10","3":"Kirikou (Nzerekore): Mano","4":"1","5":"2","6":"3","7":"6","8":"0","9":"1","10":"0","11":"0","12":"0","13":"0","14":"0","15":"0","16":"2","17":"0","18":"0","19":"0","20":"0","21":"0","22":"1"},{"1":"Gilbert_Kolie","2":"8","3":"Kirikou (Nzerekore): Mano","4":"0","5":"1","6":"3","7":"0","8":"0","9":"1","10":"0","11":"0","12":"0","13":"0","14":"0","15":"0","16":"4","17":"0","18":"0","19":"0","20":"0","21":"0","22":"0"},{"1":"Jean-Pierre_Mamy","2":"12","3":"Kirikou (Nzerekore): Bilingual","4":"9","5":"0","6":"6","7":"7","8":"15","9":"20","10":"4","11":"0","12":"0","13":"2","14":"2","15":"3","16":"11","17":"4","18":"0","19":"0","20":"0","21":"0","22":"0"},{"1":"Jean_Mamy","2":"16","3":"Kirikou (other)","4":"8","5":"2","6":"12","7":"9","8":"4","9":"13","10":"0","11":"1","12":"0","13":"2","14":"0","15":"2","16":"7","17":"1","18":"1","19":"0","20":"0","21":"0","22":"0"},{"1":"Josephine","2":"15","3":"folktales (children)","4":"3","5":"3","6":"8","7":"3","8":"6","9":"20","10":"1","11":"1","12":"0","13":"5","14":"2","15":"4","16":"7","17":"1","18":"0","19":"0","20":"0","21":"0","22":"0"},{"1":"Kala_Mamy","2":"7","3":"Kirikou (Nzerekore): Bilingual","4":"0","5":"0","6":"0","7":"1","8":"1","9":"1","10":"0","11":"0","12":"0","13":"0","14":"0","15":"2","16":"1","17":"0","18":"0","19":"0","20":"0","21":"0","22":"0"},{"1":"Marie_mamy","2":"13","3":"Kirikou (other)","4":"3","5":"1","6":"4","7":"1","8":"3","9":"3","10":"0","11":"0","12":"0","13":"1","14":"0","15":"0","16":"1","17":"0","18":"1","19":"0","20":"0","21":"0","22":"0"},{"1":"Michel_Sonomy","2":"15","3":"Kirikou (Nzerekore): Mano","4":"10","5":"2","6":"24","7":"23","8":"23","9":"23","10":"19","11":"9","12":"0","13":"4","14":"5","15":"2","16":"10","17":"1","18":"9","19":"0","20":"0","21":"0","22":"2"},{"1":"Nestor_Mamy","2":"10","3":"Kirikou (other)","4":"4","5":"0","6":"5","7":"4","8":"6","9":"7","10":"6","11":"1","12":"0","13":"3","14":"1","15":"1","16":"10","17":"0","18":"0","19":"0","20":"0","21":"0","22":"0"},{"1":"Prospere_Mamy","2":"11","3":"Kirikou (Nzerekore): Bilingual","4":"0","5":"0","6":"2","7":"1","8":"5","9":"15","10":"1","11":"0","12":"0","13":"0","14":"0","15":"2","16":"3","17":"0","18":"0","19":"0","20":"0","21":"0","22":"0"},{"1":"To","2":"19","3":"folktales (children)","4":"9","5":"1","6":"1","7":"0","8":"7","9":"6","10":"0","11":"0","12":"1","13":"0","14":"0","15":"2","16":"2","17":"0","18":"0","19":"0","20":"0","21":"0","22":"1"},{"1":"angeline","2":"4","3":"Kirikou (other)","4":"0","5":"0","6":"2","7":"1","8":"1","9":"1","10":"0","11":"0","12":"0","13":"1","14":"0","15":"0","16":"2","17":"1","18":"0","19":"0","20":"0","21":"0","22":"0"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
   </script>
 </div>
 </div>
 </div>
-<p>В RS ниукого не встретилась следующая категория</p>
+<p>В RS не у кого не встретилась следующая категория</p>
 <div class="cell">
 <details class="code-fold">
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb36"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a>tense_rs <span class="sc">|&gt;</span> </span>
-<span id="cb36-2"><a href="#cb36-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_longer</span>(<span class="at">names_to =</span> <span class="st">"tense"</span>, <span class="at">values_to =</span> <span class="st">"n"</span>, <span class="sc">-</span><span class="fu">c</span>(name, age, group_var)) <span class="sc">|&gt;</span> </span>
-<span id="cb36-3"><a href="#cb36-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(tense) <span class="sc">|&gt;</span> </span>
-<span id="cb36-4"><a href="#cb36-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">n =</span> <span class="fu">sum</span>(n)) <span class="sc">|&gt;</span> </span>
-<span id="cb36-5"><a href="#cb36-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(n <span class="sc">==</span> <span class="dv">0</span>) <span class="sc">|&gt;</span> </span>
-<span id="cb36-6"><a href="#cb36-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pull</span>(tense)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb38"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb38-1"><a href="#cb38-1" aria-hidden="true" tabindex="-1"></a>tense_rs <span class="sc">|&gt;</span> </span>
+<span id="cb38-2"><a href="#cb38-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_longer</span>(<span class="at">names_to =</span> <span class="st">"tense"</span>, <span class="at">values_to =</span> <span class="st">"n"</span>, <span class="sc">-</span><span class="fu">c</span>(name, age, group_var)) <span class="sc">|&gt;</span> </span>
+<span id="cb38-3"><a href="#cb38-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(tense) <span class="sc">|&gt;</span> </span>
+<span id="cb38-4"><a href="#cb38-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">n =</span> <span class="fu">sum</span>(n)) <span class="sc">|&gt;</span> </span>
+<span id="cb38-5"><a href="#cb38-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(n <span class="sc">==</span> <span class="dv">0</span>) <span class="sc">|&gt;</span> </span>
+<span id="cb38-6"><a href="#cb38-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pull</span>(tense)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output cell-output-stdout">
-<pre><code>[1] "PS"</code></pre>
+<pre><code>character(0)</code></pre>
 </div>
 </div>
 </section>
@@ -1112,26 +1187,26 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <div class="cell">
 <details class="code-fold">
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb38"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb38-1"><a href="#cb38-1" aria-hidden="true" tabindex="-1"></a>mano_corpus <span class="sc">|&gt;</span> </span>
-<span id="cb38-2"><a href="#cb38-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(name, age, group_var, chunk_structure) <span class="sc">|&gt;</span> </span>
-<span id="cb38-3"><a href="#cb38-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">foc =</span> <span class="fu">str_count</span>(chunk_structure, <span class="st">"foc"</span>),</span>
-<span id="cb38-4"><a href="#cb38-4" aria-hidden="true" tabindex="-1"></a>         <span class="at">rel =</span> <span class="fu">str_count</span>(chunk_structure, <span class="st">"rel"</span>),</span>
-<span id="cb38-5"><a href="#cb38-5" aria-hidden="true" tabindex="-1"></a>         <span class="at">temp =</span> <span class="fu">str_count</span>(chunk_structure, <span class="st">"temp"</span>),</span>
-<span id="cb38-6"><a href="#cb38-6" aria-hidden="true" tabindex="-1"></a>         <span class="at">cond =</span> <span class="fu">str_count</span>(chunk_structure, <span class="st">"cond"</span>),</span>
-<span id="cb38-7"><a href="#cb38-7" aria-hidden="true" tabindex="-1"></a>          <span class="at">purp =</span> <span class="fu">str_count</span>(chunk_structure, <span class="st">"purp"</span>),</span>
-<span id="cb38-8"><a href="#cb38-8" aria-hidden="true" tabindex="-1"></a>         <span class="at">prec =</span> <span class="fu">str_count</span>(chunk_structure, <span class="st">"prec"</span>),</span>
-<span id="cb38-9"><a href="#cb38-9" aria-hidden="true" tabindex="-1"></a>         <span class="at">compar =</span> <span class="fu">str_count</span>(chunk_structure, <span class="st">"compar"</span>),</span>
-<span id="cb38-10"><a href="#cb38-10" aria-hidden="true" tabindex="-1"></a>         <span class="at">mod =</span> <span class="fu">str_count</span>(chunk_structure, <span class="st">"mod"</span>),</span>
-<span id="cb38-11"><a href="#cb38-11" aria-hidden="true" tabindex="-1"></a>         <span class="at">sa =</span> <span class="fu">str_count</span>(chunk_structure, <span class="st">"sa"</span>),</span>
-<span id="cb38-12"><a href="#cb38-12" aria-hidden="true" tabindex="-1"></a>         <span class="at">le =</span> <span class="fu">str_count</span>(chunk_structure, <span class="st">"le"</span>),</span>
-<span id="cb38-13"><a href="#cb38-13" aria-hidden="true" tabindex="-1"></a>         <span class="at">ht =</span> <span class="fu">str_count</span>(chunk_structure, <span class="st">"ht"</span>),</span>
-<span id="cb38-14"><a href="#cb38-14" aria-hidden="true" tabindex="-1"></a>         <span class="at">at =</span> <span class="fu">str_count</span>(chunk_structure, <span class="st">"at"</span>),</span>
-<span id="cb38-15"><a href="#cb38-15" aria-hidden="true" tabindex="-1"></a>         <span class="at">top =</span> <span class="fu">str_count</span>(chunk_structure, <span class="st">"top"</span>),</span>
-<span id="cb38-16"><a href="#cb38-16" aria-hidden="true" tabindex="-1"></a>         <span class="at">voc =</span> <span class="fu">str_count</span>(chunk_structure, <span class="st">"voc"</span>)) <span class="sc">|&gt;</span> </span>
-<span id="cb38-17"><a href="#cb38-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="sc">-</span>chunk_structure) <span class="ot">-&gt;</span></span>
-<span id="cb38-18"><a href="#cb38-18" aria-hidden="true" tabindex="-1"></a>  syntax</span>
-<span id="cb38-19"><a href="#cb38-19" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb38-20"><a href="#cb38-20" aria-hidden="true" tabindex="-1"></a>syntax</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb40"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb40-1"><a href="#cb40-1" aria-hidden="true" tabindex="-1"></a>mano_corpus <span class="sc">|&gt;</span> </span>
+<span id="cb40-2"><a href="#cb40-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(name, age, group_var, chunk_structure) <span class="sc">|&gt;</span> </span>
+<span id="cb40-3"><a href="#cb40-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">foc =</span> <span class="fu">str_count</span>(chunk_structure, <span class="st">"foc"</span>),</span>
+<span id="cb40-4"><a href="#cb40-4" aria-hidden="true" tabindex="-1"></a>         <span class="at">rel =</span> <span class="fu">str_count</span>(chunk_structure, <span class="st">"rel"</span>),</span>
+<span id="cb40-5"><a href="#cb40-5" aria-hidden="true" tabindex="-1"></a>         <span class="at">temp =</span> <span class="fu">str_count</span>(chunk_structure, <span class="st">"temp"</span>),</span>
+<span id="cb40-6"><a href="#cb40-6" aria-hidden="true" tabindex="-1"></a>         <span class="at">cond =</span> <span class="fu">str_count</span>(chunk_structure, <span class="st">"cond"</span>),</span>
+<span id="cb40-7"><a href="#cb40-7" aria-hidden="true" tabindex="-1"></a>          <span class="at">purp =</span> <span class="fu">str_count</span>(chunk_structure, <span class="st">"purp"</span>),</span>
+<span id="cb40-8"><a href="#cb40-8" aria-hidden="true" tabindex="-1"></a>         <span class="at">prec =</span> <span class="fu">str_count</span>(chunk_structure, <span class="st">"prec"</span>),</span>
+<span id="cb40-9"><a href="#cb40-9" aria-hidden="true" tabindex="-1"></a>         <span class="at">compar =</span> <span class="fu">str_count</span>(chunk_structure, <span class="st">"compar"</span>),</span>
+<span id="cb40-10"><a href="#cb40-10" aria-hidden="true" tabindex="-1"></a>         <span class="at">mod =</span> <span class="fu">str_count</span>(chunk_structure, <span class="st">"mod"</span>),</span>
+<span id="cb40-11"><a href="#cb40-11" aria-hidden="true" tabindex="-1"></a>         <span class="at">sa =</span> <span class="fu">str_count</span>(chunk_structure, <span class="st">"sa"</span>),</span>
+<span id="cb40-12"><a href="#cb40-12" aria-hidden="true" tabindex="-1"></a>         <span class="at">le =</span> <span class="fu">str_count</span>(chunk_structure, <span class="st">"le"</span>),</span>
+<span id="cb40-13"><a href="#cb40-13" aria-hidden="true" tabindex="-1"></a>         <span class="at">ht =</span> <span class="fu">str_count</span>(chunk_structure, <span class="st">"ht"</span>),</span>
+<span id="cb40-14"><a href="#cb40-14" aria-hidden="true" tabindex="-1"></a>         <span class="at">at =</span> <span class="fu">str_count</span>(chunk_structure, <span class="st">"at"</span>),</span>
+<span id="cb40-15"><a href="#cb40-15" aria-hidden="true" tabindex="-1"></a>         <span class="at">top =</span> <span class="fu">str_count</span>(chunk_structure, <span class="st">"top"</span>),</span>
+<span id="cb40-16"><a href="#cb40-16" aria-hidden="true" tabindex="-1"></a>         <span class="at">voc =</span> <span class="fu">str_count</span>(chunk_structure, <span class="st">"voc"</span>)) <span class="sc">|&gt;</span> </span>
+<span id="cb40-17"><a href="#cb40-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="sc">-</span>chunk_structure) <span class="ot">-&gt;</span></span>
+<span id="cb40-18"><a href="#cb40-18" aria-hidden="true" tabindex="-1"></a>  syntax</span>
+<span id="cb40-19"><a href="#cb40-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb40-20"><a href="#cb40-20" aria-hidden="true" tabindex="-1"></a>syntax</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output-display">
 <div data-pagedtable="false">
@@ -1148,16 +1223,16 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <div class="cell">
 <details class="code-fold">
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb39"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb39-1"><a href="#cb39-1" aria-hidden="true" tabindex="-1"></a>mano_corpus <span class="sc">|&gt;</span> </span>
-<span id="cb39-2"><a href="#cb39-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(name, age, group_var, chunk_structure) <span class="sc">|&gt;</span> </span>
-<span id="cb39-3"><a href="#cb39-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">pro_CR =</span> <span class="fu">str_count</span>(chunk_structure, <span class="st">"pro</span><span class="sc">\\</span><span class="st">(CR</span><span class="sc">\\</span><span class="st">)"</span>),</span>
-<span id="cb39-4"><a href="#cb39-4" aria-hidden="true" tabindex="-1"></a>         <span class="at">NP_CR =</span> <span class="fu">str_count</span>(chunk_structure, <span class="st">"NP</span><span class="sc">\\</span><span class="st">(CR</span><span class="sc">\\</span><span class="st">)"</span>),</span>
-<span id="cb39-5"><a href="#cb39-5" aria-hidden="true" tabindex="-1"></a>         <span class="at">pro_SR =</span> <span class="fu">str_count</span>(chunk_structure, <span class="st">"pro</span><span class="sc">\\</span><span class="st">(SR</span><span class="sc">\\</span><span class="st">)"</span>),</span>
-<span id="cb39-6"><a href="#cb39-6" aria-hidden="true" tabindex="-1"></a>         <span class="at">NP_SR =</span> <span class="fu">str_count</span>(chunk_structure, <span class="st">"NP</span><span class="sc">\\</span><span class="st">(SR</span><span class="sc">\\</span><span class="st">)"</span>)) <span class="sc">|&gt;</span> </span>
-<span id="cb39-7"><a href="#cb39-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="sc">-</span>chunk_structure) <span class="ot">-&gt;</span></span>
-<span id="cb39-8"><a href="#cb39-8" aria-hidden="true" tabindex="-1"></a>  reference_tracking</span>
-<span id="cb39-9"><a href="#cb39-9" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb39-10"><a href="#cb39-10" aria-hidden="true" tabindex="-1"></a>reference_tracking</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb41"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb41-1"><a href="#cb41-1" aria-hidden="true" tabindex="-1"></a>mano_corpus <span class="sc">|&gt;</span> </span>
+<span id="cb41-2"><a href="#cb41-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(name, age, group_var, chunk_structure) <span class="sc">|&gt;</span> </span>
+<span id="cb41-3"><a href="#cb41-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">pro_CR =</span> <span class="fu">str_count</span>(chunk_structure, <span class="st">"pro</span><span class="sc">\\</span><span class="st">(CR</span><span class="sc">\\</span><span class="st">)"</span>),</span>
+<span id="cb41-4"><a href="#cb41-4" aria-hidden="true" tabindex="-1"></a>         <span class="at">NP_CR =</span> <span class="fu">str_count</span>(chunk_structure, <span class="st">"NP</span><span class="sc">\\</span><span class="st">(CR</span><span class="sc">\\</span><span class="st">)"</span>),</span>
+<span id="cb41-5"><a href="#cb41-5" aria-hidden="true" tabindex="-1"></a>         <span class="at">pro_SR =</span> <span class="fu">str_count</span>(chunk_structure, <span class="st">"pro</span><span class="sc">\\</span><span class="st">(SR</span><span class="sc">\\</span><span class="st">)"</span>),</span>
+<span id="cb41-6"><a href="#cb41-6" aria-hidden="true" tabindex="-1"></a>         <span class="at">NP_SR =</span> <span class="fu">str_count</span>(chunk_structure, <span class="st">"NP</span><span class="sc">\\</span><span class="st">(SR</span><span class="sc">\\</span><span class="st">)"</span>)) <span class="sc">|&gt;</span> </span>
+<span id="cb41-7"><a href="#cb41-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="sc">-</span>chunk_structure) <span class="ot">-&gt;</span></span>
+<span id="cb41-8"><a href="#cb41-8" aria-hidden="true" tabindex="-1"></a>  reference_tracking</span>
+<span id="cb41-9"><a href="#cb41-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb41-10"><a href="#cb41-10" aria-hidden="true" tabindex="-1"></a>reference_tracking</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output-display">
 <div data-pagedtable="false">
@@ -1173,10 +1248,10 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <div class="cell">
 <details class="code-fold">
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb40"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb40-1"><a href="#cb40-1" aria-hidden="true" tabindex="-1"></a>mano_corpus <span class="sc">|&gt;</span> </span>
-<span id="cb40-2"><a href="#cb40-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">n_predecations =</span> <span class="fu">str_count</span>(chunk_structure, <span class="st">"</span><span class="sc">\\</span><span class="st">["</span>)) <span class="sc">|&gt;</span> </span>
-<span id="cb40-3"><a href="#cb40-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(name, age, group_var, n_chunks, n_predecations) <span class="sc">|&gt;</span> </span>
-<span id="cb40-4"><a href="#cb40-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(<span class="sc">-</span>n_predecations)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb42"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb42-1"><a href="#cb42-1" aria-hidden="true" tabindex="-1"></a>mano_corpus <span class="sc">|&gt;</span> </span>
+<span id="cb42-2"><a href="#cb42-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">n_predecations =</span> <span class="fu">str_count</span>(chunk_structure, <span class="st">"</span><span class="sc">\\</span><span class="st">["</span>)) <span class="sc">|&gt;</span> </span>
+<span id="cb42-3"><a href="#cb42-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(name, age, group_var, n_chunks, n_predecations) <span class="sc">|&gt;</span> </span>
+<span id="cb42-4"><a href="#cb42-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(<span class="sc">-</span>n_predecations)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output-display">
 <div data-pagedtable="false">
@@ -1201,81 +1276,6 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <div class="cell">
 <details class="code-fold">
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb41"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb41-1"><a href="#cb41-1" aria-hidden="true" tabindex="-1"></a>mano_corpus <span class="sc">|&gt;</span> </span>
-<span id="cb41-2"><a href="#cb41-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">unnest_tokens</span>(<span class="at">input =</span> text, <span class="at">output =</span> word, <span class="at">token =</span> <span class="st">"words"</span>) <span class="sc">|&gt;</span> </span>
-<span id="cb41-3"><a href="#cb41-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count</span>(name, age, group_var, word)  <span class="sc">|&gt;</span> </span>
-<span id="cb41-4"><a href="#cb41-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(word <span class="sc">%in%</span> freq_words) <span class="sc">|&gt;</span> </span>
-<span id="cb41-5"><a href="#cb41-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_wider</span>(<span class="at">names_from =</span> word, <span class="at">values_from =</span> n, <span class="at">values_fill =</span> <span class="dv">0</span>)  <span class="ot">-&gt;</span></span>
-<span id="cb41-6"><a href="#cb41-6" aria-hidden="true" tabindex="-1"></a>  lexicon</span>
-<span id="cb41-7"><a href="#cb41-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb41-8"><a href="#cb41-8" aria-hidden="true" tabindex="-1"></a>syntax <span class="sc">|&gt;</span> </span>
-<span id="cb41-9"><a href="#cb41-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">full_join</span>(tense) <span class="sc">|&gt;</span> </span>
-<span id="cb41-10"><a href="#cb41-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">full_join</span>(lexicon) <span class="sc">|&gt;</span> </span>
-<span id="cb41-11"><a href="#cb41-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">full_join</span>(reference_tracking) <span class="sc">|&gt;</span>  </span>
-<span id="cb41-12"><a href="#cb41-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">full_join</span>(french) <span class="sc">|&gt;</span> </span>
-<span id="cb41-13"><a href="#cb41-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">french =</span> <span class="fu">if_else</span>(<span class="fu">is.na</span>(french), <span class="dv">0</span>, french)) <span class="sc">|&gt;</span> </span>
-<span id="cb41-14"><a href="#cb41-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="fu">across</span>(<span class="sc">-</span><span class="fu">c</span>(name, age, group_var), <span class="cf">function</span>(x) <span class="fu">scale</span>(x))) <span class="sc">|&gt;</span> </span>
-<span id="cb41-15"><a href="#cb41-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="sc">-</span><span class="fu">c</span>(name, age, group_var)) <span class="sc">|&gt;</span> </span>
-<span id="cb41-16"><a href="#cb41-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">prcomp</span>() <span class="ot">-&gt;</span></span>
-<span id="cb41-17"><a href="#cb41-17" aria-hidden="true" tabindex="-1"></a>  pca</span>
-<span id="cb41-18"><a href="#cb41-18" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb41-19"><a href="#cb41-19" aria-hidden="true" tabindex="-1"></a>syntax <span class="sc">|&gt;</span> </span>
-<span id="cb41-20"><a href="#cb41-20" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(name, age, group_var) <span class="sc">|&gt;</span> </span>
-<span id="cb41-21"><a href="#cb41-21" aria-hidden="true" tabindex="-1"></a>  <span class="fu">bind_cols</span>(pca<span class="sc">$</span>x) <span class="sc">|&gt;</span> </span>
-<span id="cb41-22"><a href="#cb41-22" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(PC1, PC2, <span class="at">color =</span> group_var))<span class="sc">+</span></span>
-<span id="cb41-23"><a href="#cb41-23" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>()<span class="sc">+</span></span>
-<span id="cb41-24"><a href="#cb41-24" aria-hidden="true" tabindex="-1"></a>  ggrepel<span class="sc">::</span><span class="fu">geom_text_repel</span>(<span class="fu">aes</span>(<span class="at">label =</span> <span class="fu">str_c</span>(name, <span class="st">" ("</span>, age, <span class="st">")"</span>)), <span class="at">max.overlaps =</span> <span class="dv">100</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</details>
-<div class="cell-output-display">
-<div>
-<figure class="figure">
-<p><img src="index_files/figure-html/unnamed-chunk-29-1.png" class="img-fluid figure-img" width="960"></p>
-</figure>
-</div>
-</div>
-</div>
-<p>Вроде CS, Cecile_Mamy 12, и Michel_Sonomy – авторы текстов, где больше всего предикаций…</p>
-<p>Всякие вопросы:</p>
-<p>Что будет если не нормализовывать?</p>
-<div class="cell">
-<details class="code-fold">
-<summary>Code</summary>
-<div class="sourceCode cell-code" id="cb42"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb42-1"><a href="#cb42-1" aria-hidden="true" tabindex="-1"></a>mano_corpus <span class="sc">|&gt;</span> </span>
-<span id="cb42-2"><a href="#cb42-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">unnest_tokens</span>(<span class="at">input =</span> text, <span class="at">output =</span> word, <span class="at">token =</span> <span class="st">"words"</span>) <span class="sc">|&gt;</span> </span>
-<span id="cb42-3"><a href="#cb42-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count</span>(name, age, group_var, word)  <span class="sc">|&gt;</span> </span>
-<span id="cb42-4"><a href="#cb42-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(word <span class="sc">%in%</span> freq_words) <span class="sc">|&gt;</span> </span>
-<span id="cb42-5"><a href="#cb42-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_wider</span>(<span class="at">names_from =</span> word, <span class="at">values_from =</span> n, <span class="at">values_fill =</span> <span class="dv">0</span>)  <span class="ot">-&gt;</span></span>
-<span id="cb42-6"><a href="#cb42-6" aria-hidden="true" tabindex="-1"></a>  lexicon</span>
-<span id="cb42-7"><a href="#cb42-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb42-8"><a href="#cb42-8" aria-hidden="true" tabindex="-1"></a>syntax <span class="sc">|&gt;</span> </span>
-<span id="cb42-9"><a href="#cb42-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">full_join</span>(tense) <span class="sc">|&gt;</span> </span>
-<span id="cb42-10"><a href="#cb42-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">full_join</span>(lexicon) <span class="sc">|&gt;</span> </span>
-<span id="cb42-11"><a href="#cb42-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">full_join</span>(reference_tracking) <span class="sc">|&gt;</span>  </span>
-<span id="cb42-12"><a href="#cb42-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">full_join</span>(french) <span class="sc">|&gt;</span> </span>
-<span id="cb42-13"><a href="#cb42-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">french =</span> <span class="fu">if_else</span>(<span class="fu">is.na</span>(french), <span class="dv">0</span>, french)) <span class="sc">|&gt;</span> </span>
-<span id="cb42-14"><a href="#cb42-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="sc">-</span><span class="fu">c</span>(name, age, group_var)) <span class="sc">|&gt;</span> </span>
-<span id="cb42-15"><a href="#cb42-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">prcomp</span>() <span class="ot">-&gt;</span></span>
-<span id="cb42-16"><a href="#cb42-16" aria-hidden="true" tabindex="-1"></a>  pca</span>
-<span id="cb42-17"><a href="#cb42-17" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb42-18"><a href="#cb42-18" aria-hidden="true" tabindex="-1"></a>syntax <span class="sc">|&gt;</span> </span>
-<span id="cb42-19"><a href="#cb42-19" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(name, age, group_var) <span class="sc">|&gt;</span> </span>
-<span id="cb42-20"><a href="#cb42-20" aria-hidden="true" tabindex="-1"></a>  <span class="fu">bind_cols</span>(pca<span class="sc">$</span>x) <span class="sc">|&gt;</span> </span>
-<span id="cb42-21"><a href="#cb42-21" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(PC1, PC2, <span class="at">color =</span> group_var))<span class="sc">+</span></span>
-<span id="cb42-22"><a href="#cb42-22" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>()<span class="sc">+</span></span>
-<span id="cb42-23"><a href="#cb42-23" aria-hidden="true" tabindex="-1"></a>  ggrepel<span class="sc">::</span><span class="fu">geom_text_repel</span>(<span class="fu">aes</span>(<span class="at">label =</span> <span class="fu">str_c</span>(name, <span class="st">" ("</span>, age, <span class="st">")"</span>)), <span class="at">max.overlaps =</span> <span class="dv">100</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</details>
-<div class="cell-output-display">
-<div>
-<figure class="figure">
-<p><img src="index_files/figure-html/unnamed-chunk-30-1.png" class="img-fluid figure-img" width="960"></p>
-</figure>
-</div>
-</div>
-</div>
-<p>Что будет если выкинуть авторов длинных текстов?</p>
-<div class="cell">
-<details class="code-fold">
-<summary>Code</summary>
 <div class="sourceCode cell-code" id="cb43"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb43-1"><a href="#cb43-1" aria-hidden="true" tabindex="-1"></a>mano_corpus <span class="sc">|&gt;</span> </span>
 <span id="cb43-2"><a href="#cb43-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">unnest_tokens</span>(<span class="at">input =</span> text, <span class="at">output =</span> word, <span class="at">token =</span> <span class="st">"words"</span>) <span class="sc">|&gt;</span> </span>
 <span id="cb43-3"><a href="#cb43-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count</span>(name, age, group_var, word)  <span class="sc">|&gt;</span> </span>
@@ -1289,25 +1289,100 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb43-11"><a href="#cb43-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">full_join</span>(reference_tracking) <span class="sc">|&gt;</span>  </span>
 <span id="cb43-12"><a href="#cb43-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">full_join</span>(french) <span class="sc">|&gt;</span> </span>
 <span id="cb43-13"><a href="#cb43-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">french =</span> <span class="fu">if_else</span>(<span class="fu">is.na</span>(french), <span class="dv">0</span>, french)) <span class="sc">|&gt;</span> </span>
-<span id="cb43-14"><a href="#cb43-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">name2 =</span> <span class="fu">str_c</span>(name, <span class="st">" ("</span>, age, <span class="st">")"</span>)) <span class="sc">|&gt;</span> </span>
-<span id="cb43-15"><a href="#cb43-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="sc">!</span>(name2 <span class="sc">%in%</span> <span class="fu">c</span>(<span class="st">"CS (100)"</span>, <span class="st">"Michel_Sonomy (15)"</span>, <span class="st">"Cecile_Mamy (12)"</span>))) <span class="sc">|&gt;</span> </span>
-<span id="cb43-16"><a href="#cb43-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="sc">-</span><span class="fu">c</span>(name, name2, age, group_var)) <span class="sc">|&gt;</span> </span>
-<span id="cb43-17"><a href="#cb43-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">prcomp</span>() <span class="ot">-&gt;</span></span>
-<span id="cb43-18"><a href="#cb43-18" aria-hidden="true" tabindex="-1"></a>  pca</span>
-<span id="cb43-19"><a href="#cb43-19" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb43-20"><a href="#cb43-20" aria-hidden="true" tabindex="-1"></a>syntax <span class="sc">|&gt;</span> </span>
-<span id="cb43-21"><a href="#cb43-21" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">name2 =</span> <span class="fu">str_c</span>(name, <span class="st">" ("</span>, age, <span class="st">")"</span>)) <span class="sc">|&gt;</span> </span>
-<span id="cb43-22"><a href="#cb43-22" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="sc">!</span>(name2 <span class="sc">%in%</span> <span class="fu">c</span>(<span class="st">"CS (100)"</span>, <span class="st">"Michel_Sonomy (15)"</span>, <span class="st">"Cecile_Mamy (12)"</span>))) <span class="sc">|&gt;</span> </span>
-<span id="cb43-23"><a href="#cb43-23" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(name, age, group_var) <span class="sc">|&gt;</span> </span>
-<span id="cb43-24"><a href="#cb43-24" aria-hidden="true" tabindex="-1"></a>  <span class="fu">bind_cols</span>(pca<span class="sc">$</span>x) <span class="sc">|&gt;</span> </span>
-<span id="cb43-25"><a href="#cb43-25" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(PC1, PC2, <span class="at">color =</span> group_var))<span class="sc">+</span></span>
-<span id="cb43-26"><a href="#cb43-26" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>()<span class="sc">+</span></span>
-<span id="cb43-27"><a href="#cb43-27" aria-hidden="true" tabindex="-1"></a>  ggrepel<span class="sc">::</span><span class="fu">geom_text_repel</span>(<span class="fu">aes</span>(<span class="at">label =</span> <span class="fu">str_c</span>(name, <span class="st">" ("</span>, age, <span class="st">")"</span>)), <span class="at">max.overlaps =</span> <span class="dv">100</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb43-14"><a href="#cb43-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="fu">across</span>(<span class="sc">-</span><span class="fu">c</span>(name, age, group_var), <span class="cf">function</span>(x) <span class="fu">scale</span>(x))) <span class="sc">|&gt;</span> </span>
+<span id="cb43-15"><a href="#cb43-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="sc">-</span><span class="fu">c</span>(name, age, group_var)) <span class="sc">|&gt;</span> </span>
+<span id="cb43-16"><a href="#cb43-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">prcomp</span>() <span class="ot">-&gt;</span></span>
+<span id="cb43-17"><a href="#cb43-17" aria-hidden="true" tabindex="-1"></a>  pca</span>
+<span id="cb43-18"><a href="#cb43-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb43-19"><a href="#cb43-19" aria-hidden="true" tabindex="-1"></a>syntax <span class="sc">|&gt;</span> </span>
+<span id="cb43-20"><a href="#cb43-20" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(name, age, group_var) <span class="sc">|&gt;</span> </span>
+<span id="cb43-21"><a href="#cb43-21" aria-hidden="true" tabindex="-1"></a>  <span class="fu">bind_cols</span>(pca<span class="sc">$</span>x) <span class="sc">|&gt;</span> </span>
+<span id="cb43-22"><a href="#cb43-22" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(PC1, PC2, <span class="at">color =</span> group_var))<span class="sc">+</span></span>
+<span id="cb43-23"><a href="#cb43-23" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>()<span class="sc">+</span></span>
+<span id="cb43-24"><a href="#cb43-24" aria-hidden="true" tabindex="-1"></a>  ggrepel<span class="sc">::</span><span class="fu">geom_text_repel</span>(<span class="fu">aes</span>(<span class="at">label =</span> <span class="fu">str_c</span>(name, <span class="st">" ("</span>, age, <span class="st">")"</span>)), <span class="at">max.overlaps =</span> <span class="dv">100</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="index_files/figure-html/unnamed-chunk-30-1.png" class="img-fluid figure-img" width="960"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>Вроде CS, Cecile_Mamy 12, и Michel_Sonomy – авторы текстов, где больше всего предикаций…</p>
+<p>Всякие вопросы:</p>
+<p>Что будет если не нормализовывать?</p>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb44"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb44-1"><a href="#cb44-1" aria-hidden="true" tabindex="-1"></a>mano_corpus <span class="sc">|&gt;</span> </span>
+<span id="cb44-2"><a href="#cb44-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">unnest_tokens</span>(<span class="at">input =</span> text, <span class="at">output =</span> word, <span class="at">token =</span> <span class="st">"words"</span>) <span class="sc">|&gt;</span> </span>
+<span id="cb44-3"><a href="#cb44-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count</span>(name, age, group_var, word)  <span class="sc">|&gt;</span> </span>
+<span id="cb44-4"><a href="#cb44-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(word <span class="sc">%in%</span> freq_words) <span class="sc">|&gt;</span> </span>
+<span id="cb44-5"><a href="#cb44-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_wider</span>(<span class="at">names_from =</span> word, <span class="at">values_from =</span> n, <span class="at">values_fill =</span> <span class="dv">0</span>)  <span class="ot">-&gt;</span></span>
+<span id="cb44-6"><a href="#cb44-6" aria-hidden="true" tabindex="-1"></a>  lexicon</span>
+<span id="cb44-7"><a href="#cb44-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb44-8"><a href="#cb44-8" aria-hidden="true" tabindex="-1"></a>syntax <span class="sc">|&gt;</span> </span>
+<span id="cb44-9"><a href="#cb44-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">full_join</span>(tense) <span class="sc">|&gt;</span> </span>
+<span id="cb44-10"><a href="#cb44-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">full_join</span>(lexicon) <span class="sc">|&gt;</span> </span>
+<span id="cb44-11"><a href="#cb44-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">full_join</span>(reference_tracking) <span class="sc">|&gt;</span>  </span>
+<span id="cb44-12"><a href="#cb44-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">full_join</span>(french) <span class="sc">|&gt;</span> </span>
+<span id="cb44-13"><a href="#cb44-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">french =</span> <span class="fu">if_else</span>(<span class="fu">is.na</span>(french), <span class="dv">0</span>, french)) <span class="sc">|&gt;</span> </span>
+<span id="cb44-14"><a href="#cb44-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="sc">-</span><span class="fu">c</span>(name, age, group_var)) <span class="sc">|&gt;</span> </span>
+<span id="cb44-15"><a href="#cb44-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">prcomp</span>() <span class="ot">-&gt;</span></span>
+<span id="cb44-16"><a href="#cb44-16" aria-hidden="true" tabindex="-1"></a>  pca</span>
+<span id="cb44-17"><a href="#cb44-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb44-18"><a href="#cb44-18" aria-hidden="true" tabindex="-1"></a>syntax <span class="sc">|&gt;</span> </span>
+<span id="cb44-19"><a href="#cb44-19" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(name, age, group_var) <span class="sc">|&gt;</span> </span>
+<span id="cb44-20"><a href="#cb44-20" aria-hidden="true" tabindex="-1"></a>  <span class="fu">bind_cols</span>(pca<span class="sc">$</span>x) <span class="sc">|&gt;</span> </span>
+<span id="cb44-21"><a href="#cb44-21" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(PC1, PC2, <span class="at">color =</span> group_var))<span class="sc">+</span></span>
+<span id="cb44-22"><a href="#cb44-22" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>()<span class="sc">+</span></span>
+<span id="cb44-23"><a href="#cb44-23" aria-hidden="true" tabindex="-1"></a>  ggrepel<span class="sc">::</span><span class="fu">geom_text_repel</span>(<span class="fu">aes</span>(<span class="at">label =</span> <span class="fu">str_c</span>(name, <span class="st">" ("</span>, age, <span class="st">")"</span>)), <span class="at">max.overlaps =</span> <span class="dv">100</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output-display">
 <div>
 <figure class="figure">
 <p><img src="index_files/figure-html/unnamed-chunk-31-1.png" class="img-fluid figure-img" width="960"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>Что будет если выкинуть авторов длинных текстов?</p>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb45"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb45-1"><a href="#cb45-1" aria-hidden="true" tabindex="-1"></a>mano_corpus <span class="sc">|&gt;</span> </span>
+<span id="cb45-2"><a href="#cb45-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">unnest_tokens</span>(<span class="at">input =</span> text, <span class="at">output =</span> word, <span class="at">token =</span> <span class="st">"words"</span>) <span class="sc">|&gt;</span> </span>
+<span id="cb45-3"><a href="#cb45-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count</span>(name, age, group_var, word)  <span class="sc">|&gt;</span> </span>
+<span id="cb45-4"><a href="#cb45-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(word <span class="sc">%in%</span> freq_words) <span class="sc">|&gt;</span> </span>
+<span id="cb45-5"><a href="#cb45-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_wider</span>(<span class="at">names_from =</span> word, <span class="at">values_from =</span> n, <span class="at">values_fill =</span> <span class="dv">0</span>)  <span class="ot">-&gt;</span></span>
+<span id="cb45-6"><a href="#cb45-6" aria-hidden="true" tabindex="-1"></a>  lexicon</span>
+<span id="cb45-7"><a href="#cb45-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb45-8"><a href="#cb45-8" aria-hidden="true" tabindex="-1"></a>syntax <span class="sc">|&gt;</span> </span>
+<span id="cb45-9"><a href="#cb45-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">full_join</span>(tense) <span class="sc">|&gt;</span> </span>
+<span id="cb45-10"><a href="#cb45-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">full_join</span>(lexicon) <span class="sc">|&gt;</span> </span>
+<span id="cb45-11"><a href="#cb45-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">full_join</span>(reference_tracking) <span class="sc">|&gt;</span>  </span>
+<span id="cb45-12"><a href="#cb45-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">full_join</span>(french) <span class="sc">|&gt;</span> </span>
+<span id="cb45-13"><a href="#cb45-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">french =</span> <span class="fu">if_else</span>(<span class="fu">is.na</span>(french), <span class="dv">0</span>, french)) <span class="sc">|&gt;</span> </span>
+<span id="cb45-14"><a href="#cb45-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">name2 =</span> <span class="fu">str_c</span>(name, <span class="st">" ("</span>, age, <span class="st">")"</span>)) <span class="sc">|&gt;</span> </span>
+<span id="cb45-15"><a href="#cb45-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="sc">!</span>(name2 <span class="sc">%in%</span> <span class="fu">c</span>(<span class="st">"CS (100)"</span>, <span class="st">"Michel_Sonomy (15)"</span>, <span class="st">"Cecile_Mamy (12)"</span>))) <span class="sc">|&gt;</span> </span>
+<span id="cb45-16"><a href="#cb45-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="sc">-</span><span class="fu">c</span>(name, name2, age, group_var)) <span class="sc">|&gt;</span> </span>
+<span id="cb45-17"><a href="#cb45-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">prcomp</span>() <span class="ot">-&gt;</span></span>
+<span id="cb45-18"><a href="#cb45-18" aria-hidden="true" tabindex="-1"></a>  pca</span>
+<span id="cb45-19"><a href="#cb45-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb45-20"><a href="#cb45-20" aria-hidden="true" tabindex="-1"></a>syntax <span class="sc">|&gt;</span> </span>
+<span id="cb45-21"><a href="#cb45-21" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">name2 =</span> <span class="fu">str_c</span>(name, <span class="st">" ("</span>, age, <span class="st">")"</span>)) <span class="sc">|&gt;</span> </span>
+<span id="cb45-22"><a href="#cb45-22" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="sc">!</span>(name2 <span class="sc">%in%</span> <span class="fu">c</span>(<span class="st">"CS (100)"</span>, <span class="st">"Michel_Sonomy (15)"</span>, <span class="st">"Cecile_Mamy (12)"</span>))) <span class="sc">|&gt;</span> </span>
+<span id="cb45-23"><a href="#cb45-23" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(name, age, group_var) <span class="sc">|&gt;</span> </span>
+<span id="cb45-24"><a href="#cb45-24" aria-hidden="true" tabindex="-1"></a>  <span class="fu">bind_cols</span>(pca<span class="sc">$</span>x) <span class="sc">|&gt;</span> </span>
+<span id="cb45-25"><a href="#cb45-25" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(PC1, PC2, <span class="at">color =</span> group_var))<span class="sc">+</span></span>
+<span id="cb45-26"><a href="#cb45-26" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>()<span class="sc">+</span></span>
+<span id="cb45-27"><a href="#cb45-27" aria-hidden="true" tabindex="-1"></a>  ggrepel<span class="sc">::</span><span class="fu">geom_text_repel</span>(<span class="fu">aes</span>(<span class="at">label =</span> <span class="fu">str_c</span>(name, <span class="st">" ("</span>, age, <span class="st">")"</span>)), <span class="at">max.overlaps =</span> <span class="dv">100</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="index_files/figure-html/unnamed-chunk-32-1.png" class="img-fluid figure-img" width="960"></p>
 </figure>
 </div>
 </div>

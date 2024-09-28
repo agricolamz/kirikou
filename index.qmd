@@ -575,21 +575,76 @@ mano_corpus |>
          FUT = str_count(chunk_structure, "FUT"),
          NEG.COND = str_count(chunk_structure, "NEG.COND"),
          NEG = str_count(chunk_structure, "NEG") - NEG.COND,
-         RES = str_count(chunk_structure, "RES"),
          COND = str_count(chunk_structure, "COND"),
          IMP = str_count(chunk_structure, "IMP"),
          PROSP = str_count(chunk_structure, "PROSP"),
-         ADV = str_count(chunk_structure, "ADV"),
          PROT.IRR = str_count(chunk_structure, "PROT.IRR"),
          APOD.IRR = str_count(chunk_structure, "APOD.IRR"),
          IRR = str_count(chunk_structure, "APOD.IRR"),
-         PROH = str_count(chunk_structure, "PROH"),
-         PURP = str_count(chunk_structure, "PURP"),
-         PS = str_count(chunk_structure, "PS") - PST,
-         FUR = str_count(chunk_structure, "FUR")) |> 
+         PROH = str_count(chunk_structure, "PROH")) |> 
   select(-chunk_structure) ->
   tense
+
+tense
+
+tense |> 
+  pivot_longer(names_to = "tense", values_to = "n", -c(name, age, group_var)) |> 
+  mutate(tense = case_when(tense %in% c("COND", "IRR", "PROT.IRR", "APOD.IRR", "NEG.COND") ~ "CONDs",
+                           tense %in% c("PROH", "IMP") ~ "PROH or IMP",
+                           tense %in% c("EXI", "PRED", "IPFV", "FUT", "PROSP") ~ "non-past",
+                           TRUE ~ tense)) |> 
+  group_by(name, age, group_var, tense) |>
+  summarise(n = sum(n)) |> 
+  group_by(name, age, group_var) |> 
+  mutate(total = sum(n),
+         ratio = n/total) |> 
+  select(-n, -total) |> 
+  ungroup() |> 
+  mutate(name = str_c(name, " (", age, ")"),
+         name = fct_reorder(name, age),
+         tense = factor(tense, levels = c("CONDs", "PROH or IMP",
+                                          "non-past","NEG", "CONJ",
+                                          "PRF", "JNT", "PST")),
+         label = str_c(round(ratio * 100), "%")) |>
+  filter(ratio > 0) |>
+  ggplot(aes(x = ratio, y = name, label = label, color = tense))+
+  geom_col(aes(fill = tense))+
+  geom_label(position = position_fill(vjust = 0.5), fill = "white")+
+  scale_x_continuous(label = scales::percent)+
+  labs(x = NULL, y = NULL)
 ```
+
+Выкидываем JNT и PST
+
+```{r}
+tense |> 
+  pivot_longer(names_to = "tense", values_to = "n", -c(name, age, group_var)) |> 
+  mutate(tense = case_when(tense %in% c("COND", "IRR", "PROT.IRR", "APOD.IRR", "NEG.COND") ~ "CONDs",
+                           tense %in% c("PROH", "IMP") ~ "PROH or IMP",
+                           tense %in% c("EXI", "PRED", "IPFV", "FUT", "PROSP") ~ "non-past",
+                           TRUE ~ tense)) |> 
+  filter(!(tense %in% c("JNT", "PST"))) |> 
+  group_by(name, age, group_var, tense) |>
+  summarise(n = sum(n)) |> 
+  group_by(name, age, group_var) |> 
+  mutate(total = sum(n),
+         ratio = n/total) |> 
+  select(-n, -total) |> 
+  ungroup() |> 
+  mutate(name = str_c(name, " (", age, ")"),
+         name = fct_reorder(name, age),
+         tense = factor(tense, levels = c("CONDs", "PROH or IMP",
+                                          "non-past","NEG", "CONJ",
+                                          "PRF", "JNT", "PST")),
+         label = str_c(round(ratio * 100), "%")) |>
+  filter(ratio > 0) |>
+  ggplot(aes(x = ratio, y = name, label = label, color = tense))+
+  geom_col(aes(fill = tense))+
+  geom_label(position = position_fill(vjust = 0.5), fill = "white")+
+  scale_x_continuous(label = scales::percent)+
+  labs(x = NULL, y = NULL)
+```
+
 
 График соотношения количества JNT и PST
 
@@ -708,17 +763,14 @@ mano_corpus |>
          PROT.IRR = str_count(rs, "PROT.IRR"),
          APOD.IRR = str_count(rs, "APOD.IRR"),
          IRR = str_count(rs, "APOD.IRR"),
-         PROH = str_count(rs, "PROH"),
-         PURP = str_count(rs, "PURP"),
-         PS = str_count(rs, "PS") - PST,
-         FUR = str_count(rs, "FUR")) |> 
+         PROH = str_count(rs, "PROH")) |> 
   select(-chunk_structure, -rs) ->
   tense_rs
 
 tense_rs
 ```
 
-В RS ниукого не встретилась следующая категория
+В RS не у кого не встретилась следующая категория
 
 ```{r}
 tense_rs |> 
