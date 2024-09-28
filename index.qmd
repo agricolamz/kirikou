@@ -2,12 +2,15 @@
 title: "Kirikou NLP"
 date: today
 date-format: D.MM.YYYY
-format: html
+format: 
+  html:
+    toc: true
 df-print: paged
 execute:
   warning: false
   message: false
-  fig-width: 9
+fig-height: 6
+fig-width: 10
 editor: source
 code-fold: true
 editor_options: 
@@ -21,7 +24,8 @@ editor_options:
 
 # setwd("/home/agricolamz/work/articles/2025_kirikou/repo/")
 library(tidyverse)
-theme_set(theme_minimal()+theme(text = element_text(size = 16)))
+theme_set(theme_minimal()+theme(legend.position = "bottom", 
+                                text = element_text(size = 16)))
 library(tidytext)
 
 readxl::read_xlsx("kirikou_annotations.xlsx", sheet = "kirikou Mano") |>
@@ -63,7 +67,8 @@ readxl::read_xlsx("kirikou_annotations.xlsx", sheet = "folktales Mano adults") |
             ft = str_c(ft, collapse = " ")) |> 
   mutate(age_group = "adults") |> 
   bind_rows(mano_chi_corpus) |> 
-  mutate(group_var = case_when(text_type == "kirikou" & residence_place == "Nzerekore" ~ "Kirikou (Nzerekore)",
+  mutate(group_var = case_when(text_type == "kirikou" & residence_place == "Nzerekore" & socio_family_adoptive == "Mano" ~ "Kirikou (Nzerekore): Mano",
+                               text_type == "kirikou" & residence_place == "Nzerekore" & socio_family_adoptive == "Bilingual" ~ "Kirikou (Nzerekore): Bilingual",
                                text_type == "kirikou" & residence_place != "Nzerekore" ~ "Kirikou (other)",
                                text_type == "folktales" & age_group == "children" ~ "folktales (children)",
                                text_type == "folktales" & age_group == "adults" ~ "folktales (adults)")) |> 
@@ -82,7 +87,7 @@ mano_corpus |>
   mutate(word = reorder_within(word, by = n, within = group_var)) |>  
   ggplot(aes(n, word))+
   geom_col()+
-  facet_wrap(~group_var, scales = "free", nrow = 1)+
+  facet_wrap(~group_var, scales = "free")+
   scale_y_reordered()+
   labs(x = NULL, y = NULL)
 ```
@@ -193,7 +198,7 @@ mano_corpus |>
   mutate(word = reorder_within(word, by = n, within = group_var)) |> 
   ggplot(aes(n, word))+
   geom_col()+
-  facet_wrap(~group_var, scales = "free", nrow = 1)+
+  facet_wrap(~group_var, scales = "free")+
   scale_y_reordered()+
   labs(x = NULL, y = NULL)
 ```
@@ -209,7 +214,7 @@ mano_corpus |>
   mutate(ngram = reorder_within(ngram, by = n, within = group_var)) |> 
   ggplot(aes(n, ngram))+
   geom_col()+
-  facet_wrap(~group_var, scales = "free", nrow = 1)+
+  facet_wrap(~group_var, scales = "free")+
   scale_y_reordered()+
   labs(x = NULL, y = NULL)
 ```
@@ -225,7 +230,7 @@ mano_corpus |>
   mutate(ngram = reorder_within(ngram, by = n, within = group_var)) |> 
   ggplot(aes(n, ngram))+
   geom_col()+
-  facet_wrap(~group_var, scales = "free", nrow = 1)+
+  facet_wrap(~group_var, scales = "free")+
   scale_y_reordered()+
   labs(x = NULL, y = NULL)
 ```
@@ -245,7 +250,7 @@ mano_corpus |>
   mutate(word = reorder_within(word, n, group_var)) |> 
   ggplot(aes(word, n)) +
   geom_bar(stat="identity") +
-  facet_wrap(~ group_var, scales = "free", nrow = 1) +
+  facet_wrap(~ group_var, scales = "free") +
   coord_flip() +
   scale_x_reordered() +
   labs(x = NULL, y = NULL)
@@ -260,7 +265,7 @@ mano_corpus |>
   mutate(ngram = reorder_within(ngram, n, group_var)) |> 
   ggplot(aes(ngram, n)) +
   geom_bar(stat="identity") +
-  facet_wrap(~ group_var, scales = "free", nrow = 1) +
+  facet_wrap(~ group_var, scales = "free") +
   coord_flip() +
   scale_x_reordered() +
   labs(x = NULL, y = NULL)
@@ -275,7 +280,7 @@ mano_corpus |>
   mutate(ngram = reorder_within(ngram, n, group_var)) |> 
   ggplot(aes(ngram, n)) +
   geom_bar(stat="identity") +
-  facet_wrap(~ group_var, scales = "free", nrow = 1) +
+  facet_wrap(~ group_var, scales = "free") +
   coord_flip() +
   scale_x_reordered() +
   labs(x = NULL, y = NULL)
@@ -367,7 +372,7 @@ library(dendextend)
 
 mano_corpus |> 
   mutate(name = str_c(name, " (", age, "):\t", group_var),
-         color = scales::hue_pal()(4)[factor(group_var)]) |> 
+         color = scales::hue_pal()(5)[factor(group_var)]) |> 
   distinct(name, color) ->
   colors
 
@@ -388,13 +393,11 @@ mano_corpus |>
   as.dendrogram() ->
   dend
 
-par(mar=c(2,0,0,18))
+par(mar=c(2,0,0,23))
 dend |> 
   set("labels_col", colors$color[match(labels(dend), colors$name)]) |> 
   plot(horiz = TRUE)
 ```
-
-Я попробовал разные количества слов (20-30-40-50, больше тупо брать --- совсем много пропусков буедт), но красные билингвы из Нзерекоре устойчивы, а синие-зеленые манцы перемешиваются, что в принципе подтверждает, что билингвы немного другие.
 
 ### Векторизация
 
@@ -561,101 +564,44 @@ mano_corpus |>
 
 ```{r}
 mano_corpus |> 
-  mutate(chunk_structure_old = chunk_structure, 
-         chunk_structure = str_remove_all(chunk_structure, "(?<=\\]).*?(?=\\[)"), 
-         chunk_structure = str_remove_all(chunk_structure, "<.*?>"),
-         chunk_structure = str_remove_all(chunk_structure, "(NP)|(CR)|(SR)|(FRENCH)|(ONOMAT)|(SG)|(SC)|(NMLZ)|(\\.\\.\\.)"),
-         chunk_structure = str_remove_all(chunk_structure, "[^A-Z_\\.\\]\\[]"),
-         #chunk_structure = str_remove_all(chunk_structure, not_french),
-         chunk_structure = str_replace_all(chunk_structure, "IPFVPP", "IPFV"),
-         chunk_structure = str_replace_all(chunk_structure, "PRFPP", "PRF"),
-         chunk_structure = str_replace_all(chunk_structure, "PSTPP", "PST"),
-         chunk_structure = str_replace_all(chunk_structure, "PSTADV", "PST"),
-         chunk_structure = str_replace_all(chunk_structure, "JNTPP", "JNT"),
-         chunk_structure = str_replace_all(chunk_structure, "JNTADV", "JNT"),
-         chunk_structure = str_replace_all(chunk_structure, "JNTPP", "JNT"),
-         chunk_structure = str_replace_all(chunk_structure, "EXI\\.\\.PP", "EXI"),
-         chunk_structure = str_replace_all(chunk_structure, "EXIPP", "EXI"),
-         chunk_structure = str_replace_all(chunk_structure, "PSTPP\\.", "PST"),
-         chunk_structure = str_replace_all(chunk_structure, "CONJ\\.", "CONJ"),
-         chunk_structure = str_replace_all(chunk_structure, "EXI\\.DUR", "EXI"),
-         chunk_structure = str_replace_all(chunk_structure, "EXIDUR", "EXI"),
-         chunk_structure = str_replace_all(chunk_structure, "PST\\.DURADV", "PST"),
-          chunk_structure = str_replace_all(chunk_structure, "PSTPP..ADV", "PST"),
-         chunk_structure = str_replace_all(chunk_structure, "PSTPP.PP", "PST"),
-         chunk_structure = str_replace_all(chunk_structure, "CONJPP", "CONJ"),
-         chunk_structure = str_replace_all(chunk_structure, "CONJPP", "CONJ"),
-         chunk_structure = str_replace_all(chunk_structure, "PSTPST", "PSTPST"),
-         chunk_structure = str_replace_all(chunk_structure, "CONJADV", "CONJ"),
-         chunk_structure = str_replace_all(chunk_structure, "PSTPHASPP", "PSTP"),
-         chunk_structure = str_replace_all(chunk_structure, "PST\\.DURPP\\.", "PST"),
-         chunk_structure = str_replace_all(chunk_structure, "PST\\.DURPP\\.", "PST"),
-         chunk_structure = str_replace_all(chunk_structure, "PST\\.", "PST"),
-         chunk_structure = str_replace_all(chunk_structure, "PST\\.", "PST"),
-         chunk_structure = str_replace_all(chunk_structure, "PSTDUR", "PST"),
-         chunk_structure = str_replace_all(chunk_structure, "PSTADV", "PST"),
-         chunk_structure = str_replace_all(chunk_structure, "PSTPP", "PST"),
-                  chunk_structure = str_replace_all(chunk_structure, "PSTPST", "PST"),
-         chunk_structure = str_replace_all(chunk_structure, "PSTP", "PST"),
-         chunk_structure = str_replace_all(chunk_structure, "PSTSAY", "PST\\.SAY"),
-         chunk_structure = str_replace_all(chunk_structure, "JNT.SAYPP", "JNT.SAY"),
-         chunk_structure = str_replace_all(chunk_structure, "JNT.SAYPP", "JNT.SAY"),
-         chunk_structure = str_replace_all(chunk_structure, "IMPPP", "IMP"),
-         chunk_structure = str_replace_all(chunk_structure, "JNTJNT", "JNT"),
-         chunk_structure = str_replace_all(chunk_structure, "PST.NEG", "NEG"),
-         chunk_structure = str_replace_all(chunk_structure, "PST.SAYPP", "PST.SAY"),
-         chunk_structure = str_replace_all(chunk_structure, "PRF\\.\\.", "PRF"),
-         chunk_structure = str_replace_all(chunk_structure, "PRF\\.\\.", "PRF"),
-         chunk_structure = str_split(chunk_structure, "\\]\\[")) |> 
-  unnest_longer(chunk_structure) |> 
-  mutate(chunk_structure = str_remove_all(chunk_structure, "[\\]\\}\\[\\{]"),
-         chunk_structure = str_remove_all(chunk_structure, "^[_\\.]{1,}")) |> 
-  mutate(chunk_structure = str_remove(chunk_structure, "\\_.*")) |> 
-  filter(chunk_structure != "",
-         chunk_structure != "PP",
-         chunk_structure != "NP",
-         chunk_structure != "R",
-         chunk_structure != "SAY") ->
-  tense_marking
-```
-
-Вот какие получились столбцы:
-
-```{r}
-tense_marking |> 
-  distinct(chunk_structure) |> 
-  pull(chunk_structure)
-```
-
-Вот финальная таблица:
-
-```{r}
-tense_marking |> 
-  mutate(chunk_structure = str_remove(chunk_structure, "\\.SAY")) |> 
-  count(name, age, group_var, chunk_structure, sort = TRUE) |> 
-  pivot_wider(names_from = chunk_structure, values_from = n, values_fill = 0)  ->
+  select(name, age, group_var, chunk_structure) |> 
+  mutate(PST = str_count(chunk_structure, "PST"),
+         JNT = str_count(chunk_structure, "JNT"),
+         IPFV = str_count(chunk_structure, "IPFV"),
+         PRED = str_count(chunk_structure, "PRED"),
+         EXI = str_count(chunk_structure, "EXI"),
+         CONJ = str_count(chunk_structure, "CONJ"),
+         PRF = str_count(chunk_structure, "PRF"),
+         FUT = str_count(chunk_structure, "FUT"),
+         NEG.COND = str_count(chunk_structure, "NEG.COND"),
+         NEG = str_count(chunk_structure, "NEG") - NEG.COND,
+         RES = str_count(chunk_structure, "RES"),
+         COND = str_count(chunk_structure, "COND"),
+         IMP = str_count(chunk_structure, "IMP"),
+         PROSP = str_count(chunk_structure, "PROSP"),
+         ADV = str_count(chunk_structure, "ADV"),
+         PROT.IRR = str_count(chunk_structure, "PROT.IRR"),
+         APOD.IRR = str_count(chunk_structure, "APOD.IRR"),
+         IRR = str_count(chunk_structure, "APOD.IRR"),
+         PROH = str_count(chunk_structure, "PROH"),
+         PURP = str_count(chunk_structure, "PURP"),
+         PS = str_count(chunk_structure, "PS") - PST,
+         FUR = str_count(chunk_structure, "FUR")) |> 
+  select(-chunk_structure) ->
   tense
-
-tense
 ```
 
 График соотношения количества JNT и PST
 
 ```{r}
-tense_marking |> 
-  mutate(chunk_structure = str_remove(chunk_structure, "\\.SAY")) |> 
-  count(name, age, group_var, chunk_structure, sort = TRUE)  |> 
-  pivot_wider(names_from = chunk_structure, values_from = n, values_fill = 0) |> 
+tense |> 
   mutate(PST = if_else(PST == 0, 0.9, PST),
          JNT = if_else(JNT == 0, 0.9, JNT)) |> 
   select(name, age, group_var, PST, JNT) |> 
   mutate(ratio = PST/(PST+JNT)) |> 
   arrange(-ratio)
 
-tense_marking |> 
-  mutate(chunk_structure = str_remove(chunk_structure, "\\.SAY")) |> 
-  count(name, age, group_var, chunk_structure, sort = TRUE)  |> 
-  pivot_wider(names_from = chunk_structure, values_from = n, values_fill = 0) |> 
+tense |> 
   mutate(PST = if_else(PST == 0, 0.9, PST),
          JNT = if_else(JNT == 0, 0.9, JNT)) |> 
   select(name, age, group_var, PST, JNT) |> 
@@ -672,20 +618,22 @@ tense_marking |>
 JNT.SAY vs JNT без SAY
 
 ```{r}
-tense_marking |> 
-  filter(str_detect(chunk_structure, "JNT")) |> 
-  count(name, age, group_var, chunk_structure, sort = TRUE) |> 
-  pivot_wider(names_from = chunk_structure, values_from = n, values_fill = 0) |> 
-  mutate(ratio = JNT/(JNT+JNT.SAY)) |> 
+mano_corpus |> 
+  select(name, age, group_var, chunk_structure) |> 
+  mutate(JNT.SAY = str_count(chunk_structure, "JNT.SAY"),
+         JNT = str_count(chunk_structure, "JNT") - JNT.SAY,
+         ratio = JNT/(JNT+JNT.SAY)) |> 
+  select(-chunk_structure) |>
   arrange(-ratio)
 
-tense_marking |> 
-  filter(str_detect(chunk_structure, "JNT")) |> 
-  count(name, age, group_var, chunk_structure, sort = TRUE) |> 
-  pivot_wider(names_from = chunk_structure, values_from = n, values_fill = 0) |> 
-  mutate(JNT = if_else(JNT == 0, 0.9, JNT),
-         JNT.SAY = if_else(JNT.SAY == 0, 0.9, JNT.SAY)) |> 
-  mutate(name = str_c(name, " (", age, ")")) |> 
+mano_corpus |> 
+  select(name, age, group_var, chunk_structure) |> 
+  mutate(JNT.SAY = str_count(chunk_structure, "JNT.SAY"),
+         JNT = str_count(chunk_structure, "JNT") - JNT.SAY,
+         JNT.SAY = if_else(JNT.SAY == 0, 0.9, JNT.SAY),
+         JNT = if_else(JNT == 0, 0.9, JNT),
+         name = str_c(name, " (", age, ")")) |> 
+  select(-chunk_structure) |>
   ggplot(aes(JNT, JNT.SAY, color = group_var))+
   geom_smooth(method = "lm", se = FALSE, color = "grey60", linetype = 2)+
   geom_point()+
@@ -697,30 +645,88 @@ tense_marking |>
 PST + JNT vs other
 
 ```{r}
-tense_marking |> 
-  mutate(pst_jnt_other = if_else(str_detect(chunk_structure, "(PST)|(JNT)"), 
+tense |> 
+  pivot_longer(names_to = "tense", values_to = "n", -c(name, age, group_var)) |> 
+  mutate(pst_jnt_other = if_else(str_detect(tense, "(PST)|(JNT)"), 
                                  "PST_or_JNT",
                                  "other")) |> 
-  count(name, age, group_var, pst_jnt_other, sort = TRUE) |> 
+  group_by(name, age, group_var, pst_jnt_other) |> 
+  summarise(n = sum(n)) |> 
   pivot_wider(names_from = pst_jnt_other, values_from = n, values_fill = 0) |> 
   mutate(ratio = PST_or_JNT/(PST_or_JNT+other)) |> 
   arrange(-ratio)
 
-tense_marking |> 
-  mutate(pst_jnt_other = if_else(str_detect(chunk_structure, "(PST)|(JNT)"), 
+tense |> 
+  pivot_longer(names_to = "tense", values_to = "n", -c(name, age, group_var)) |> 
+  mutate(pst_jnt_other = if_else(str_detect(tense, "(PST)|(JNT)"), 
                                  "PST_or_JNT",
                                  "other")) |> 
-  count(name, age, group_var, pst_jnt_other, sort = TRUE) |> 
+  group_by(name, age, group_var, pst_jnt_other) |> 
+  summarise(n = sum(n)) |> 
   pivot_wider(names_from = pst_jnt_other, values_from = n, values_fill = 0) |> 
   mutate(PST_or_JNT = if_else(PST_or_JNT == 0, 0.9, PST_or_JNT),
-         other = if_else(other == 0, 0.9, other)) |> 
-  mutate(name = str_c(name, " (", age, ")")) |> 
+         other = if_else(other == 0, 0.9, other),
+         name = str_c(name, " (", age, ")")) |> 
   ggplot(aes(PST_or_JNT, other, color = group_var))+
   geom_smooth(method = "lm", se = FALSE, color = "grey60", linetype = 2)+
   geom_point()+
   scale_x_log10()+
   scale_y_log10()+
   ggrepel::geom_text_repel(aes(label = name))
+```
+
+## Diversity of tense marking in rs
+
+```{r}
+extract_and_concatenate_rs <- function(string){
+  string |> 
+    str_extract_all("rs%.*?%") |> 
+    unlist() |> 
+    str_remove_all("rs%") |> 
+    str_remove_all("%") |> 
+    str_c(collapse = " ")
+}
+
+mano_corpus |> 
+  select(name, age, group_var, chunk_structure) |> 
+  mutate(rs = map_chr(mano_corpus$chunk_structure, extract_and_concatenate_rs),
+         PST = str_count(rs, "PST"),
+         JNT = str_count(rs, "JNT"),
+         IPFV = str_count(rs, "IPFV"),
+         PRED = str_count(rs, "PRED"),
+         EXI = str_count(rs, "EXI"),
+         CONJ = str_count(rs, "CONJ"),
+         PRF = str_count(rs, "PRF"),
+         FUT = str_count(rs, "FUT"),
+         NEG.COND = str_count(rs, "NEG.COND"),
+         NEG = str_count(rs, "NEG") - NEG.COND,
+         RES = str_count(rs, "RES"),
+         COND = str_count(rs, "COND"),
+         IMP = str_count(rs, "IMP"),
+         PROSP = str_count(rs, "PROSP"),
+         ADV = str_count(rs, "ADV"),
+         PROT.IRR = str_count(rs, "PROT.IRR"),
+         APOD.IRR = str_count(rs, "APOD.IRR"),
+         IRR = str_count(rs, "APOD.IRR"),
+         PROH = str_count(rs, "PROH"),
+         PURP = str_count(rs, "PURP"),
+         PS = str_count(rs, "PS") - PST,
+         FUR = str_count(rs, "FUR")) |> 
+  select(-chunk_structure, -rs) ->
+  tense_rs
+
+tense_rs
+```
+
+В RS ниукого не встретилась следующая категория
+
+```{r}
+tense_rs |> 
+  pivot_longer(names_to = "tense", values_to = "n", -c(name, age, group_var)) |> 
+  group_by(tense) |> 
+  summarise(n = sum(n)) |> 
+  filter(n == 0) |> 
+  pull(tense)
 ```
 
 ## сложный синтаксис
@@ -734,7 +740,7 @@ mano_corpus |>
          rel = str_count(chunk_structure, "rel"),
          temp = str_count(chunk_structure, "temp"),
          cond = str_count(chunk_structure, "cond"),
-         purp = str_count(chunk_structure, "purp"),
+          purp = str_count(chunk_structure, "purp"),
          prec = str_count(chunk_structure, "prec"),
          compar = str_count(chunk_structure, "compar"),
          mod = str_count(chunk_structure, "mod"),
@@ -816,3 +822,67 @@ syntax |>
 ```
 
 Вроде CS, Cecile_Mamy 12, и Michel_Sonomy -- авторы текстов, где больше всего предикаций...
+
+
+Всякие вопросы:
+
+Что будет если не нормализовывать?
+
+```{r}
+mano_corpus |> 
+  unnest_tokens(input = text, output = word, token = "words") |> 
+  count(name, age, group_var, word)  |> 
+  filter(word %in% freq_words) |> 
+  pivot_wider(names_from = word, values_from = n, values_fill = 0)  ->
+  lexicon
+
+syntax |> 
+  full_join(tense) |> 
+  full_join(lexicon) |> 
+  full_join(reference_tracking) |>  
+  full_join(french) |> 
+  mutate(french = if_else(is.na(french), 0, french)) |> 
+  select(-c(name, age, group_var)) |> 
+  prcomp() ->
+  pca
+
+syntax |> 
+  select(name, age, group_var) |> 
+  bind_cols(pca$x) |> 
+  ggplot(aes(PC1, PC2, color = group_var))+
+  geom_point()+
+  ggrepel::geom_text_repel(aes(label = str_c(name, " (", age, ")")), max.overlaps = 100)
+```
+
+Что будет если выкинуть авторов длинных текстов?
+
+```{r}
+mano_corpus |> 
+  unnest_tokens(input = text, output = word, token = "words") |> 
+  count(name, age, group_var, word)  |> 
+  filter(word %in% freq_words) |> 
+  pivot_wider(names_from = word, values_from = n, values_fill = 0)  ->
+  lexicon
+
+syntax |> 
+  full_join(tense) |> 
+  full_join(lexicon) |> 
+  full_join(reference_tracking) |>  
+  full_join(french) |> 
+  mutate(french = if_else(is.na(french), 0, french)) |> 
+  mutate(name2 = str_c(name, " (", age, ")")) |> 
+  filter(!(name2 %in% c("CS (100)", "Michel_Sonomy (15)", "Cecile_Mamy (12)"))) |> 
+  select(-c(name, name2, age, group_var)) |> 
+  prcomp() ->
+  pca
+
+syntax |> 
+  mutate(name2 = str_c(name, " (", age, ")")) |> 
+  filter(!(name2 %in% c("CS (100)", "Michel_Sonomy (15)", "Cecile_Mamy (12)"))) |> 
+  select(name, age, group_var) |> 
+  bind_cols(pca$x) |> 
+  ggplot(aes(PC1, PC2, color = group_var))+
+  geom_point()+
+  ggrepel::geom_text_repel(aes(label = str_c(name, " (", age, ")")), max.overlaps = 100)
+```
+
