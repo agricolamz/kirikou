@@ -1366,12 +1366,18 @@ corpus_duration |>
   total_duration
 
 total_duration
+
+corpus_duration |> 
+  ungroup() |> 
+  summarise(duration = median(duration)) |> 
+  pull(duration) |> 
+  as.duration() ->
+  median_duration
+
+median_duration
 ```
 
-Общая длительность корпуса 2 часа 50 минут.
-
-
-Overall, in our corpus they were used X and Y times respectively, or ??? and ???%, out of ??? finite predications total.
+The total duration of the corpus is 2 h 50 min, while the median duration of texts is 4 min.
 
 ```{r}
 mano_corpus |> 
@@ -1388,7 +1394,141 @@ mano_corpus |>
   summarise(n_predecations = sum(n_predecations)) ->
   n_predecations
 
-percantage <- round((pst_jnt$pst + pst_jnt$jnt)/n_predecations*100)
+percantage <- round((pst_jnt$pst + pst_jnt$jnt)/n_predecations$n_predecations*100)
 ```
 
-Overall, in our corpus they were used `r pst_jnt$pst` and `r pst_jnt$jnt` times respectively, or  and `r percantage`%, out of `r n_predecations` finite predications total.
+Overall, in our (Mano) corpus they were used `r pst_jnt$pst` and `r pst_jnt$jnt` times respectively, or  and `r percantage`%, out of `r n_predecations$n_predecations` finite predications total.
+
+```{r}
+mano_corpus |> 
+  select(name, age, group_var, chunk_structure) |> 
+  mutate(ors = str_remove_all(chunk_structure, "rs%.*?%"),
+         pst = str_count(ors, "PST"),
+         jnt = str_count(ors, "JNT")) |> 
+  select(-chunk_structure, -ors) |> 
+  summarise(pst = sum(pst),
+            jnt = sum(jnt))->
+  pst_jnt_ors
+
+percantage_ors <- round((pst_jnt_ors$pst + pst_jnt_ors$jnt)/n_predecations$n_predecations*100)
+```
+
+By excluding reported speech we arrive at an even **LOWER** proportion: `r pst_jnt_ors$pst` and `r pst_jnt_ors$jnt` tokens of PST and JNT, respectively, representing `r pst_jnt_ors$pst+pst_jnt_ors$jnt` and `r percantage_ors`% of predications.
+
+> Is it true that IMP is only used in RS? what about PROH?
+
+```{r}
+mano_corpus |> 
+  select(name, age, group_var, chunk_structure) |> 
+  mutate(imp = str_count(chunk_structure, "IMP"),
+         proh = str_count(chunk_structure, "PROH"),
+         ors = str_remove_all(chunk_structure, "rs%.*?%"),
+         imp_ors = str_count(ors, "IMP"),
+         proh_ors = str_count(ors, "PROH")) |> 
+  summarise(imp = sum(imp),
+            proh = sum(proh),
+            imp_ors = sum(imp_ors),
+            proh_ors = sum(proh_ors)) ->
+  imp_proh
+```
+
+There are only `r imp_proh$imp_ors` utterances of IMP outside of RS out of `r imp_proh$imp` total utterances. There are only `r imp_proh$proh_ors` utterances of PROH outside of RS out of `r imp_proh$proh` total utterances.
+
+> Visualization of RES + PHAS + RETR to the number of predications outside RS
+
+```{r}
+mano_corpus |> 
+  select(name, age, group_var, chunk_structure) |> 
+  mutate(chunk_structure = str_remove_all(chunk_structure, "rs%.*?%"),
+         res = str_count(chunk_structure, "RES"),
+         phas = str_count(chunk_structure, "PHAS"),
+         retr = str_count(chunk_structure, "RETR")) |> 
+  summarise(res = sum(res),
+            phas = sum(phas),
+            retr = sum(retr)) ->
+  res_phas_retr
+
+percantage_res <- round((res_phas_retr$res)/n_predecations$n_predecations*100)
+percantage_phas <- round((res_phas_retr$phas)/n_predecations$n_predecations*100)
+percantage_retr <- round((res_phas_retr$retr)/n_predecations$n_predecations*100)
+
+res_phas_retr_sum <- sum(res_phas_retr)
+percantage_res_phas_retr <- round((res_phas_retr_sum)/n_predecations$n_predecations*100)
+```
+
+- There are only `r res_phas_retr_sum` utterances of RES outside of RS (`r percantage_res_phas_retr`%). 
+- There are only `r res_phas_retr$res` utterances of RES outside of RS (`r percantage_res`%). 
+- There are only `r res_phas_retr$phas` utterances of PHAS outside of RS (`r percantage_phas`%). 
+- There are only `r res_phas_retr$retr` utterances of RETR outside of RS (`r percantage_retr`%).
+
+Я не очень понимаю, о какой визуализации ты говоришь... Там такие крошечные числа...
+
+```{r}
+mano_corpus |> 
+  select(name, age, group_var, chunk_structure) |> 
+  mutate(chunk_structure = str_remove_all(chunk_structure, "rs%.*?%"),
+         res = str_count(chunk_structure, "RES"),
+         phas = str_count(chunk_structure, "PHAS"),
+         retr = str_count(chunk_structure, "RETR"),
+         res_phas_retr = res + phas + retr,
+         n_predecations = str_count(chunk_structure, "\\[")) |> 
+  ggplot(aes(n_predecations, res_phas_retr, color = group_var))+
+  geom_smooth(method = "lm", se = FALSE, color = "grey60", linetype = 2)+
+  geom_point()
+
+mano_corpus |> 
+  select(name, age, group_var, chunk_structure) |> 
+  mutate(chunk_structure = str_remove_all(chunk_structure, "rs%.*?%"),
+         res = str_count(chunk_structure, "RES"),
+         phas = str_count(chunk_structure, "PHAS"),
+         retr = str_count(chunk_structure, "RETR"),
+         res_phas_retr = res + phas + retr,
+         n_predecations = str_count(chunk_structure, "\\["),
+         ratio = res_phas_retr/n_predecations) |> 
+  ggplot(aes(ratio, group_var))+
+  geom_point(alpha = 0.4)+
+  labs(y = NULL)
+```
+
+> calculate and visualize individual ratios of DUR to text length in predications outside RS
+
+```{r}
+
+```
+
+```{r}
+mano_corpus |> 
+  select(name, age, group_var, chunk_structure) |> 
+  mutate(chunk_structure = str_remove_all(chunk_structure, "rs%.*?%"),
+         dur = str_count(chunk_structure, "DUR")) |> 
+  summarise(dur = sum(dur)) |> 
+  pull(dur) ->
+  dur
+
+percantage_dur <- round(dur/n_predecations$n_predecations*100)
+```
+
+- There are only `r dur` utterances of RES outside of RS (`r percantage_dur`%). 
+
+```{r}
+mano_corpus |> 
+  select(name, age, group_var, chunk_structure) |> 
+  mutate(chunk_structure = str_remove_all(chunk_structure, "rs%.*?%"),
+         dur = str_count(chunk_structure, "DUR"),
+         n_predecations = str_count(chunk_structure, "\\[")) |> 
+  ggplot(aes(n_predecations, dur, color = group_var))+
+  geom_smooth(method = "lm", se = FALSE, color = "grey60", linetype = 2)+
+  geom_point()
+
+mano_corpus |> 
+  select(name, age, group_var, chunk_structure) |> 
+  mutate(chunk_structure = str_remove_all(chunk_structure, "rs%.*?%"),
+         dur = str_count(chunk_structure, "DUR"),
+         n_predecations = str_count(chunk_structure, "\\["),
+         ratio = dur/n_predecations) |> 
+  ggplot(aes(ratio, group_var))+
+  geom_point(alpha = 0.4)+
+  labs(y = NULL)
+```
+
+> visualize which TAMP constructions are used with DUR (check all forms that have the _DUR extension, such as PST_DUR, separate DUR and regroup the remainder of the forms in the same way as you did when visualizing tense diversity)
