@@ -1327,3 +1327,68 @@ syntax |>
   ggrepel::geom_text_repel(aes(label = str_c(name, " (", age, ")")), max.overlaps = 100)
 ```
 
+## Для статьи
+
+Я получил вот такие вот длительности 
+
+```{r}
+library(lubridate)
+
+ma_ch_ki <- readxl::read_xlsx("kirikou_annotations.xlsx", sheet = "kirikou Mano") |>
+  select(name, source, `temps de fin - hh:mm:ss.ms`, `Temps de départ - hh:mm:ss.ms`)
+ma_ch_fo <- readxl::read_xlsx("kirikou_annotations.xlsx", sheet = "folktales Mano children") |>
+  select(name, source, `temps de fin - hh:mm:ss.ms`, `Temps de départ - hh:mm:ss.ms`)
+ma_ad_fo <- readxl::read_xlsx("kirikou_annotations.xlsx", sheet = "folktales Mano adults") |>
+  select(name, source, `temps de fin - hh:mm:ss.ms`, `Temps de départ - hh:mm:ss.ms`)
+kp_ad_fo <- readxl::read_xlsx("kirikou_annotations.xlsx", sheet = "folktales Kpelle adults") |>
+  select(name, source, `temps de fin - hh:mm:ss.ms`, `Temps de départ - hh:mm:ss.ms`)
+kp_ch_fo <- readxl::read_xlsx("kirikou_annotations.xlsx", sheet = "folktales Kpelle children") |>
+  select(name, source, `temps de fin - hh:mm:ss.ms`, `Temps de départ - hh:mm:ss.ms`)
+
+ma_ch_ki |>
+  bind_rows(ma_ch_fo, ma_ad_fo, kp_ad_fo, kp_ch_fo) |> 
+  rename(time_start = `Temps de départ - hh:mm:ss.ms`,
+         time_end = `temps de fin - hh:mm:ss.ms`) |> 
+  group_by(name, source) |> 
+  summarise(time_start = min(time_start),
+            time_end = max(time_end),
+            duration = time_end-time_start) |> 
+  select(-time_start, -time_end) ->
+  corpus_duration
+
+corpus_duration
+
+corpus_duration |> 
+  ungroup() |> 
+  summarise(duration = sum(duration)) |> 
+  pull(duration) |> 
+  as.duration() ->
+  total_duration
+
+total_duration
+```
+
+Общая длительность корпуса 2 часа 50 минут.
+
+
+Overall, in our corpus they were used X and Y times respectively, or ??? and ???%, out of ??? finite predications total.
+
+```{r}
+mano_corpus |> 
+  mutate(pst = str_count(chunk_structure, "PST"),
+         jnt = str_count(chunk_structure, "JNT")) |> 
+  summarise(pst = sum(pst),
+            jnt = sum(jnt)) ->
+  pst_jnt
+
+mano_corpus |> 
+  mutate(n_predecations = str_count(chunk_structure, "\\[")) |> 
+  select(name, age, group_var, n_chunks, n_predecations) |> 
+  arrange(-n_predecations) |> 
+  summarise(n_predecations = sum(n_predecations)) ->
+  n_predecations
+
+percantage <- round((pst_jnt$pst + pst_jnt$jnt)/n_predecations*100)
+```
+
+Overall, in our corpus they were used `r pst_jnt$pst` and `r pst_jnt$jnt` times respectively, or  and `r percantage`%, out of `r n_predecations` finite predications total.
