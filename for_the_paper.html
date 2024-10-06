@@ -89,6 +89,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <li><a href="#tamp" id="toc-tamp" class="nav-link" data-scroll-target="#tamp">TAMP</a>
   <ul class="collapse">
   <li><a href="#mano" id="toc-mano" class="nav-link" data-scroll-target="#mano">Mano</a></li>
+  <li><a href="#kpelle" id="toc-kpelle" class="nav-link" data-scroll-target="#kpelle">Kpelle</a></li>
   </ul></li>
   </ul>
 </nav>
@@ -496,7 +497,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb10-17"><a href="#cb10-17" aria-hidden="true" tabindex="-1"></a>         <span class="at">PROSP =</span> <span class="fu">str_count</span>(chunk_structure, <span class="st">"PROSP"</span>),</span>
 <span id="cb10-18"><a href="#cb10-18" aria-hidden="true" tabindex="-1"></a>         <span class="at">PROT.IRR =</span> <span class="fu">str_count</span>(chunk_structure, <span class="st">"PROT.IRR"</span>),</span>
 <span id="cb10-19"><a href="#cb10-19" aria-hidden="true" tabindex="-1"></a>         <span class="at">APOD.IRR =</span> <span class="fu">str_count</span>(chunk_structure, <span class="st">"APOD.IRR"</span>),</span>
-<span id="cb10-20"><a href="#cb10-20" aria-hidden="true" tabindex="-1"></a>         <span class="at">IRR =</span> <span class="fu">str_count</span>(chunk_structure, <span class="st">"APOD.IRR"</span>),</span>
+<span id="cb10-20"><a href="#cb10-20" aria-hidden="true" tabindex="-1"></a>         <span class="at">IRR =</span> <span class="fu">str_count</span>(chunk_structure, <span class="st">"IRR"</span>) <span class="sc">-</span> PROT.IRR <span class="sc">-</span> APOD.IRR,</span>
 <span id="cb10-21"><a href="#cb10-21" aria-hidden="true" tabindex="-1"></a>         <span class="at">PROH =</span> <span class="fu">str_count</span>(chunk_structure, <span class="st">"PROH"</span>)) <span class="sc">|&gt;</span> </span>
 <span id="cb10-22"><a href="#cb10-22" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="sc">-</span>chunk_structure) <span class="ot">-&gt;</span></span>
 <span id="cb10-23"><a href="#cb10-23" aria-hidden="true" tabindex="-1"></a>  tense_without_RS_m</span>
@@ -549,6 +550,54 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 </div>
 </div>
+</section>
+<section id="kpelle" class="level3">
+<h3 class="anchored" data-anchor-id="kpelle">Kpelle</h3>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>kpelle_corpus <span class="sc">|&gt;</span> </span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(new_source, age, group_var, chunk_structure) <span class="sc">|&gt;</span> </span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">CONJ_PST =</span> <span class="fu">str_count</span>(chunk_structure, <span class="st">"CONJ/PST"</span>),</span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a>         <span class="at">PST =</span> <span class="fu">str_count</span>(chunk_structure, <span class="st">"PST"</span>)<span class="sc">-</span>CONJ_PST,</span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a>         <span class="at">CONJ =</span> <span class="fu">str_count</span>(chunk_structure, <span class="st">"CONJ"</span>)<span class="sc">-</span>CONJ_PST,</span>
+<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a>         <span class="at">JNT =</span> <span class="fu">str_count</span>(chunk_structure, <span class="st">"JNT"</span>),</span>
+<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a>         <span class="at">QUOT =</span> <span class="fu">str_count</span>(chunk_structure, <span class="st">"QUOT"</span>),</span>
+<span id="cb12-8"><a href="#cb12-8" aria-hidden="true" tabindex="-1"></a>         <span class="at">PRF =</span> <span class="fu">str_count</span>(chunk_structure, <span class="st">"PRF"</span>),</span>
+<span id="cb12-9"><a href="#cb12-9" aria-hidden="true" tabindex="-1"></a>         <span class="at">IRR_COND =</span> <span class="fu">str_count</span>(chunk_structure, <span class="st">"IRR/COND"</span>),</span>
+<span id="cb12-10"><a href="#cb12-10" aria-hidden="true" tabindex="-1"></a>         <span class="at">COND =</span> <span class="fu">str_count</span>(chunk_structure, <span class="st">"COND"</span>)<span class="sc">-</span>IRR_COND,</span>
+<span id="cb12-11"><a href="#cb12-11" aria-hidden="true" tabindex="-1"></a>         <span class="at">IRR =</span> <span class="fu">str_count</span>(chunk_structure, <span class="st">"IRR"</span>)<span class="sc">-</span>IRR_COND,</span>
+<span id="cb12-12"><a href="#cb12-12" aria-hidden="true" tabindex="-1"></a>         <span class="at">NEG =</span> <span class="fu">str_count</span>(chunk_structure, <span class="st">"NEG"</span>),</span>
+<span id="cb12-13"><a href="#cb12-13" aria-hidden="true" tabindex="-1"></a>         <span class="at">EXI =</span> <span class="fu">str_count</span>(chunk_structure, <span class="st">"EXI"</span>),</span>
+<span id="cb12-14"><a href="#cb12-14" aria-hidden="true" tabindex="-1"></a>         <span class="at">PRED =</span> <span class="fu">str_count</span>(chunk_structure, <span class="st">"PRED"</span>),</span>
+<span id="cb12-15"><a href="#cb12-15" aria-hidden="true" tabindex="-1"></a>         <span class="at">RESSTAT =</span> <span class="fu">str_count</span>(chunk_structure, <span class="st">"RESSTAT"</span>),</span>
+<span id="cb12-16"><a href="#cb12-16" aria-hidden="true" tabindex="-1"></a>         <span class="at">STAT1 =</span> <span class="fu">str_count</span>(chunk_structure, <span class="st">"STAT1"</span>),</span>
+<span id="cb12-17"><a href="#cb12-17" aria-hidden="true" tabindex="-1"></a>         <span class="at">FUT =</span> <span class="fu">str_count</span>(chunk_structure, <span class="st">"FUT"</span>),</span>
+<span id="cb12-18"><a href="#cb12-18" aria-hidden="true" tabindex="-1"></a>         <span class="at">IMP =</span> <span class="fu">str_count</span>(chunk_structure, <span class="st">"IMP"</span>),</span>
+<span id="cb12-19"><a href="#cb12-19" aria-hidden="true" tabindex="-1"></a>         <span class="at">PROH =</span> <span class="fu">str_count</span>(chunk_structure, <span class="st">"PROH"</span>)) <span class="sc">|&gt;</span> </span>
+<span id="cb12-20"><a href="#cb12-20" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="sc">-</span>chunk_structure) <span class="ot">-&gt;</span></span>
+<span id="cb12-21"><a href="#cb12-21" aria-hidden="true" tabindex="-1"></a>  tense_k</span>
+<span id="cb12-22"><a href="#cb12-22" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-23"><a href="#cb12-23" aria-hidden="true" tabindex="-1"></a>tense_k</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output-display">
+<div data-pagedtable="false">
+  <script data-pagedtable-source="" type="application/json">
+{"columns":[{"label":["new_source"],"name":[1],"type":["chr"],"align":["left"]},{"label":["age"],"name":[2],"type":["dbl"],"align":["right"]},{"label":["group_var"],"name":[3],"type":["chr"],"align":["left"]},{"label":["CONJ_PST"],"name":[4],"type":["int"],"align":["right"]},{"label":["PST"],"name":[5],"type":["int"],"align":["right"]},{"label":["CONJ"],"name":[6],"type":["int"],"align":["right"]},{"label":["JNT"],"name":[7],"type":["int"],"align":["right"]},{"label":["QUOT"],"name":[8],"type":["int"],"align":["right"]},{"label":["PRF"],"name":[9],"type":["int"],"align":["right"]},{"label":["IRR_COND"],"name":[10],"type":["int"],"align":["right"]},{"label":["COND"],"name":[11],"type":["int"],"align":["right"]},{"label":["IRR"],"name":[12],"type":["int"],"align":["right"]},{"label":["NEG"],"name":[13],"type":["int"],"align":["right"]},{"label":["EXI"],"name":[14],"type":["int"],"align":["right"]},{"label":["PRED"],"name":[15],"type":["int"],"align":["right"]},{"label":["RESSTAT"],"name":[16],"type":["int"],"align":["right"]},{"label":["STAT1"],"name":[17],"type":["int"],"align":["right"]},{"label":["FUT"],"name":[18],"type":["int"],"align":["right"]},{"label":["IMP"],"name":[19],"type":["int"],"align":["right"]},{"label":["PROH"],"name":[20],"type":["int"],"align":["right"]}],"data":[{"1":"s_2_t_1","2":"65","3":"adults","4":"10","5":"10","6":"18","7":"14","8":"12","9":"1","10":"2","11":"2","12":"4","13":"6","14":"7","15":"6","16":"0","17":"0","18":"0","19":"5","20":"0"},{"1":"s_3_t_1","2":"32","3":"adults","4":"39","5":"11","6":"37","7":"22","8":"19","9":"16","10":"4","11":"9","12":"6","13":"19","14":"21","15":"6","16":"10","17":"1","18":"0","19":"13","20":"0"},{"1":"s_4_t_1","2":"60","3":"adults","4":"32","5":"17","6":"66","7":"26","8":"21","9":"9","10":"1","11":"19","12":"26","13":"12","14":"27","15":"6","16":"11","17":"3","18":"3","19":"8","20":"1"},{"1":"s_5_t_1","2":"60","3":"adults","4":"31","5":"28","6":"157","7":"24","8":"79","9":"20","10":"3","11":"19","12":"18","13":"35","14":"36","15":"18","16":"6","17":"1","18":"6","19":"9","20":"0"},{"1":"s_5_t_2","2":"60","3":"adults","4":"21","5":"18","6":"44","7":"10","8":"38","9":"14","10":"2","11":"2","12":"3","13":"16","14":"18","15":"6","16":"10","17":"0","18":"0","19":"4","20":"1"},{"1":"s_1_t_1","2":"10","3":"children","4":"27","5":"12","6":"73","7":"11","8":"45","9":"4","10":"0","11":"10","12":"2","13":"12","14":"14","15":"4","16":"4","17":"1","18":"9","19":"12","20":"0"},{"1":"s_6_t_1","2":"19","3":"children","4":"13","5":"5","6":"13","7":"0","8":"9","9":"0","10":"0","11":"5","12":"2","13":"10","14":"5","15":"0","16":"4","17":"0","18":"0","19":"0","20":"0"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
+  </script>
+</div>
+</div>
+</div>
+<blockquote class="blockquote">
+<p>Kpelle: how many times PST, CONJ, CONJ/PST and JNT total in Kpelle, how many total predications</p>
+</blockquote>
+<ul>
+<li>PST: 101</li>
+<li>CONJ: 408</li>
+<li>CONJ/PST: 173</li>
+<li>JNT: 107</li>
+<li>total predications: 1570</li>
+</ul>
 </section>
 </section>
 

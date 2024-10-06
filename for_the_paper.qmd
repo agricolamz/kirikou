@@ -347,7 +347,7 @@ mano_corpus |>
          PROSP = str_count(chunk_structure, "PROSP"),
          PROT.IRR = str_count(chunk_structure, "PROT.IRR"),
          APOD.IRR = str_count(chunk_structure, "APOD.IRR"),
-         IRR = str_count(chunk_structure, "APOD.IRR"),
+         IRR = str_count(chunk_structure, "IRR") - PROT.IRR - APOD.IRR,
          PROH = str_count(chunk_structure, "PROH")) |> 
   select(-chunk_structure) ->
   tense_without_RS_m
@@ -393,4 +393,39 @@ tense_without_RS_m |>
   theme(axis.text.y = element_text(colour = people_text_color_m))
 ```
 
+### Kpelle
+
+```{r}
+kpelle_corpus |> 
+  select(new_source, age, group_var, chunk_structure) |> 
+  mutate(CONJ_PST = str_count(chunk_structure, "CONJ/PST"),
+         PST = str_count(chunk_structure, "PST")-CONJ_PST,
+         CONJ = str_count(chunk_structure, "CONJ")-CONJ_PST,
+         JNT = str_count(chunk_structure, "JNT"),
+         QUOT = str_count(chunk_structure, "QUOT"),
+         PRF = str_count(chunk_structure, "PRF"),
+         IRR_COND = str_count(chunk_structure, "IRR/COND"),
+         COND = str_count(chunk_structure, "COND")-IRR_COND,
+         IRR = str_count(chunk_structure, "IRR")-IRR_COND,
+         NEG = str_count(chunk_structure, "NEG"),
+         EXI = str_count(chunk_structure, "EXI"),
+         PRED = str_count(chunk_structure, "PRED"),
+         RESSTAT = str_count(chunk_structure, "RESSTAT"),
+         STAT1 = str_count(chunk_structure, "STAT1"),
+         FUT = str_count(chunk_structure, "FUT"),
+         IMP = str_count(chunk_structure, "IMP"),
+         PROH = str_count(chunk_structure, "PROH")) |> 
+  select(-chunk_structure) ->
+  tense_k
+
+tense_k
+```
+
+> Kpelle: how many times PST, CONJ, CONJ/PST and JNT total in Kpelle, how many total predications
+
+- PST: `r sum(tense_k$PST)`
+- CONJ: `r sum(tense_k$CONJ)` 
+- CONJ/PST: `r sum(tense_k$CONJ_PST)`
+- JNT: `r sum(tense_k$JNT)`
+- total predications: `r n_predecations_k`
 
