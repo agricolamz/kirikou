@@ -147,44 +147,48 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>         <span class="at">txenfant =</span> <span class="fu">str_remove_all</span>(txenfant, <span class="st">"</span><span class="sc">\\</span><span class="st">[.*?</span><span class="sc">\\</span><span class="st">]"</span>),</span>
 <span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a>         <span class="at">txenfant =</span> <span class="fu">if_else</span>(<span class="fu">is.na</span>(txenfant), <span class="st">""</span>, txenfant),</span>
 <span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a>         <span class="at">ft =</span> <span class="fu">if_else</span>(<span class="fu">is.na</span>(ft), <span class="st">""</span>, ft),</span>
-<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a>         <span class="at">chunk_structure =</span> <span class="fu">if_else</span>(<span class="fu">is.na</span>(chunk_structure), <span class="st">""</span>, chunk_structure)) <span class="sc">|&gt;</span></span>
-<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">add_count</span>(name, age) <span class="sc">|&gt;</span> </span>
-<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rename</span>(<span class="at">n_chunks =</span> n) <span class="sc">|&gt;</span> </span>
-<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(name, age, socio_family_adoptive, text_type, residence_place, n_chunks) <span class="sc">|&gt;</span> </span>
-<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarize</span>(<span class="at">text =</span> <span class="fu">str_c</span>(txenfant, <span class="at">collapse =</span> <span class="st">" "</span>),</span>
-<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a>            <span class="at">chunk_structure =</span> <span class="fu">str_c</span>(chunk_structure, <span class="at">collapse =</span> <span class="st">" "</span>),</span>
-<span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a>            <span class="at">ft =</span> <span class="fu">str_c</span>(ft, <span class="at">collapse =</span> <span class="st">" "</span>)) <span class="sc">|&gt;</span> </span>
-<span id="cb1-24"><a href="#cb1-24" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">age_group =</span> <span class="st">"children"</span>) <span class="sc">|&gt;</span> </span>
-<span id="cb1-25"><a href="#cb1-25" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ungroup</span>() <span class="ot">-&gt;</span></span>
-<span id="cb1-26"><a href="#cb1-26" aria-hidden="true" tabindex="-1"></a>  mano_chi_corpus</span>
-<span id="cb1-27"><a href="#cb1-27" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-28"><a href="#cb1-28" aria-hidden="true" tabindex="-1"></a>readxl<span class="sc">::</span><span class="fu">read_xlsx</span>(<span class="st">"kirikou_annotations.xlsx"</span>, <span class="at">sheet =</span> <span class="st">"folktales Mano adults"</span>) <span class="sc">|&gt;</span> </span>
-<span id="cb1-29"><a href="#cb1-29" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">age =</span> <span class="dv">100</span>,</span>
-<span id="cb1-30"><a href="#cb1-30" aria-hidden="true" tabindex="-1"></a>         <span class="at">text_type =</span> <span class="st">"folktales"</span>) <span class="sc">|&gt;</span> </span>
-<span id="cb1-31"><a href="#cb1-31" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rename</span>(<span class="at">txenfant =</span> <span class="st">`</span><span class="at">txenfant = tx</span><span class="st">`</span>,</span>
-<span id="cb1-32"><a href="#cb1-32" aria-hidden="true" tabindex="-1"></a>         <span class="at">chunk_structure =</span> <span class="st">`</span><span class="at">chunk structure</span><span class="st">`</span>) <span class="sc">|&gt;</span> </span>
-<span id="cb1-33"><a href="#cb1-33" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">txenfant =</span> <span class="fu">str_remove_all</span>(txenfant , <span class="st">"[/+]"</span>),</span>
-<span id="cb1-34"><a href="#cb1-34" aria-hidden="true" tabindex="-1"></a>         <span class="at">txenfant =</span> <span class="fu">str_remove_all</span>(txenfant, <span class="st">"</span><span class="sc">\\</span><span class="st">[.*?</span><span class="sc">\\</span><span class="st">]"</span>),</span>
-<span id="cb1-35"><a href="#cb1-35" aria-hidden="true" tabindex="-1"></a>         <span class="at">txenfant =</span> <span class="fu">if_else</span>(<span class="fu">is.na</span>(txenfant), <span class="st">""</span>, txenfant),</span>
-<span id="cb1-36"><a href="#cb1-36" aria-hidden="true" tabindex="-1"></a>         <span class="at">ft =</span> <span class="fu">if_else</span>(<span class="fu">is.na</span>(ft), <span class="st">""</span>, ft),</span>
-<span id="cb1-37"><a href="#cb1-37" aria-hidden="true" tabindex="-1"></a>         <span class="at">chunk_structure =</span> <span class="fu">if_else</span>(<span class="fu">is.na</span>(chunk_structure), <span class="st">""</span>, chunk_structure)) <span class="sc">|&gt;</span></span>
-<span id="cb1-38"><a href="#cb1-38" aria-hidden="true" tabindex="-1"></a>  <span class="fu">add_count</span>(name, age) <span class="sc">|&gt;</span> </span>
-<span id="cb1-39"><a href="#cb1-39" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rename</span>(<span class="at">n_chunks =</span> n) <span class="sc">|&gt;</span> </span>
-<span id="cb1-40"><a href="#cb1-40" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(name, age, socio_family_adoptive, text_type, residence_place, n_chunks) <span class="sc">|&gt;</span> </span>
-<span id="cb1-41"><a href="#cb1-41" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarize</span>(<span class="at">text =</span> <span class="fu">str_c</span>(txenfant, <span class="at">collapse =</span> <span class="st">" "</span>),</span>
-<span id="cb1-42"><a href="#cb1-42" aria-hidden="true" tabindex="-1"></a>            <span class="at">chunk_structure =</span> <span class="fu">str_c</span>(chunk_structure, <span class="at">collapse =</span> <span class="st">" "</span>),</span>
-<span id="cb1-43"><a href="#cb1-43" aria-hidden="true" tabindex="-1"></a>            <span class="at">ft =</span> <span class="fu">str_c</span>(ft, <span class="at">collapse =</span> <span class="st">" "</span>)) <span class="sc">|&gt;</span> </span>
-<span id="cb1-44"><a href="#cb1-44" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">age_group =</span> <span class="st">"adults"</span>) <span class="sc">|&gt;</span> </span>
-<span id="cb1-45"><a href="#cb1-45" aria-hidden="true" tabindex="-1"></a>  <span class="fu">bind_rows</span>(mano_chi_corpus) <span class="sc">|&gt;</span> </span>
-<span id="cb1-46"><a href="#cb1-46" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">group_var =</span> <span class="fu">case_when</span>(text_type <span class="sc">==</span> <span class="st">"kirikou"</span> <span class="sc">&amp;</span> residence_place <span class="sc">==</span> <span class="st">"Nzerekore"</span> <span class="sc">&amp;</span> socio_family_adoptive <span class="sc">==</span> <span class="st">"Mano"</span> <span class="sc">~</span> <span class="st">"Kirikou (Nzerekore): Mano"</span>,</span>
-<span id="cb1-47"><a href="#cb1-47" aria-hidden="true" tabindex="-1"></a>                               text_type <span class="sc">==</span> <span class="st">"kirikou"</span> <span class="sc">&amp;</span> residence_place <span class="sc">==</span> <span class="st">"Nzerekore"</span> <span class="sc">&amp;</span> socio_family_adoptive <span class="sc">==</span> <span class="st">"Bilingual"</span> <span class="sc">~</span> <span class="st">"Kirikou (Nzerekore): Bilingual"</span>,</span>
-<span id="cb1-48"><a href="#cb1-48" aria-hidden="true" tabindex="-1"></a>                               text_type <span class="sc">==</span> <span class="st">"kirikou"</span> <span class="sc">&amp;</span> residence_place <span class="sc">!=</span> <span class="st">"Nzerekore"</span> <span class="sc">~</span> <span class="st">"Kirikou (other)"</span>,</span>
-<span id="cb1-49"><a href="#cb1-49" aria-hidden="true" tabindex="-1"></a>                               text_type <span class="sc">==</span> <span class="st">"folktales"</span> <span class="sc">&amp;</span> age_group <span class="sc">==</span> <span class="st">"children"</span> <span class="sc">~</span> <span class="st">"folktales (children)"</span>,</span>
-<span id="cb1-50"><a href="#cb1-50" aria-hidden="true" tabindex="-1"></a>                               text_type <span class="sc">==</span> <span class="st">"folktales"</span> <span class="sc">&amp;</span> age_group <span class="sc">==</span> <span class="st">"adults"</span> <span class="sc">~</span> <span class="st">"folktales (adults)"</span>)) <span class="sc">|&gt;</span> </span>
-<span id="cb1-51"><a href="#cb1-51" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ungroup</span>() <span class="ot">-&gt;</span> </span>
-<span id="cb1-52"><a href="#cb1-52" aria-hidden="true" tabindex="-1"></a>  mano_corpus</span>
-<span id="cb1-53"><a href="#cb1-53" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-54"><a href="#cb1-54" aria-hidden="true" tabindex="-1"></a><span class="fu">rm</span>(mano_chi_corpus)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a>         <span class="at">comment =</span> <span class="fu">if_else</span>(<span class="fu">is.na</span>(comment), <span class="st">""</span>, comment),</span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a>         <span class="at">chunk_structure =</span> <span class="fu">if_else</span>(<span class="fu">is.na</span>(chunk_structure), <span class="st">""</span>, chunk_structure)) <span class="sc">|&gt;</span></span>
+<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a>  <span class="fu">add_count</span>(name, age) <span class="sc">|&gt;</span> </span>
+<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rename</span>(<span class="at">n_chunks =</span> n) <span class="sc">|&gt;</span> </span>
+<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(name, age, socio_family_adoptive, text_type, residence_place, n_chunks) <span class="sc">|&gt;</span> </span>
+<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarize</span>(<span class="at">text =</span> <span class="fu">str_c</span>(txenfant, <span class="at">collapse =</span> <span class="st">" "</span>),</span>
+<span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a>            <span class="at">chunk_structure =</span> <span class="fu">str_c</span>(chunk_structure, <span class="at">collapse =</span> <span class="st">" "</span>),</span>
+<span id="cb1-24"><a href="#cb1-24" aria-hidden="true" tabindex="-1"></a>            <span class="at">ft =</span> <span class="fu">str_c</span>(ft, <span class="at">collapse =</span> <span class="st">" "</span>),</span>
+<span id="cb1-25"><a href="#cb1-25" aria-hidden="true" tabindex="-1"></a>            <span class="at">comment =</span> <span class="fu">str_c</span>(comment, <span class="at">collapse =</span> <span class="st">" "</span>)) <span class="sc">|&gt;</span> </span>
+<span id="cb1-26"><a href="#cb1-26" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">age_group =</span> <span class="st">"children"</span>) <span class="sc">|&gt;</span> </span>
+<span id="cb1-27"><a href="#cb1-27" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ungroup</span>() <span class="ot">-&gt;</span></span>
+<span id="cb1-28"><a href="#cb1-28" aria-hidden="true" tabindex="-1"></a>  mano_chi_corpus</span>
+<span id="cb1-29"><a href="#cb1-29" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-30"><a href="#cb1-30" aria-hidden="true" tabindex="-1"></a>readxl<span class="sc">::</span><span class="fu">read_xlsx</span>(<span class="st">"kirikou_annotations.xlsx"</span>, <span class="at">sheet =</span> <span class="st">"folktales Mano adults"</span>) <span class="sc">|&gt;</span> </span>
+<span id="cb1-31"><a href="#cb1-31" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">age =</span> <span class="dv">100</span>,</span>
+<span id="cb1-32"><a href="#cb1-32" aria-hidden="true" tabindex="-1"></a>         <span class="at">text_type =</span> <span class="st">"folktales"</span>) <span class="sc">|&gt;</span> </span>
+<span id="cb1-33"><a href="#cb1-33" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rename</span>(<span class="at">txenfant =</span> <span class="st">`</span><span class="at">txenfant = tx</span><span class="st">`</span>,</span>
+<span id="cb1-34"><a href="#cb1-34" aria-hidden="true" tabindex="-1"></a>         <span class="at">chunk_structure =</span> <span class="st">`</span><span class="at">chunk structure</span><span class="st">`</span>) <span class="sc">|&gt;</span> </span>
+<span id="cb1-35"><a href="#cb1-35" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">txenfant =</span> <span class="fu">str_remove_all</span>(txenfant , <span class="st">"[/+]"</span>),</span>
+<span id="cb1-36"><a href="#cb1-36" aria-hidden="true" tabindex="-1"></a>         <span class="at">txenfant =</span> <span class="fu">str_remove_all</span>(txenfant, <span class="st">"</span><span class="sc">\\</span><span class="st">[.*?</span><span class="sc">\\</span><span class="st">]"</span>),</span>
+<span id="cb1-37"><a href="#cb1-37" aria-hidden="true" tabindex="-1"></a>         <span class="at">txenfant =</span> <span class="fu">if_else</span>(<span class="fu">is.na</span>(txenfant), <span class="st">""</span>, txenfant),</span>
+<span id="cb1-38"><a href="#cb1-38" aria-hidden="true" tabindex="-1"></a>         <span class="at">ft =</span> <span class="fu">if_else</span>(<span class="fu">is.na</span>(ft), <span class="st">""</span>, ft),</span>
+<span id="cb1-39"><a href="#cb1-39" aria-hidden="true" tabindex="-1"></a>         <span class="at">comment =</span> <span class="fu">if_else</span>(<span class="fu">is.na</span>(comment), <span class="st">""</span>, comment),</span>
+<span id="cb1-40"><a href="#cb1-40" aria-hidden="true" tabindex="-1"></a>         <span class="at">chunk_structure =</span> <span class="fu">if_else</span>(<span class="fu">is.na</span>(chunk_structure), <span class="st">""</span>, chunk_structure)) <span class="sc">|&gt;</span></span>
+<span id="cb1-41"><a href="#cb1-41" aria-hidden="true" tabindex="-1"></a>  <span class="fu">add_count</span>(name, age) <span class="sc">|&gt;</span> </span>
+<span id="cb1-42"><a href="#cb1-42" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rename</span>(<span class="at">n_chunks =</span> n) <span class="sc">|&gt;</span> </span>
+<span id="cb1-43"><a href="#cb1-43" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(name, age, socio_family_adoptive, text_type, residence_place, n_chunks) <span class="sc">|&gt;</span> </span>
+<span id="cb1-44"><a href="#cb1-44" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarize</span>(<span class="at">text =</span> <span class="fu">str_c</span>(txenfant, <span class="at">collapse =</span> <span class="st">" "</span>),</span>
+<span id="cb1-45"><a href="#cb1-45" aria-hidden="true" tabindex="-1"></a>            <span class="at">chunk_structure =</span> <span class="fu">str_c</span>(chunk_structure, <span class="at">collapse =</span> <span class="st">" "</span>),</span>
+<span id="cb1-46"><a href="#cb1-46" aria-hidden="true" tabindex="-1"></a>            <span class="at">ft =</span> <span class="fu">str_c</span>(ft, <span class="at">collapse =</span> <span class="st">" "</span>),</span>
+<span id="cb1-47"><a href="#cb1-47" aria-hidden="true" tabindex="-1"></a>            <span class="at">comment =</span> <span class="fu">str_c</span>(comment, <span class="at">collapse =</span> <span class="st">" "</span>)) <span class="sc">|&gt;</span> </span>
+<span id="cb1-48"><a href="#cb1-48" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">age_group =</span> <span class="st">"adults"</span>) <span class="sc">|&gt;</span> </span>
+<span id="cb1-49"><a href="#cb1-49" aria-hidden="true" tabindex="-1"></a>  <span class="fu">bind_rows</span>(mano_chi_corpus) <span class="sc">|&gt;</span> </span>
+<span id="cb1-50"><a href="#cb1-50" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">group_var =</span> <span class="fu">case_when</span>(text_type <span class="sc">==</span> <span class="st">"kirikou"</span> <span class="sc">&amp;</span> residence_place <span class="sc">==</span> <span class="st">"Nzerekore"</span> <span class="sc">&amp;</span> socio_family_adoptive <span class="sc">==</span> <span class="st">"Mano"</span> <span class="sc">~</span> <span class="st">"Kirikou (Nzerekore): Mano"</span>,</span>
+<span id="cb1-51"><a href="#cb1-51" aria-hidden="true" tabindex="-1"></a>                               text_type <span class="sc">==</span> <span class="st">"kirikou"</span> <span class="sc">&amp;</span> residence_place <span class="sc">==</span> <span class="st">"Nzerekore"</span> <span class="sc">&amp;</span> socio_family_adoptive <span class="sc">==</span> <span class="st">"Bilingual"</span> <span class="sc">~</span> <span class="st">"Kirikou (Nzerekore): Bilingual"</span>,</span>
+<span id="cb1-52"><a href="#cb1-52" aria-hidden="true" tabindex="-1"></a>                               text_type <span class="sc">==</span> <span class="st">"kirikou"</span> <span class="sc">&amp;</span> residence_place <span class="sc">!=</span> <span class="st">"Nzerekore"</span> <span class="sc">~</span> <span class="st">"Kirikou (other)"</span>,</span>
+<span id="cb1-53"><a href="#cb1-53" aria-hidden="true" tabindex="-1"></a>                               text_type <span class="sc">==</span> <span class="st">"folktales"</span> <span class="sc">&amp;</span> age_group <span class="sc">==</span> <span class="st">"children"</span> <span class="sc">~</span> <span class="st">"folktales (children)"</span>,</span>
+<span id="cb1-54"><a href="#cb1-54" aria-hidden="true" tabindex="-1"></a>                               text_type <span class="sc">==</span> <span class="st">"folktales"</span> <span class="sc">&amp;</span> age_group <span class="sc">==</span> <span class="st">"adults"</span> <span class="sc">~</span> <span class="st">"folktales (adults)"</span>)) <span class="sc">|&gt;</span> </span>
+<span id="cb1-55"><a href="#cb1-55" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ungroup</span>() <span class="ot">-&gt;</span> </span>
+<span id="cb1-56"><a href="#cb1-56" aria-hidden="true" tabindex="-1"></a>  mano_corpus</span>
+<span id="cb1-57"><a href="#cb1-57" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-58"><a href="#cb1-58" aria-hidden="true" tabindex="-1"></a><span class="fu">rm</span>(mano_chi_corpus)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 </div>
 <div class="cell">
@@ -2164,6 +2168,15 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 </div>
 <p>Oh, it is Barbie time…</p>
+<blockquote class="blockquote">
+<p>visualize subset of complex syntax: prefixes (temp, prec, cond, comme, tail-head), + glosses (COND) + “clause-final ā as the only marker of subordination” (search in the comment field), without filtering RS</p>
+</blockquote>
+<blockquote class="blockquote">
+<p>check purp (prefix) + PURP to all predications, without filtering</p>
+</blockquote>
+<blockquote class="blockquote">
+<p>Kpelle: quot vs jnt.say in Kpelle jnt vs quot + jnt.say in Kpelle quot+jnt.say vs other.say in Kpelle</p>
+</blockquote>
 </section>
 
 </main>
