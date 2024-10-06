@@ -640,6 +640,83 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <blockquote class="blockquote">
 <p>Kpelle: how many times PST, CONJ, CONJ/PST and JNT excluding RS in Kpelle, how many total predications excluding RS</p>
 </blockquote>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>kpelle_corpus <span class="sc">|&gt;</span> </span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">chunk_structure =</span> <span class="fu">str_remove_all</span>(chunk_structure, <span class="st">"rs%.*?%"</span>),</span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>         <span class="at">n_predecations =</span> <span class="fu">str_count</span>(chunk_structure, <span class="st">"</span><span class="sc">\\</span><span class="st">["</span>)) <span class="sc">|&gt;</span> </span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(new_source, age, group_var, chunk_structure, n_predecations) <span class="sc">|&gt;</span> </span>
+<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">CONJ_PST =</span> <span class="fu">str_count</span>(chunk_structure, <span class="st">"CONJ/PST"</span>),</span>
+<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a>         <span class="at">PST =</span> <span class="fu">str_count</span>(chunk_structure, <span class="st">"PST"</span>)<span class="sc">-</span>CONJ_PST,</span>
+<span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a>         <span class="at">CONJ =</span> <span class="fu">str_count</span>(chunk_structure, <span class="st">"CONJ"</span>)<span class="sc">-</span>CONJ_PST,</span>
+<span id="cb14-8"><a href="#cb14-8" aria-hidden="true" tabindex="-1"></a>         <span class="at">JNT =</span> <span class="fu">str_count</span>(chunk_structure, <span class="st">"JNT"</span>),</span>
+<span id="cb14-9"><a href="#cb14-9" aria-hidden="true" tabindex="-1"></a>         <span class="at">QUOT =</span> <span class="fu">str_count</span>(chunk_structure, <span class="st">"QUOT"</span>),</span>
+<span id="cb14-10"><a href="#cb14-10" aria-hidden="true" tabindex="-1"></a>         <span class="at">PRF =</span> <span class="fu">str_count</span>(chunk_structure, <span class="st">"PRF"</span>),</span>
+<span id="cb14-11"><a href="#cb14-11" aria-hidden="true" tabindex="-1"></a>         <span class="at">IRR_COND =</span> <span class="fu">str_count</span>(chunk_structure, <span class="st">"IRR/COND"</span>),</span>
+<span id="cb14-12"><a href="#cb14-12" aria-hidden="true" tabindex="-1"></a>         <span class="at">COND =</span> <span class="fu">str_count</span>(chunk_structure, <span class="st">"COND"</span>)<span class="sc">-</span>IRR_COND,</span>
+<span id="cb14-13"><a href="#cb14-13" aria-hidden="true" tabindex="-1"></a>         <span class="at">IRR =</span> <span class="fu">str_count</span>(chunk_structure, <span class="st">"IRR"</span>)<span class="sc">-</span>IRR_COND,</span>
+<span id="cb14-14"><a href="#cb14-14" aria-hidden="true" tabindex="-1"></a>         <span class="at">NEG =</span> <span class="fu">str_count</span>(chunk_structure, <span class="st">"NEG"</span>),</span>
+<span id="cb14-15"><a href="#cb14-15" aria-hidden="true" tabindex="-1"></a>         <span class="at">EXI =</span> <span class="fu">str_count</span>(chunk_structure, <span class="st">"EXI"</span>),</span>
+<span id="cb14-16"><a href="#cb14-16" aria-hidden="true" tabindex="-1"></a>         <span class="at">PRED =</span> <span class="fu">str_count</span>(chunk_structure, <span class="st">"PRED"</span>),</span>
+<span id="cb14-17"><a href="#cb14-17" aria-hidden="true" tabindex="-1"></a>         <span class="at">RESSTAT =</span> <span class="fu">str_count</span>(chunk_structure, <span class="st">"RESSTAT"</span>),</span>
+<span id="cb14-18"><a href="#cb14-18" aria-hidden="true" tabindex="-1"></a>         <span class="at">STAT1 =</span> <span class="fu">str_count</span>(chunk_structure, <span class="st">"STAT1"</span>),</span>
+<span id="cb14-19"><a href="#cb14-19" aria-hidden="true" tabindex="-1"></a>         <span class="at">FUT =</span> <span class="fu">str_count</span>(chunk_structure, <span class="st">"FUT"</span>),</span>
+<span id="cb14-20"><a href="#cb14-20" aria-hidden="true" tabindex="-1"></a>         <span class="at">IMP =</span> <span class="fu">str_count</span>(chunk_structure, <span class="st">"IMP"</span>),</span>
+<span id="cb14-21"><a href="#cb14-21" aria-hidden="true" tabindex="-1"></a>         <span class="at">PROH =</span> <span class="fu">str_count</span>(chunk_structure, <span class="st">"PROH"</span>)) <span class="sc">|&gt;</span> </span>
+<span id="cb14-22"><a href="#cb14-22" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="sc">-</span>chunk_structure) <span class="ot">-&gt;</span></span>
+<span id="cb14-23"><a href="#cb14-23" aria-hidden="true" tabindex="-1"></a>  tense_without_RS_k</span>
+<span id="cb14-24"><a href="#cb14-24" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-25"><a href="#cb14-25" aria-hidden="true" tabindex="-1"></a>n_predecations_without_RS_k <span class="ot">&lt;-</span> <span class="fu">sum</span>(tense_without_RS_k<span class="sc">$</span>n_predecations)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+<ul>
+<li>PST: 90</li>
+<li>CONJ: 356</li>
+<li>CONJ/PST: 158</li>
+<li>JNT: 98</li>
+<li>total predications: 1252</li>
+</ul>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>tense_without_RS_k <span class="sc">|&gt;</span> </span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="sc">-</span>n_predecations) <span class="sc">|&gt;</span> </span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_longer</span>(<span class="at">names_to =</span> <span class="st">"tense"</span>, <span class="at">values_to =</span> <span class="st">"n"</span>, <span class="sc">-</span><span class="fu">c</span>(new_source, age, group_var)) <span class="sc">|&gt;</span> </span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">tense =</span> <span class="fu">case_when</span>(tense <span class="sc">%in%</span> <span class="fu">c</span>(<span class="st">"JNT"</span>, <span class="st">"QUOT"</span>) <span class="sc">~</span> <span class="st">"JNT or QUOT"</span>,</span>
+<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a>                           tense <span class="sc">%in%</span> <span class="fu">c</span>(<span class="st">"COND"</span>, <span class="st">"IRR"</span>, <span class="st">"IRR_COND"</span>) <span class="sc">~</span> <span class="st">"CONDs"</span>,</span>
+<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a>                           tense <span class="sc">%in%</span> <span class="fu">c</span>(<span class="st">"PROH"</span>, <span class="st">"IMP"</span>) <span class="sc">~</span> <span class="st">"PROH or IMP"</span>,</span>
+<span id="cb15-7"><a href="#cb15-7" aria-hidden="true" tabindex="-1"></a>                           tense <span class="sc">%in%</span> <span class="fu">c</span>(<span class="st">"EXI"</span>, <span class="st">"PRED"</span>, <span class="st">"RESSTAT"</span>, <span class="st">"FUT"</span>, <span class="st">"STAT1"</span>) <span class="sc">~</span> <span class="st">"non-past"</span>,</span>
+<span id="cb15-8"><a href="#cb15-8" aria-hidden="true" tabindex="-1"></a>                           <span class="cn">TRUE</span> <span class="sc">~</span> tense)) <span class="sc">|&gt;</span> </span>
+<span id="cb15-9"><a href="#cb15-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(new_source, age, group_var, tense) <span class="sc">|&gt;</span></span>
+<span id="cb15-10"><a href="#cb15-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">n =</span> <span class="fu">sum</span>(n)) <span class="sc">|&gt;</span> </span>
+<span id="cb15-11"><a href="#cb15-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(new_source, age, group_var) <span class="sc">|&gt;</span> </span>
+<span id="cb15-12"><a href="#cb15-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">total =</span> <span class="fu">sum</span>(n),</span>
+<span id="cb15-13"><a href="#cb15-13" aria-hidden="true" tabindex="-1"></a>         <span class="at">ratio =</span> n<span class="sc">/</span>total) <span class="sc">|&gt;</span> </span>
+<span id="cb15-14"><a href="#cb15-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="sc">-</span>n, <span class="sc">-</span>total) <span class="sc">|&gt;</span> </span>
+<span id="cb15-15"><a href="#cb15-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ungroup</span>() <span class="sc">|&gt;</span> </span>
+<span id="cb15-16"><a href="#cb15-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">new_source =</span> <span class="fu">str_c</span>(new_source, <span class="st">" ("</span>, age, <span class="st">")"</span>),</span>
+<span id="cb15-17"><a href="#cb15-17" aria-hidden="true" tabindex="-1"></a>         <span class="at">new_source =</span> <span class="fu">fct_reorder</span>(new_source, age),</span>
+<span id="cb15-18"><a href="#cb15-18" aria-hidden="true" tabindex="-1"></a>         <span class="at">tense =</span> <span class="fu">factor</span>(tense, <span class="at">levels =</span> <span class="fu">c</span>(<span class="st">"PROH or IMP"</span>, <span class="st">"non-past"</span>, </span>
+<span id="cb15-19"><a href="#cb15-19" aria-hidden="true" tabindex="-1"></a>                                          <span class="st">"NEG"</span>, <span class="st">"CONDs"</span>, <span class="st">"PRF"</span>,</span>
+<span id="cb15-20"><a href="#cb15-20" aria-hidden="true" tabindex="-1"></a>                                          <span class="st">"JNT or QUOT"</span>, <span class="st">"CONJ_PST"</span>, </span>
+<span id="cb15-21"><a href="#cb15-21" aria-hidden="true" tabindex="-1"></a>                                          <span class="st">"CONJ"</span>, <span class="st">"PST"</span>)),</span>
+<span id="cb15-22"><a href="#cb15-22" aria-hidden="true" tabindex="-1"></a>         <span class="at">label =</span> <span class="fu">str_c</span>(<span class="fu">round</span>(ratio <span class="sc">*</span> <span class="dv">100</span>), <span class="st">"%"</span>)) <span class="sc">|&gt;</span></span>
+<span id="cb15-23"><a href="#cb15-23" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(ratio <span class="sc">&gt;</span> <span class="dv">0</span>) <span class="sc">|&gt;</span></span>
+<span id="cb15-24"><a href="#cb15-24" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> ratio, <span class="at">y =</span> new_source, <span class="at">label =</span> label, <span class="at">color =</span> tense))<span class="sc">+</span></span>
+<span id="cb15-25"><a href="#cb15-25" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_col</span>(<span class="fu">aes</span>(<span class="at">fill =</span> tense))<span class="sc">+</span></span>
+<span id="cb15-26"><a href="#cb15-26" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_label</span>(<span class="at">position =</span> <span class="fu">position_fill</span>(<span class="at">vjust =</span> <span class="fl">0.5</span>), <span class="at">fill =</span> <span class="st">"white"</span>)<span class="sc">+</span></span>
+<span id="cb15-27"><a href="#cb15-27" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_x_continuous</span>(<span class="at">label =</span> scales<span class="sc">::</span>percent)<span class="sc">+</span></span>
+<span id="cb15-28"><a href="#cb15-28" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="cn">NULL</span>, <span class="at">y =</span> <span class="cn">NULL</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="for_the_paper_files/figure-html/unnamed-chunk-13-1.png" class="img-fluid figure-img" width="960"></p>
+</figure>
+</div>
+</div>
+</div>
 </section>
 </section>
 
