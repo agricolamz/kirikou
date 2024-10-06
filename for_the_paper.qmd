@@ -429,3 +429,35 @@ tense_k
 - JNT: `r sum(tense_k$JNT)`
 - total predications: `r n_predecations_k`
 
+
+```{r}
+tense_k |> 
+  pivot_longer(names_to = "tense", values_to = "n", -c(new_source, age, group_var)) |> 
+  mutate(tense = case_when(tense %in% c("JNT", "QUOT") ~ "JNT or QUOT",
+                           tense %in% c("COND", "IRR", "IRR_COND") ~ "CONDs",
+                           tense %in% c("PROH", "IMP") ~ "PROH or IMP",
+                           tense %in% c("EXI", "PRED", "RESSTAT", "FUT", "STAT1") ~ "non-past",
+                           TRUE ~ tense)) |> 
+  group_by(new_source, age, group_var, tense) |>
+  summarise(n = sum(n)) |> 
+  group_by(new_source, age, group_var) |> 
+  mutate(total = sum(n),
+         ratio = n/total) |> 
+  select(-n, -total) |> 
+  ungroup() |> 
+  mutate(new_source = str_c(new_source, " (", age, ")"),
+         new_source = fct_reorder(new_source, age),
+         tense = factor(tense, levels = c("PROH or IMP", "non-past", 
+                                          "NEG", "CONDs", "PRF",
+                                          "JNT or QUOT", "CONJ_PST", 
+                                          "CONJ", "PST")),
+         label = str_c(round(ratio * 100), "%")) |>
+  filter(ratio > 0) |>
+  ggplot(aes(x = ratio, y = new_source, label = label, color = tense))+
+  geom_col(aes(fill = tense))+
+  geom_label(position = position_fill(vjust = 0.5), fill = "white")+
+  scale_x_continuous(label = scales::percent)+
+  labs(x = NULL, y = NULL)
+```
+
+> Kpelle: how many times PST, CONJ, CONJ/PST and JNT excluding RS in Kpelle, how many total predications excluding RS
