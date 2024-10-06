@@ -567,4 +567,121 @@ kpelle_corpus |>
 
 There are only `r imp_proh_k$imp_ors` utterances of IMP outside of RS out of `r imp_proh_k$imp` total utterances. There are only `r imp_proh_k$proh_ors` utterances of PROH outside of RS out of `r imp_proh_k$proh` total utterances.
 
+## RES+RETR+PHAS/IMPF
+
+### Mano
+
+> Mano: calculate and vizualize individual ratios of RES+PHAS+RETR to text length in predications outside RS
+
+```{r}
+mano_corpus |> 
+  select(new_source, group_var, chunk_structure) |> 
+  mutate(chunk_structure = str_remove_all(chunk_structure, "rs%.*?%"),
+         res = str_count(chunk_structure, "RES"),
+         phas = str_count(chunk_structure, "PHAS"),
+         retr = str_count(chunk_structure, "RETR")) |> 
+  summarise(res = sum(res),
+            phas = sum(phas),
+            retr = sum(retr)) ->
+  res_phas_retr
+
+percantage_res_m <- round((res_phas_retr$res)/n_predecations_without_RS_m*100)
+percantage_phas_m <- round((res_phas_retr$phas)/n_predecations_without_RS_m*100)
+percantage_retr_m <- round((res_phas_retr$retr)/n_predecations_without_RS_m*100)
+
+res_phas_retr_sum_m <- sum(res_phas_retr)
+percantage_res_phas_retr_m <- round((res_phas_retr_sum_m)/n_predecations_without_RS_m*100)
+```
+
+- There are only `r res_phas_retr_sum_m` utterances of RES/PHAS/RETR outside of RS (`r percantage_res_phas_retr_m`%).
+- There are only `r res_phas_retr$res` utterances of RES outside of RS (`r percantage_res_m`%). 
+- There are only `r res_phas_retr$phas` utterances of PHAS outside of RS (`r percantage_phas_m`%). 
+- There are only `r res_phas_retr$retr` utterances of RETR outside of RS (`r percantage_retr_m`%).
+
+```{r}
+mano_corpus |> 
+  select(name, age, group_var, chunk_structure) |> 
+  mutate(chunk_structure = str_remove_all(chunk_structure, "rs%.*?%"),
+         res = str_count(chunk_structure, "RES"),
+         phas = str_count(chunk_structure, "PHAS"),
+         retr = str_count(chunk_structure, "RETR"),
+         res_phas_retr = res + phas + retr,
+         n_predecations = str_count(chunk_structure, "\\[")) |> 
+  ggplot(aes(n_predecations, res_phas_retr, color = group_var))+
+  geom_smooth(method = "lm", se = FALSE, color = "grey60", linetype = 2)+
+  geom_point()+
+  scale_x_log10()+
+  labs(x = "n predications (log)")
+
+mano_corpus |> 
+  select(name, age, group_var, chunk_structure) |> 
+  mutate(chunk_structure = str_remove_all(chunk_structure, "rs%.*?%"),
+         res = str_count(chunk_structure, "RES"),
+         phas = str_count(chunk_structure, "PHAS"),
+         retr = str_count(chunk_structure, "RETR"),
+         res_phas_retr = res + phas + retr,
+         n_predecations = str_count(chunk_structure, "\\["),
+         ratio = res_phas_retr/n_predecations) |> 
+  ggplot(aes(ratio, group_var))+
+  geom_point(alpha = 0.4)+
+  labs(y = NULL)
+```
+
+### Kpelle
+
+> Kpelle: calculate individual ratios of RETR+RES+IMPF to text length in predications outside RS
+
+```{r}
+kpelle_corpus |> 
+  select(new_source, group_var, chunk_structure) |> 
+  mutate(chunk_structure = str_remove_all(chunk_structure, "rs%.*?%"),
+         res = str_count(chunk_structure, "RES"),
+         impf = str_count(chunk_structure, "IMPF"),
+         retr = str_count(chunk_structure, "RETR")) |> 
+  summarise(res = sum(res),
+            impf = sum(impf),
+            retr = sum(retr)) ->
+  res_impf_retr
+
+percantage_res_k <- round((res_impf_retr$res)/n_predecations_without_RS_k*100)
+percantage_impf_k <- round((res_impf_retr$impf)/n_predecations_without_RS_k*100)
+percantage_retr_k <- round((res_impf_retr$retr)/n_predecations_without_RS_k*100)
+
+res_impf_retr_sum_k <- sum(res_impf_retr)
+percantage_res_impf_retr_k <- round((res_impf_retr_sum_k)/n_predecations_without_RS_k*100)
+```
+
+- There are only `r res_impf_retr_sum_k` utterances of RES/IMPF/RETR outside of RS (`r percantage_res_impf_retr_k`%).
+- There are only `r res_impf_retr$res` utterances of RES outside of RS (`r percantage_res_k`%). 
+- There are only `r res_impf_retr$impf` utterances of IMPF outside of RS (`r percantage_impf_k`%). 
+- There are only `r res_impf_retr$retr` utterances of RETR outside of RS (`r percantage_retr_k`%).
+
+```{r}
+kpelle_corpus |> 
+  select(new_source, group_var, chunk_structure) |> 
+  mutate(chunk_structure = str_remove_all(chunk_structure, "rs%.*?%"),
+         res = str_count(chunk_structure, "RES"),
+         impf = str_count(chunk_structure, "IMPF"),
+         retr = str_count(chunk_structure, "RETR"),
+         res_impf_retr = res + impf + retr,
+         n_predecations = str_count(chunk_structure, "\\[")) |> 
+  ggplot(aes(n_predecations, res_impf_retr, color = group_var))+
+  geom_smooth(method = "lm", se = FALSE, color = "grey60", linetype = 2)+
+  geom_point()+
+  scale_x_log10()+
+  labs(x = "n predications (log)")
+
+kpelle_corpus |> 
+  select(new_source, group_var, chunk_structure) |> 
+  mutate(chunk_structure = str_remove_all(chunk_structure, "rs%.*?%"),
+         res = str_count(chunk_structure, "RES"),
+         impf = str_count(chunk_structure, "IMPF"),
+         retr = str_count(chunk_structure, "RETR"),
+         res_impf_retr = res + impf + retr,
+         n_predecations = str_count(chunk_structure, "\\["),
+         ratio = res_impf_retr/n_predecations) |> 
+  ggplot(aes(ratio, group_var))+
+  geom_point(alpha = 0.4)+
+  labs(y = NULL)
+```
 
