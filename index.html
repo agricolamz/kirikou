@@ -1940,16 +1940,18 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb66-2"><a href="#cb66-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(name, age, group_var, chunk_structure) <span class="sc">|&gt;</span> </span>
 <span id="cb66-3"><a href="#cb66-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">ors =</span> <span class="fu">str_remove_all</span>(chunk_structure, <span class="st">"rs%.*?%"</span>),</span>
 <span id="cb66-4"><a href="#cb66-4" aria-hidden="true" tabindex="-1"></a>         <span class="at">pst =</span> <span class="fu">str_count</span>(ors, <span class="st">"PST"</span>),</span>
-<span id="cb66-5"><a href="#cb66-5" aria-hidden="true" tabindex="-1"></a>         <span class="at">jnt =</span> <span class="fu">str_count</span>(ors, <span class="st">"JNT"</span>)) <span class="sc">|&gt;</span> </span>
-<span id="cb66-6"><a href="#cb66-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="sc">-</span>chunk_structure, <span class="sc">-</span>ors) <span class="sc">|&gt;</span> </span>
-<span id="cb66-7"><a href="#cb66-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">pst =</span> <span class="fu">sum</span>(pst),</span>
-<span id="cb66-8"><a href="#cb66-8" aria-hidden="true" tabindex="-1"></a>            <span class="at">jnt =</span> <span class="fu">sum</span>(jnt))<span class="ot">-&gt;</span></span>
-<span id="cb66-9"><a href="#cb66-9" aria-hidden="true" tabindex="-1"></a>  pst_jnt_ors</span>
-<span id="cb66-10"><a href="#cb66-10" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb66-11"><a href="#cb66-11" aria-hidden="true" tabindex="-1"></a>percantage_ors <span class="ot">&lt;-</span> <span class="fu">round</span>((pst_jnt_ors<span class="sc">$</span>pst <span class="sc">+</span> pst_jnt_ors<span class="sc">$</span>jnt)<span class="sc">/</span>n_predecations<span class="sc">$</span>n_predecations<span class="sc">*</span><span class="dv">100</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb66-5"><a href="#cb66-5" aria-hidden="true" tabindex="-1"></a>         <span class="at">jnt =</span> <span class="fu">str_count</span>(ors, <span class="st">"JNT"</span>),</span>
+<span id="cb66-6"><a href="#cb66-6" aria-hidden="true" tabindex="-1"></a>         <span class="at">n_predicates =</span> <span class="fu">str_count</span>(ors, <span class="st">"</span><span class="sc">\\</span><span class="st">["</span>)) <span class="sc">|&gt;</span> </span>
+<span id="cb66-7"><a href="#cb66-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="sc">-</span>chunk_structure, <span class="sc">-</span>ors) <span class="sc">|&gt;</span> </span>
+<span id="cb66-8"><a href="#cb66-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">pst =</span> <span class="fu">sum</span>(pst),</span>
+<span id="cb66-9"><a href="#cb66-9" aria-hidden="true" tabindex="-1"></a>            <span class="at">jnt =</span> <span class="fu">sum</span>(jnt),</span>
+<span id="cb66-10"><a href="#cb66-10" aria-hidden="true" tabindex="-1"></a>            <span class="at">n_predicates =</span> <span class="fu">sum</span>(n_predicates))<span class="ot">-&gt;</span></span>
+<span id="cb66-11"><a href="#cb66-11" aria-hidden="true" tabindex="-1"></a>  pst_jnt_ors</span>
+<span id="cb66-12"><a href="#cb66-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb66-13"><a href="#cb66-13" aria-hidden="true" tabindex="-1"></a>percantage_ors <span class="ot">&lt;-</span> <span class="fu">round</span>((pst_jnt_ors<span class="sc">$</span>pst <span class="sc">+</span> pst_jnt_ors<span class="sc">$</span>jnt)<span class="sc">/</span>pst_jnt_ors<span class="sc">$</span>n_predicates<span class="sc">*</span><span class="dv">100</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 </div>
-<p>By excluding reported speech we arrive at an even <strong>LOWER</strong> proportion: 2175 and 906 tokens of PST and JNT, respectively, representing 3081 and 64% of predications.</p>
+<p>By excluding reported speech we arrive at an even higher proportion: 2175 and 906 tokens of PST and JNT, respectively, representing 3081 and 83% of predications.</p>
 <blockquote class="blockquote">
 <p>Is it true that IMP is only used in RS? what about PROH?</p>
 </blockquote>

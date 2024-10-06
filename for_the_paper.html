@@ -1,0 +1,820 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.5.52">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>Kirikou NLP</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { display: inline-block; text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="for_the_paper_files/libs/clipboard/clipboard.min.js"></script>
+<script src="for_the_paper_files/libs/quarto-html/quarto.js"></script>
+<script src="for_the_paper_files/libs/quarto-html/popper.min.js"></script>
+<script src="for_the_paper_files/libs/quarto-html/tippy.umd.min.js"></script>
+<script src="for_the_paper_files/libs/quarto-html/anchor.min.js"></script>
+<link href="for_the_paper_files/libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="for_the_paper_files/libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="for_the_paper_files/libs/bootstrap/bootstrap.min.js"></script>
+<link href="for_the_paper_files/libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="for_the_paper_files/libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+<link href="for_the_paper_files/libs/pagedtable-1.1/css/pagedtable.css" rel="stylesheet">
+<script src="for_the_paper_files/libs/pagedtable-1.1/js/pagedtable.js"></script>
+
+
+</head>
+
+<body>
+
+<div id="quarto-content" class="page-columns page-rows-contents page-layout-article">
+<div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+  <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">Table of contents</h2>
+   
+  <ul>
+  <li><a href="#общая-информация-про-корпус-мано" id="toc-общая-информация-про-корпус-мано" class="nav-link active" data-scroll-target="#общая-информация-про-корпус-мано">Общая информация про корпус Мано</a></li>
+  <li><a href="#narrative-chain" id="toc-narrative-chain" class="nav-link" data-scroll-target="#narrative-chain">Narrative chain</a></li>
+  </ul>
+</nav>
+</div>
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">Kirikou NLP</h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+    <div>
+    <div class="quarto-title-meta-heading">Published</div>
+    <div class="quarto-title-meta-contents">
+      <p class="date">6.10.2024</p>
+    </div>
+  </div>
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co"># setwd("/home/agricolamz/work/articles/2025_kirikou/repo/")</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="fu">theme_set</span>(<span class="fu">theme_minimal</span>()<span class="sc">+</span><span class="fu">theme</span>(<span class="at">legend.position =</span> <span class="st">"bottom"</span>, </span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>                                <span class="at">text =</span> <span class="fu">element_text</span>(<span class="at">size =</span> <span class="dv">16</span>)))</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidytext)</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>readxl<span class="sc">::</span><span class="fu">read_xlsx</span>(<span class="st">"kirikou_annotations.xlsx"</span>, <span class="at">sheet =</span> <span class="st">"kirikou Mano"</span>) <span class="sc">|&gt;</span></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="sc">-</span>elicitation_date) <span class="sc">|&gt;</span> </span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">text_type =</span> <span class="st">"kirikou"</span>) <span class="sc">|&gt;</span></span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">bind_rows</span>(readxl<span class="sc">::</span><span class="fu">read_xlsx</span>(<span class="st">"kirikou_annotations.xlsx"</span>, <span class="at">sheet =</span> <span class="st">"folktales Mano children"</span>) <span class="sc">|&gt;</span> </span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>              <span class="fu">mutate</span>(<span class="at">text_type =</span> <span class="st">"folktales"</span>)) <span class="sc">|&gt;</span> </span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rename</span>(<span class="at">chunk_structure =</span> <span class="st">`</span><span class="at">chunk structure</span><span class="st">`</span>,</span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>         <span class="at">time_end =</span> <span class="st">`</span><span class="at">temps de fin - hh:mm:ss.ms</span><span class="st">`</span>, </span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>         <span class="at">time_start =</span><span class="st">`</span><span class="at">Temps de départ - hh:mm:ss.ms</span><span class="st">`</span>) <span class="sc">|&gt;</span> </span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">txenfant =</span> <span class="fu">str_remove_all</span>(txenfant , <span class="st">"[/+]"</span>),</span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a>         <span class="at">txenfant =</span> <span class="fu">str_remove_all</span>(txenfant, <span class="st">"</span><span class="sc">\\</span><span class="st">[.*?</span><span class="sc">\\</span><span class="st">]"</span>),</span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a>         <span class="at">txenfant =</span> <span class="fu">if_else</span>(<span class="fu">is.na</span>(txenfant), <span class="st">""</span>, txenfant),</span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a>         <span class="at">ft =</span> <span class="fu">if_else</span>(<span class="fu">is.na</span>(ft), <span class="st">""</span>, ft),</span>
+<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a>         <span class="at">comment =</span> <span class="fu">if_else</span>(<span class="fu">is.na</span>(comment), <span class="st">""</span>, comment),</span>
+<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a>         <span class="at">chunk_structure =</span> <span class="fu">if_else</span>(<span class="fu">is.na</span>(chunk_structure), <span class="st">""</span>, chunk_structure)) <span class="sc">|&gt;</span></span>
+<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a>  <span class="fu">add_count</span>(name, age, source) <span class="sc">|&gt;</span> </span>
+<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rename</span>(<span class="at">n_chunks =</span> n) <span class="sc">|&gt;</span> </span>
+<span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(name, age, source, socio_family_adoptive, text_type, residence_place, n_chunks) <span class="sc">|&gt;</span> </span>
+<span id="cb1-24"><a href="#cb1-24" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarize</span>(<span class="at">text =</span> <span class="fu">str_c</span>(txenfant, <span class="at">collapse =</span> <span class="st">" "</span>),</span>
+<span id="cb1-25"><a href="#cb1-25" aria-hidden="true" tabindex="-1"></a>            <span class="at">chunk_structure =</span> <span class="fu">str_c</span>(chunk_structure, <span class="at">collapse =</span> <span class="st">" "</span>),</span>
+<span id="cb1-26"><a href="#cb1-26" aria-hidden="true" tabindex="-1"></a>            <span class="at">ft =</span> <span class="fu">str_c</span>(ft, <span class="at">collapse =</span> <span class="st">" "</span>),</span>
+<span id="cb1-27"><a href="#cb1-27" aria-hidden="true" tabindex="-1"></a>            <span class="at">comment =</span> <span class="fu">str_c</span>(comment, <span class="at">collapse =</span> <span class="st">" "</span>),</span>
+<span id="cb1-28"><a href="#cb1-28" aria-hidden="true" tabindex="-1"></a>            <span class="at">time_start =</span> <span class="fu">min</span>(time_start),</span>
+<span id="cb1-29"><a href="#cb1-29" aria-hidden="true" tabindex="-1"></a>            <span class="at">time_end =</span> <span class="fu">max</span>(time_end),</span>
+<span id="cb1-30"><a href="#cb1-30" aria-hidden="true" tabindex="-1"></a>            <span class="at">duration =</span> time_end <span class="sc">-</span> time_start) <span class="sc">|&gt;</span> </span>
+<span id="cb1-31"><a href="#cb1-31" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">age_group =</span> <span class="st">"children"</span>) <span class="sc">|&gt;</span> </span>
+<span id="cb1-32"><a href="#cb1-32" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="sc">-</span>time_start, <span class="sc">-</span>time_end) <span class="sc">|&gt;</span> </span>
+<span id="cb1-33"><a href="#cb1-33" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ungroup</span>() <span class="ot">-&gt;</span></span>
+<span id="cb1-34"><a href="#cb1-34" aria-hidden="true" tabindex="-1"></a>  mano_chi_corpus</span>
+<span id="cb1-35"><a href="#cb1-35" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-36"><a href="#cb1-36" aria-hidden="true" tabindex="-1"></a>readxl<span class="sc">::</span><span class="fu">read_xlsx</span>(<span class="st">"kirikou_annotations.xlsx"</span>, <span class="at">sheet =</span> <span class="st">"folktales Mano adults"</span>) <span class="sc">|&gt;</span> </span>
+<span id="cb1-37"><a href="#cb1-37" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">age =</span> <span class="dv">100</span>,</span>
+<span id="cb1-38"><a href="#cb1-38" aria-hidden="true" tabindex="-1"></a>         <span class="at">text_type =</span> <span class="st">"folktales"</span>) <span class="sc">|&gt;</span> </span>
+<span id="cb1-39"><a href="#cb1-39" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rename</span>(<span class="at">txenfant =</span> <span class="st">`</span><span class="at">txenfant = tx</span><span class="st">`</span>,</span>
+<span id="cb1-40"><a href="#cb1-40" aria-hidden="true" tabindex="-1"></a>         <span class="at">chunk_structure =</span> <span class="st">`</span><span class="at">chunk structure</span><span class="st">`</span>,</span>
+<span id="cb1-41"><a href="#cb1-41" aria-hidden="true" tabindex="-1"></a>         <span class="at">time_end =</span> <span class="st">`</span><span class="at">temps de fin - hh:mm:ss.ms</span><span class="st">`</span>, </span>
+<span id="cb1-42"><a href="#cb1-42" aria-hidden="true" tabindex="-1"></a>         <span class="at">time_start =</span><span class="st">`</span><span class="at">Temps de départ - hh:mm:ss.ms</span><span class="st">`</span>) <span class="sc">|&gt;</span> </span>
+<span id="cb1-43"><a href="#cb1-43" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">txenfant =</span> <span class="fu">str_remove_all</span>(txenfant , <span class="st">"[/+]"</span>),</span>
+<span id="cb1-44"><a href="#cb1-44" aria-hidden="true" tabindex="-1"></a>         <span class="at">txenfant =</span> <span class="fu">str_remove_all</span>(txenfant, <span class="st">"</span><span class="sc">\\</span><span class="st">[.*?</span><span class="sc">\\</span><span class="st">]"</span>),</span>
+<span id="cb1-45"><a href="#cb1-45" aria-hidden="true" tabindex="-1"></a>         <span class="at">txenfant =</span> <span class="fu">if_else</span>(<span class="fu">is.na</span>(txenfant), <span class="st">""</span>, txenfant),</span>
+<span id="cb1-46"><a href="#cb1-46" aria-hidden="true" tabindex="-1"></a>         <span class="at">ft =</span> <span class="fu">if_else</span>(<span class="fu">is.na</span>(ft), <span class="st">""</span>, ft),</span>
+<span id="cb1-47"><a href="#cb1-47" aria-hidden="true" tabindex="-1"></a>         <span class="at">comment =</span> <span class="fu">if_else</span>(<span class="fu">is.na</span>(comment), <span class="st">""</span>, comment),</span>
+<span id="cb1-48"><a href="#cb1-48" aria-hidden="true" tabindex="-1"></a>         <span class="at">chunk_structure =</span> <span class="fu">if_else</span>(<span class="fu">is.na</span>(chunk_structure), <span class="st">""</span>, chunk_structure)) <span class="sc">|&gt;</span></span>
+<span id="cb1-49"><a href="#cb1-49" aria-hidden="true" tabindex="-1"></a>  <span class="fu">add_count</span>(name, age, source) <span class="sc">|&gt;</span> </span>
+<span id="cb1-50"><a href="#cb1-50" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rename</span>(<span class="at">n_chunks =</span> n) <span class="sc">|&gt;</span> </span>
+<span id="cb1-51"><a href="#cb1-51" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(name, age, source, socio_family_adoptive, text_type, residence_place, n_chunks) <span class="sc">|&gt;</span> </span>
+<span id="cb1-52"><a href="#cb1-52" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarize</span>(<span class="at">text =</span> <span class="fu">str_c</span>(txenfant, <span class="at">collapse =</span> <span class="st">" "</span>),</span>
+<span id="cb1-53"><a href="#cb1-53" aria-hidden="true" tabindex="-1"></a>            <span class="at">chunk_structure =</span> <span class="fu">str_c</span>(chunk_structure, <span class="at">collapse =</span> <span class="st">" "</span>),</span>
+<span id="cb1-54"><a href="#cb1-54" aria-hidden="true" tabindex="-1"></a>            <span class="at">ft =</span> <span class="fu">str_c</span>(ft, <span class="at">collapse =</span> <span class="st">" "</span>),</span>
+<span id="cb1-55"><a href="#cb1-55" aria-hidden="true" tabindex="-1"></a>            <span class="at">comment =</span> <span class="fu">str_c</span>(comment, <span class="at">collapse =</span> <span class="st">" "</span>),</span>
+<span id="cb1-56"><a href="#cb1-56" aria-hidden="true" tabindex="-1"></a>            <span class="at">time_start =</span> <span class="fu">min</span>(time_start),</span>
+<span id="cb1-57"><a href="#cb1-57" aria-hidden="true" tabindex="-1"></a>            <span class="at">time_end =</span> <span class="fu">max</span>(time_end),</span>
+<span id="cb1-58"><a href="#cb1-58" aria-hidden="true" tabindex="-1"></a>            <span class="at">duration =</span> time_end <span class="sc">-</span> time_start,</span>
+<span id="cb1-59"><a href="#cb1-59" aria-hidden="true" tabindex="-1"></a>            <span class="at">duration =</span> lubridate<span class="sc">::</span><span class="fu">as.duration</span>(duration)) <span class="sc">|&gt;</span> </span>
+<span id="cb1-60"><a href="#cb1-60" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="sc">-</span>time_start, <span class="sc">-</span>time_end) <span class="sc">|&gt;</span> </span>
+<span id="cb1-61"><a href="#cb1-61" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">age_group =</span> <span class="st">"adults"</span>) <span class="sc">|&gt;</span> </span>
+<span id="cb1-62"><a href="#cb1-62" aria-hidden="true" tabindex="-1"></a>  <span class="fu">bind_rows</span>(mano_chi_corpus) <span class="sc">|&gt;</span> </span>
+<span id="cb1-63"><a href="#cb1-63" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">group_var =</span> <span class="fu">case_when</span>(text_type <span class="sc">==</span> <span class="st">"kirikou"</span> <span class="sc">&amp;</span> residence_place <span class="sc">==</span> <span class="st">"Nzerekore"</span> <span class="sc">&amp;</span> socio_family_adoptive <span class="sc">==</span> <span class="st">"Mano"</span> <span class="sc">~</span> <span class="st">"Kirikou (Nzerekore): Mano"</span>,</span>
+<span id="cb1-64"><a href="#cb1-64" aria-hidden="true" tabindex="-1"></a>                               text_type <span class="sc">==</span> <span class="st">"kirikou"</span> <span class="sc">&amp;</span> residence_place <span class="sc">==</span> <span class="st">"Nzerekore"</span> <span class="sc">&amp;</span> socio_family_adoptive <span class="sc">==</span> <span class="st">"Bilingual"</span> <span class="sc">~</span> <span class="st">"Kirikou (Nzerekore): Bilingual"</span>,</span>
+<span id="cb1-65"><a href="#cb1-65" aria-hidden="true" tabindex="-1"></a>                               text_type <span class="sc">==</span> <span class="st">"kirikou"</span> <span class="sc">&amp;</span> residence_place <span class="sc">!=</span> <span class="st">"Nzerekore"</span> <span class="sc">~</span> <span class="st">"Kirikou (other)"</span>,</span>
+<span id="cb1-66"><a href="#cb1-66" aria-hidden="true" tabindex="-1"></a>                               text_type <span class="sc">==</span> <span class="st">"folktales"</span> <span class="sc">&amp;</span> age_group <span class="sc">==</span> <span class="st">"children"</span> <span class="sc">~</span> <span class="st">"folktales (children)"</span>,</span>
+<span id="cb1-67"><a href="#cb1-67" aria-hidden="true" tabindex="-1"></a>                               text_type <span class="sc">==</span> <span class="st">"folktales"</span> <span class="sc">&amp;</span> age_group <span class="sc">==</span> <span class="st">"adults"</span> <span class="sc">~</span> <span class="st">"folktales (adults)"</span>)) <span class="sc">|&gt;</span> </span>
+<span id="cb1-68"><a href="#cb1-68" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ungroup</span>() <span class="sc">|&gt;</span> </span>
+<span id="cb1-69"><a href="#cb1-69" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">new_name =</span> name <span class="sc">|&gt;</span> <span class="fu">factor</span>() <span class="sc">|&gt;</span> <span class="fu">as.integer</span>(),</span>
+<span id="cb1-70"><a href="#cb1-70" aria-hidden="true" tabindex="-1"></a>         <span class="at">new_name =</span> <span class="fu">str_c</span>(<span class="st">"s_"</span>, new_name)) <span class="sc">|&gt;</span> </span>
+<span id="cb1-71"><a href="#cb1-71" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(new_name) <span class="sc">|&gt;</span> </span>
+<span id="cb1-72"><a href="#cb1-72" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">new_source =</span> source <span class="sc">|&gt;</span> <span class="fu">factor</span>() <span class="sc">|&gt;</span> <span class="fu">as.integer</span>(),</span>
+<span id="cb1-73"><a href="#cb1-73" aria-hidden="true" tabindex="-1"></a>         <span class="at">new_source =</span> <span class="fu">str_c</span>(new_name, <span class="st">"_t_"</span>, new_source)) <span class="sc">|&gt;</span> </span>
+<span id="cb1-74"><a href="#cb1-74" aria-hidden="true" tabindex="-1"></a>  <span class="fu">relocate</span>(new_name, <span class="at">.after =</span> name) <span class="sc">|&gt;</span> </span>
+<span id="cb1-75"><a href="#cb1-75" aria-hidden="true" tabindex="-1"></a>  <span class="fu">relocate</span>(new_source, <span class="at">.after =</span> source) <span class="sc">|&gt;</span> </span>
+<span id="cb1-76"><a href="#cb1-76" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ungroup</span>() <span class="ot">-&gt;</span></span>
+<span id="cb1-77"><a href="#cb1-77" aria-hidden="true" tabindex="-1"></a>  mano_corpus</span>
+<span id="cb1-78"><a href="#cb1-78" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-79"><a href="#cb1-79" aria-hidden="true" tabindex="-1"></a><span class="fu">rm</span>(mano_chi_corpus)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+<section id="общая-информация-про-корпус-мано" class="level2">
+<h2 class="anchored" data-anchor-id="общая-информация-про-корпус-мано">Общая информация про корпус Мано</h2>
+<p>Соответствие кодов:</p>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>mano_corpus <span class="sc">|&gt;</span> </span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(new_source, name, age, source)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output-display">
+<div data-pagedtable="false">
+  <script data-pagedtable-source="" type="application/json">
+{"columns":[{"label":["new_source"],"name":[1],"type":["chr"],"align":["left"]},{"label":["name"],"name":[2],"type":["chr"],"align":["left"]},{"label":["age"],"name":[3],"type":["dbl"],"align":["right"]},{"label":["source"],"name":[4],"type":["chr"],"align":["left"]}],"data":[{"1":"s_1_t_1","2":"AD","3":"100","4":"bossou_histoire_nooni"},{"1":"s_6_t_1","2":"CS","3":"100","4":"chasseur_deux_femmes"},{"1":"s_6_t_2","2":"CS","3":"100","4":"trois_chasseurs"},{"1":"s_7_t_1","2":"EL","3":"100","4":"bouc"},{"1":"s_7_t_2","2":"EL","3":"100","4":"homme_papa"},{"1":"s_19_t_1","2":"PM","3":"100","4":"maamia_escargots"},{"1":"s_2_t_1","2":"Andrey_Mamy","3":"4","4":"interview_andrey_film_kirikou"},{"1":"s_4_t_1","2":"Cecile_Mamy","3":"9","4":"180110_cecile_conte1"},{"1":"s_4_t_2","2":"Cecile_Mamy","3":"9","4":"180110_cecile_conte2"},{"1":"s_4_t_3","2":"Cecile_Mamy","3":"10","4":"181221_cecile_conte_mano"},{"1":"s_4_t_4","2":"Cecile_Mamy","3":"12","4":"interview_cecile_film_kirikou"},{"1":"s_5_t_1","2":"Christine","3":"9","4":"christine_interview_film_kirikou"},{"1":"s_8_t_1","2":"Etienne_Mamy","3":"9","4":"etienne_mamy_interview_film kirikou"},{"1":"s_9_t_1","2":"Eugenie_Mamy","3":"10","4":"interview_eugenie_film_kirikou_audio"},{"1":"s_10_t_1","2":"Gbamon_Kpomy","3":"10","4":"gbamon kpomy_interview_film kirikou"},{"1":"s_11_t_1","2":"Gilbert_Kolie","3":"8","4":"gilbert kolie_interview_film kirikou"},{"1":"s_13_t_1","2":"Jean-Pierre_Mamy","3":"12","4":"interview_jean_pierre_film_kirikou"},{"1":"s_12_t_1","2":"Jean_Mamy","3":"16","4":"jean mamy_interview_film_kirikou"},{"1":"s_14_t_1","2":"Josephine","3":"15","4":"181221_josephine_conte_mano_1"},{"1":"s_14_t_2","2":"Josephine","3":"15","4":"181221_josephine_conte_mano_2"},{"1":"s_14_t_3","2":"Josephine","3":"15","4":"181221_josephine_conte_mano_3"},{"1":"s_15_t_1","2":"Kala_Mamy","3":"7","4":"kala_interview_film kirikou"},{"1":"s_16_t_1","2":"Marie_mamy","3":"13","4":"marie mamy_interview_film kirikou"},{"1":"s_17_t_1","2":"Michel_Sonomy","3":"15","4":"michel sonomy_interview_film kirikou"},{"1":"s_18_t_1","2":"Nestor_Mamy","3":"10","4":"nestor_interview_kirikou"},{"1":"s_20_t_1","2":"Prospere_Mamy","3":"11","4":"interview_prospere_film_kirikou_audio"},{"1":"s_21_t_1","2":"To","3":"19","4":"181221_to_conte_mano"},{"1":"s_3_t_1","2":"angeline","3":"4","4":"angeline mamy_interview_film kirikou"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
+  </script>
+</div>
+</div>
+</div>
+<p>Длительность в чанках, в количестве предикаций и в секундах.</p>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>mano_corpus <span class="sc">|&gt;</span> </span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">n_predecations =</span> <span class="fu">str_count</span>(chunk_structure, <span class="st">"</span><span class="sc">\\</span><span class="st">["</span>)) <span class="sc">|&gt;</span> </span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(new_source, group_var, n_chunks, n_predecations, duration) <span class="sc">|&gt;</span></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(<span class="sc">-</span>n_predecations) <span class="ot">-&gt;</span></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>  total_stats</span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>total_stats</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output-display">
+<div data-pagedtable="false">
+  <script data-pagedtable-source="" type="application/json">
+{"columns":[{"label":["new_source"],"name":[1],"type":["chr"],"align":["left"]},{"label":["group_var"],"name":[2],"type":["chr"],"align":["left"]},{"label":["n_chunks"],"name":[3],"type":["int"],"align":["right"]},{"label":["n_predecations"],"name":[4],"type":["int"],"align":["right"]},{"label":["duration"],"name":[5],"type":["Duration"],"align":["right"]}],"data":[{"1":"s_4_t_4","2":"Kirikou (Nzerekore): Bilingual","3":"593","4":"832","5":"1149.80500030518s (~19.16 minutes)"},{"1":"s_17_t_1","2":"Kirikou (Nzerekore): Mano","3":"416","4":"643","5":"895.711999893188s (~14.93 minutes)"},{"1":"s_13_t_1","2":"Kirikou (Nzerekore): Bilingual","3":"190","4":"371","5":"406.327000141144s (~6.77 minutes)"},{"1":"s_6_t_1","2":"folktales (adults)","3":"267","4":"331","5":"586.760000228882s (~9.78 minutes)"},{"1":"s_5_t_1","2":"Kirikou (Nzerekore): Mano","3":"244","4":"329","5":"460.567999839783s (~7.68 minutes)"},{"1":"s_12_t_1","2":"Kirikou (other)","3":"136","4":"227","5":"296.076000213623s (~4.93 minutes)"},{"1":"s_8_t_1","2":"Kirikou (other)","3":"162","4":"215","5":"311.625s (~5.19 minutes)"},{"1":"s_10_t_1","2":"Kirikou (Nzerekore): Mano","3":"135","4":"197","5":"282.782999992371s (~4.71 minutes)"},{"1":"s_18_t_1","2":"Kirikou (other)","3":"154","4":"190","5":"309.220000267029s (~5.15 minutes)"},{"1":"s_4_t_1","2":"folktales (children)","3":"135","4":"159","5":"290.041000366211s (~4.83 minutes)"},{"1":"s_6_t_2","2":"folktales (adults)","3":"82","4":"131","5":"205.224999904633s (~3.42 minutes)"},{"1":"s_14_t_3","2":"folktales (children)","3":"94","4":"128","5":"212.875999927521s (~3.55 minutes)"},{"1":"s_14_t_1","2":"folktales (children)","3":"71","4":"123","5":"179.346999645233s (~2.99 minutes)"},{"1":"s_7_t_2","2":"folktales (adults)","3":"126","4":"111","5":"292.897999763489s (~4.88 minutes)"},{"1":"s_4_t_2","2":"folktales (children)","3":"122","4":"96","5":"220.252000331879s (~3.67 minutes)"},{"1":"s_14_t_2","2":"folktales (children)","3":"71","4":"82","5":"152.883999824524s (~2.55 minutes)"},{"1":"s_19_t_1","2":"folktales (adults)","3":"55","4":"77","5":"129.625s (~2.16 minutes)"},{"1":"s_11_t_1","2":"Kirikou (Nzerekore): Mano","3":"49","4":"73","5":"176.28200006485s (~2.94 minutes)"},{"1":"s_16_t_1","2":"Kirikou (other)","3":"42","4":"73","5":"96.1740002632141s (~1.6 minutes)"},{"1":"s_4_t_3","2":"folktales (children)","3":"91","4":"71","5":"196.365000247955s (~3.27 minutes)"},{"1":"s_20_t_1","2":"Kirikou (Nzerekore): Bilingual","3":"61","4":"70","5":"117.125999927521s (~1.95 minutes)"},{"1":"s_9_t_1","2":"Kirikou (Nzerekore): Bilingual","3":"43","4":"60","5":"108.765000343323s (~1.81 minutes)"},{"1":"s_7_t_1","2":"folktales (adults)","3":"61","4":"58","5":"161.628999710083s (~2.69 minutes)"},{"1":"s_21_t_1","2":"folktales (children)","3":"36","4":"57","5":"77.460000038147s (~1.29 minutes)"},{"1":"s_15_t_1","2":"Kirikou (Nzerekore): Bilingual","3":"41","4":"45","5":"76.1360001564026s (~1.27 minutes)"},{"1":"s_3_t_1","2":"Kirikou (other)","3":"28","4":"33","5":"52.4900002479553s"},{"1":"s_1_t_1","2":"folktales (adults)","3":"41","4":"25","5":"78.4770002365112s (~1.31 minutes)"},{"1":"s_2_t_1","2":"Kirikou (Nzerekore): Bilingual","3":"13","4":"11","5":"80.5020003318787s (~1.34 minutes)"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
+  </script>
+</div>
+</div>
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>n_predecations <span class="ot">&lt;-</span> <span class="fu">sum</span>(total_stats<span class="sc">$</span>n_predecations)</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>n_duration <span class="ot">&lt;-</span> <span class="fu">sum</span>(total_stats<span class="sc">$</span>duration)</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>hours <span class="ot">&lt;-</span> <span class="fu">floor</span>(n_duration<span class="sc">/</span><span class="dv">60</span><span class="sc">/</span><span class="dv">60</span>)</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>minutes <span class="ot">&lt;-</span> <span class="fu">ceiling</span>(n_duration<span class="sc">/</span><span class="dv">60</span> <span class="sc">-</span> hours<span class="sc">*</span><span class="dv">60</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+<p>Общая длительность корпуса 2 часа 7 минут. Всего в корпусе 4818 предикаций.</p>
+</section>
+<section id="narrative-chain" class="level2">
+<h2 class="anchored" data-anchor-id="narrative-chain">Narrative chain</h2>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>mano_corpus <span class="sc">|&gt;</span> </span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(new_source, age, group_var, chunk_structure) <span class="sc">|&gt;</span> </span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">PST =</span> <span class="fu">str_count</span>(chunk_structure, <span class="st">"PST"</span>),</span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>         <span class="at">JNT =</span> <span class="fu">str_count</span>(chunk_structure, <span class="st">"JNT"</span>),</span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>         <span class="at">IPFV =</span> <span class="fu">str_count</span>(chunk_structure, <span class="st">"IPFV"</span>),</span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>         <span class="at">PRED =</span> <span class="fu">str_count</span>(chunk_structure, <span class="st">"PRED"</span>),</span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>         <span class="at">EXI =</span> <span class="fu">str_count</span>(chunk_structure, <span class="st">"EXI"</span>),</span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>         <span class="at">CONJ =</span> <span class="fu">str_count</span>(chunk_structure, <span class="st">"CONJ"</span>),</span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>         <span class="at">PRF =</span> <span class="fu">str_count</span>(chunk_structure, <span class="st">"PRF"</span>),</span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a>         <span class="at">FUT =</span> <span class="fu">str_count</span>(chunk_structure, <span class="st">"FUT"</span>),</span>
+<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a>         <span class="at">NEG.COND =</span> <span class="fu">str_count</span>(chunk_structure, <span class="st">"NEG.COND"</span>),</span>
+<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a>         <span class="at">NEG =</span> <span class="fu">str_count</span>(chunk_structure, <span class="st">"NEG"</span>) <span class="sc">-</span> NEG.COND,</span>
+<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a>         <span class="at">COND =</span> <span class="fu">str_count</span>(chunk_structure, <span class="st">"COND"</span>),</span>
+<span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a>         <span class="at">IMP =</span> <span class="fu">str_count</span>(chunk_structure, <span class="st">"IMP"</span>),</span>
+<span id="cb5-15"><a href="#cb5-15" aria-hidden="true" tabindex="-1"></a>         <span class="at">PROSP =</span> <span class="fu">str_count</span>(chunk_structure, <span class="st">"PROSP"</span>),</span>
+<span id="cb5-16"><a href="#cb5-16" aria-hidden="true" tabindex="-1"></a>         <span class="at">PROT.IRR =</span> <span class="fu">str_count</span>(chunk_structure, <span class="st">"PROT.IRR"</span>),</span>
+<span id="cb5-17"><a href="#cb5-17" aria-hidden="true" tabindex="-1"></a>         <span class="at">APOD.IRR =</span> <span class="fu">str_count</span>(chunk_structure, <span class="st">"APOD.IRR"</span>),</span>
+<span id="cb5-18"><a href="#cb5-18" aria-hidden="true" tabindex="-1"></a>         <span class="at">IRR =</span> <span class="fu">str_count</span>(chunk_structure, <span class="st">"APOD.IRR"</span>),</span>
+<span id="cb5-19"><a href="#cb5-19" aria-hidden="true" tabindex="-1"></a>         <span class="at">PROH =</span> <span class="fu">str_count</span>(chunk_structure, <span class="st">"PROH"</span>)) <span class="sc">|&gt;</span> </span>
+<span id="cb5-20"><a href="#cb5-20" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="sc">-</span>chunk_structure) <span class="ot">-&gt;</span></span>
+<span id="cb5-21"><a href="#cb5-21" aria-hidden="true" tabindex="-1"></a>  tense</span>
+<span id="cb5-22"><a href="#cb5-22" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-23"><a href="#cb5-23" aria-hidden="true" tabindex="-1"></a>perc_pst <span class="ot">&lt;-</span> <span class="fu">floor</span>(<span class="fu">sum</span>(tense<span class="sc">$</span>PST)<span class="sc">/</span>n_predecations<span class="sc">*</span><span class="dv">100</span>)</span>
+<span id="cb5-24"><a href="#cb5-24" aria-hidden="true" tabindex="-1"></a>perc_jnt <span class="ot">&lt;-</span> <span class="fu">floor</span>(<span class="fu">sum</span>(tense<span class="sc">$</span>JNT)<span class="sc">/</span>n_predecations<span class="sc">*</span><span class="dv">100</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+<p>Overall, in our corpus they were used 2286 and 929 times respectively, or 47% and 19%, out of 4818 finite predications total.</p>
+<p>The individual breakdown of TAMP constructions (note that some constructions are put into thematic groups to simplify representation, see Supplement for details on the groups) in individual texts looks as follows, where the speakers are sorted by their age:</p>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>tense <span class="sc">|&gt;</span> </span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_longer</span>(<span class="at">names_to =</span> <span class="st">"tense"</span>, <span class="at">values_to =</span> <span class="st">"n"</span>, <span class="sc">-</span><span class="fu">c</span>(new_source, age, group_var)) <span class="sc">|&gt;</span> </span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">tense =</span> <span class="fu">case_when</span>(tense <span class="sc">%in%</span> <span class="fu">c</span>(<span class="st">"COND"</span>, <span class="st">"IRR"</span>, <span class="st">"PROT.IRR"</span>, <span class="st">"APOD.IRR"</span>, <span class="st">"NEG.COND"</span>) <span class="sc">~</span> <span class="st">"CONDs"</span>,</span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>                           tense <span class="sc">%in%</span> <span class="fu">c</span>(<span class="st">"PROH"</span>, <span class="st">"IMP"</span>) <span class="sc">~</span> <span class="st">"PROH or IMP"</span>,</span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>                           tense <span class="sc">%in%</span> <span class="fu">c</span>(<span class="st">"EXI"</span>, <span class="st">"PRED"</span>, <span class="st">"IPFV"</span>, <span class="st">"FUT"</span>, <span class="st">"PROSP"</span>) <span class="sc">~</span> <span class="st">"non-past"</span>,</span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>                           <span class="cn">TRUE</span> <span class="sc">~</span> tense)) <span class="sc">|&gt;</span> </span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(new_source, age, group_var, tense) <span class="sc">|&gt;</span></span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">n =</span> <span class="fu">sum</span>(n)) <span class="sc">|&gt;</span> </span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(new_source, age, group_var) <span class="sc">|&gt;</span> </span>
+<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">total =</span> <span class="fu">sum</span>(n),</span>
+<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a>         <span class="at">ratio =</span> n<span class="sc">/</span>total) <span class="sc">|&gt;</span> </span>
+<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="sc">-</span>n, <span class="sc">-</span>total) <span class="sc">|&gt;</span> </span>
+<span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ungroup</span>() <span class="sc">|&gt;</span> </span>
+<span id="cb6-14"><a href="#cb6-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">age2 =</span> <span class="fu">if_else</span>(age <span class="sc">==</span> <span class="dv">100</span>, <span class="st">"ad"</span>, <span class="fu">as.character</span>(age)),</span>
+<span id="cb6-15"><a href="#cb6-15" aria-hidden="true" tabindex="-1"></a>         <span class="at">new_source =</span> <span class="fu">str_c</span>(new_source, <span class="st">" ("</span>, age2, <span class="st">")"</span>),</span>
+<span id="cb6-16"><a href="#cb6-16" aria-hidden="true" tabindex="-1"></a>         <span class="at">new_source =</span> <span class="fu">fct_reorder</span>(new_source, age),</span>
+<span id="cb6-17"><a href="#cb6-17" aria-hidden="true" tabindex="-1"></a>         <span class="at">tense =</span> <span class="fu">factor</span>(tense, <span class="at">levels =</span> <span class="fu">c</span>(<span class="st">"CONDs"</span>, <span class="st">"PROH or IMP"</span>,</span>
+<span id="cb6-18"><a href="#cb6-18" aria-hidden="true" tabindex="-1"></a>                                          <span class="st">"non-past"</span>,<span class="st">"NEG"</span>, <span class="st">"CONJ"</span>,</span>
+<span id="cb6-19"><a href="#cb6-19" aria-hidden="true" tabindex="-1"></a>                                          <span class="st">"PRF"</span>, <span class="st">"JNT"</span>, <span class="st">"PST"</span>)),</span>
+<span id="cb6-20"><a href="#cb6-20" aria-hidden="true" tabindex="-1"></a>         <span class="at">label =</span> <span class="fu">str_c</span>(<span class="fu">round</span>(ratio <span class="sc">*</span> <span class="dv">100</span>), <span class="st">"%"</span>)) <span class="sc">|&gt;</span></span>
+<span id="cb6-21"><a href="#cb6-21" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(ratio <span class="sc">&gt;</span> <span class="dv">0</span>) <span class="sc">|&gt;</span></span>
+<span id="cb6-22"><a href="#cb6-22" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> ratio, <span class="at">y =</span> new_source, <span class="at">label =</span> label, <span class="at">color =</span> tense))<span class="sc">+</span></span>
+<span id="cb6-23"><a href="#cb6-23" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_col</span>(<span class="fu">aes</span>(<span class="at">fill =</span> tense))<span class="sc">+</span></span>
+<span id="cb6-24"><a href="#cb6-24" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_label</span>(<span class="at">position =</span> <span class="fu">position_fill</span>(<span class="at">vjust =</span> <span class="fl">0.5</span>), <span class="at">fill =</span> <span class="st">"white"</span>)<span class="sc">+</span></span>
+<span id="cb6-25"><a href="#cb6-25" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_x_continuous</span>(<span class="at">label =</span> scales<span class="sc">::</span>percent)<span class="sc">+</span></span>
+<span id="cb6-26"><a href="#cb6-26" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="cn">NULL</span>, <span class="at">y =</span> <span class="cn">NULL</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="for_the_paper_files/figure-html/unnamed-chunk-5-1.png" class="img-fluid figure-img" width="960"></p>
+</figure>
+</div>
+</div>
+</div>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>mano_corpus <span class="sc">|&gt;</span> </span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">chunk_structure =</span> <span class="fu">str_remove_all</span>(chunk_structure, <span class="st">"rs%.*?%"</span>),</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>         <span class="at">n_predecations =</span> <span class="fu">str_count</span>(chunk_structure, <span class="st">"</span><span class="sc">\\</span><span class="st">["</span>)) <span class="sc">|&gt;</span> </span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(new_source, age, group_var, chunk_structure, n_predecations) <span class="sc">|&gt;</span> </span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">PST =</span> <span class="fu">str_count</span>(chunk_structure, <span class="st">"PST"</span>),</span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>         <span class="at">JNT =</span> <span class="fu">str_count</span>(chunk_structure, <span class="st">"JNT"</span>),</span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>         <span class="at">IPFV =</span> <span class="fu">str_count</span>(chunk_structure, <span class="st">"IPFV"</span>),</span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a>         <span class="at">PRED =</span> <span class="fu">str_count</span>(chunk_structure, <span class="st">"PRED"</span>),</span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a>         <span class="at">EXI =</span> <span class="fu">str_count</span>(chunk_structure, <span class="st">"EXI"</span>),</span>
+<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a>         <span class="at">CONJ =</span> <span class="fu">str_count</span>(chunk_structure, <span class="st">"CONJ"</span>),</span>
+<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a>         <span class="at">PRF =</span> <span class="fu">str_count</span>(chunk_structure, <span class="st">"PRF"</span>),</span>
+<span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a>         <span class="at">FUT =</span> <span class="fu">str_count</span>(chunk_structure, <span class="st">"FUT"</span>),</span>
+<span id="cb7-13"><a href="#cb7-13" aria-hidden="true" tabindex="-1"></a>         <span class="at">NEG.COND =</span> <span class="fu">str_count</span>(chunk_structure, <span class="st">"NEG.COND"</span>),</span>
+<span id="cb7-14"><a href="#cb7-14" aria-hidden="true" tabindex="-1"></a>         <span class="at">NEG =</span> <span class="fu">str_count</span>(chunk_structure, <span class="st">"NEG"</span>) <span class="sc">-</span> NEG.COND,</span>
+<span id="cb7-15"><a href="#cb7-15" aria-hidden="true" tabindex="-1"></a>         <span class="at">COND =</span> <span class="fu">str_count</span>(chunk_structure, <span class="st">"COND"</span>),</span>
+<span id="cb7-16"><a href="#cb7-16" aria-hidden="true" tabindex="-1"></a>         <span class="at">IMP =</span> <span class="fu">str_count</span>(chunk_structure, <span class="st">"IMP"</span>),</span>
+<span id="cb7-17"><a href="#cb7-17" aria-hidden="true" tabindex="-1"></a>         <span class="at">PROSP =</span> <span class="fu">str_count</span>(chunk_structure, <span class="st">"PROSP"</span>),</span>
+<span id="cb7-18"><a href="#cb7-18" aria-hidden="true" tabindex="-1"></a>         <span class="at">PROT.IRR =</span> <span class="fu">str_count</span>(chunk_structure, <span class="st">"PROT.IRR"</span>),</span>
+<span id="cb7-19"><a href="#cb7-19" aria-hidden="true" tabindex="-1"></a>         <span class="at">APOD.IRR =</span> <span class="fu">str_count</span>(chunk_structure, <span class="st">"APOD.IRR"</span>),</span>
+<span id="cb7-20"><a href="#cb7-20" aria-hidden="true" tabindex="-1"></a>         <span class="at">IRR =</span> <span class="fu">str_count</span>(chunk_structure, <span class="st">"APOD.IRR"</span>),</span>
+<span id="cb7-21"><a href="#cb7-21" aria-hidden="true" tabindex="-1"></a>         <span class="at">PROH =</span> <span class="fu">str_count</span>(chunk_structure, <span class="st">"PROH"</span>)) <span class="sc">|&gt;</span> </span>
+<span id="cb7-22"><a href="#cb7-22" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="sc">-</span>chunk_structure) <span class="ot">-&gt;</span></span>
+<span id="cb7-23"><a href="#cb7-23" aria-hidden="true" tabindex="-1"></a>  tense_without_RS</span>
+<span id="cb7-24"><a href="#cb7-24" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-25"><a href="#cb7-25" aria-hidden="true" tabindex="-1"></a>n_predecations_without_RS <span class="ot">&lt;-</span> <span class="fu">sum</span>(tense_without_RS<span class="sc">$</span>n_predecations)</span>
+<span id="cb7-26"><a href="#cb7-26" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-27"><a href="#cb7-27" aria-hidden="true" tabindex="-1"></a>perc_pst_without_RS <span class="ot">&lt;-</span> <span class="fu">floor</span>(<span class="fu">sum</span>(tense_without_RS<span class="sc">$</span>PST)<span class="sc">/</span>n_predecations_without_RS<span class="sc">*</span><span class="dv">100</span>)</span>
+<span id="cb7-28"><a href="#cb7-28" aria-hidden="true" tabindex="-1"></a>perc_jnt_without_RS <span class="ot">&lt;-</span> <span class="fu">floor</span>(<span class="fu">sum</span>(tense_without_RS<span class="sc">$</span>JNT)<span class="sc">/</span>n_predecations_without_RS<span class="sc">*</span><span class="dv">100</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+<p>By excluding reported speech we arrive at an even higher proportion: 2175 and 906 tokens of PST and JNT, respectively, representing 58% and 24% of predications.</p>
+<p>The difference between distributions of TAMP constructions within reported speech and in the narrative chain alone indicates that PST and JNT are indeed mostly narrative tenses, while other forms are used in both and some are mostly restricted to the conversational domain, such as the imperative which was used outside reported speech only 6 times out of 146.</p>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>tense_without_RS <span class="sc">|&gt;</span> </span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="sc">-</span>n_predecations) <span class="sc">|&gt;</span> </span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_longer</span>(<span class="at">names_to =</span> <span class="st">"tense"</span>, <span class="at">values_to =</span> <span class="st">"n"</span>, <span class="sc">-</span><span class="fu">c</span>(new_source, age, group_var)) <span class="sc">|&gt;</span> </span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">tense =</span> <span class="fu">case_when</span>(tense <span class="sc">%in%</span> <span class="fu">c</span>(<span class="st">"COND"</span>, <span class="st">"IRR"</span>, <span class="st">"PROT.IRR"</span>, <span class="st">"APOD.IRR"</span>, <span class="st">"NEG.COND"</span>) <span class="sc">~</span> <span class="st">"CONDs"</span>,</span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>                           tense <span class="sc">%in%</span> <span class="fu">c</span>(<span class="st">"PROH"</span>, <span class="st">"IMP"</span>) <span class="sc">~</span> <span class="st">"PROH or IMP"</span>,</span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>                           tense <span class="sc">%in%</span> <span class="fu">c</span>(<span class="st">"EXI"</span>, <span class="st">"PRED"</span>, <span class="st">"IPFV"</span>, <span class="st">"FUT"</span>, <span class="st">"PROSP"</span>) <span class="sc">~</span> <span class="st">"non-past"</span>,</span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>                           <span class="cn">TRUE</span> <span class="sc">~</span> tense)) <span class="sc">|&gt;</span>  </span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(new_source, age, group_var, tense) <span class="sc">|&gt;</span></span>
+<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">n =</span> <span class="fu">sum</span>(n)) <span class="sc">|&gt;</span> </span>
+<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(new_source, age, group_var) <span class="sc">|&gt;</span> </span>
+<span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">total =</span> <span class="fu">sum</span>(n),</span>
+<span id="cb8-12"><a href="#cb8-12" aria-hidden="true" tabindex="-1"></a>         <span class="at">ratio =</span> n<span class="sc">/</span>total) <span class="sc">|&gt;</span> </span>
+<span id="cb8-13"><a href="#cb8-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="sc">-</span>n, <span class="sc">-</span>total) <span class="sc">|&gt;</span> </span>
+<span id="cb8-14"><a href="#cb8-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ungroup</span>() <span class="sc">|&gt;</span> </span>
+<span id="cb8-15"><a href="#cb8-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">age2 =</span> <span class="fu">if_else</span>(age <span class="sc">==</span> <span class="dv">100</span>, <span class="st">"ad"</span>, <span class="fu">as.character</span>(age)),</span>
+<span id="cb8-16"><a href="#cb8-16" aria-hidden="true" tabindex="-1"></a>         <span class="at">new_source =</span> <span class="fu">str_c</span>(new_source, <span class="st">" ("</span>, age2, <span class="st">")"</span>),</span>
+<span id="cb8-17"><a href="#cb8-17" aria-hidden="true" tabindex="-1"></a>         <span class="at">new_source =</span> <span class="fu">fct_reorder</span>(new_source, age),</span>
+<span id="cb8-18"><a href="#cb8-18" aria-hidden="true" tabindex="-1"></a>         <span class="at">tense =</span> <span class="fu">factor</span>(tense, <span class="at">levels =</span> <span class="fu">c</span>(<span class="st">"CONDs"</span>, <span class="st">"PROH or IMP"</span>,</span>
+<span id="cb8-19"><a href="#cb8-19" aria-hidden="true" tabindex="-1"></a>                                          <span class="st">"non-past"</span>,<span class="st">"NEG"</span>, <span class="st">"CONJ"</span>,</span>
+<span id="cb8-20"><a href="#cb8-20" aria-hidden="true" tabindex="-1"></a>                                          <span class="st">"PRF"</span>, <span class="st">"JNT"</span>, <span class="st">"PST"</span>)),</span>
+<span id="cb8-21"><a href="#cb8-21" aria-hidden="true" tabindex="-1"></a>         <span class="at">label =</span> <span class="fu">str_c</span>(<span class="fu">round</span>(ratio <span class="sc">*</span> <span class="dv">100</span>), <span class="st">"%"</span>)) <span class="sc">|&gt;</span></span>
+<span id="cb8-22"><a href="#cb8-22" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(ratio <span class="sc">&gt;</span> <span class="dv">0</span>) <span class="sc">|&gt;</span></span>
+<span id="cb8-23"><a href="#cb8-23" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> ratio, <span class="at">y =</span> new_source, <span class="at">label =</span> label, <span class="at">color =</span> tense))<span class="sc">+</span></span>
+<span id="cb8-24"><a href="#cb8-24" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_col</span>(<span class="fu">aes</span>(<span class="at">fill =</span> tense))<span class="sc">+</span></span>
+<span id="cb8-25"><a href="#cb8-25" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_label</span>(<span class="at">position =</span> <span class="fu">position_fill</span>(<span class="at">vjust =</span> <span class="fl">0.5</span>), <span class="at">fill =</span> <span class="st">"white"</span>)<span class="sc">+</span></span>
+<span id="cb8-26"><a href="#cb8-26" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_x_continuous</span>(<span class="at">label =</span> scales<span class="sc">::</span>percent)<span class="sc">+</span></span>
+<span id="cb8-27"><a href="#cb8-27" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="cn">NULL</span>, <span class="at">y =</span> <span class="cn">NULL</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="for_the_paper_files/figure-html/unnamed-chunk-7-1.png" class="img-fluid figure-img" width="960"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+
+</main>
+<!-- /main column -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
+  const onCopySuccess = function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  }
+  const getTextToCopy = function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+    text: getTextToCopy
+  });
+  clipboard.on('success', onCopySuccess);
+  if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+    // For code content inside modals, clipBoardJS needs to be initialized with a container option
+    // TODO: Check when it could be a function (https://github.com/zenorocha/clipboard.js/issues/860)
+    const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+      text: getTextToCopy,
+      container: window.document.getElementById('quarto-embedded-source-code-modal')
+    });
+    clipboardModal.on('success', onCopySuccess);
+  }
+    var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+    var mailtoRegex = new RegExp(/^mailto:/);
+      var filterRegex = new RegExp('/' + window.location.host + '/');
+    var isInternal = (href) => {
+        return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+    }
+    // Inspect non-navigation links and adorn them if external
+ 	var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+    for (var i=0; i<links.length; i++) {
+      const link = links[i];
+      if (!isInternal(link.href)) {
+        // undo the damage that might have been done by quarto-nav.js in the case of
+        // links that we want to consider external
+        if (link.dataset.originalHref !== undefined) {
+          link.href = link.dataset.originalHref;
+        }
+      }
+    }
+  function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+    const config = {
+      allowHTML: true,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start',
+    };
+    if (contentFn) {
+      config.content = contentFn;
+    }
+    if (onTriggerFn) {
+      config.onTrigger = onTriggerFn;
+    }
+    if (onUntriggerFn) {
+      config.onUntrigger = onUntriggerFn;
+    }
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      if (note) {
+        return note.innerHTML;
+      } else {
+        return "";
+      }
+    });
+  }
+  const xrefs = window.document.querySelectorAll('a.quarto-xref');
+  const processXRef = (id, note) => {
+    // Strip column container classes
+    const stripColumnClz = (el) => {
+      el.classList.remove("page-full", "page-columns");
+      if (el.children) {
+        for (const child of el.children) {
+          stripColumnClz(child);
+        }
+      }
+    }
+    stripColumnClz(note)
+    if (id === null || id.startsWith('sec-')) {
+      // Special case sections, only their first couple elements
+      const container = document.createElement("div");
+      if (note.children && note.children.length > 2) {
+        container.appendChild(note.children[0].cloneNode(true));
+        for (let i = 1; i < note.children.length; i++) {
+          const child = note.children[i];
+          if (child.tagName === "P" && child.innerText === "") {
+            continue;
+          } else {
+            container.appendChild(child.cloneNode(true));
+            break;
+          }
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(container);
+        }
+        return container.innerHTML
+      } else {
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        return note.innerHTML;
+      }
+    } else {
+      // Remove any anchor links if they are present
+      const anchorLink = note.querySelector('a.anchorjs-link');
+      if (anchorLink) {
+        anchorLink.remove();
+      }
+      if (window.Quarto?.typesetMath) {
+        window.Quarto.typesetMath(note);
+      }
+      // TODO in 1.5, we should make sure this works without a callout special case
+      if (note.classList.contains("callout")) {
+        return note.outerHTML;
+      } else {
+        return note.innerHTML;
+      }
+    }
+  }
+  for (var i=0; i<xrefs.length; i++) {
+    const xref = xrefs[i];
+    tippyHover(xref, undefined, function(instance) {
+      instance.disable();
+      let url = xref.getAttribute('href');
+      let hash = undefined; 
+      if (url.startsWith('#')) {
+        hash = url;
+      } else {
+        try { hash = new URL(url).hash; } catch {}
+      }
+      if (hash) {
+        const id = hash.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note !== null) {
+          try {
+            const html = processXRef(id, note.cloneNode(true));
+            instance.setContent(html);
+          } finally {
+            instance.enable();
+            instance.show();
+          }
+        } else {
+          // See if we can fetch this
+          fetch(url.split('#')[0])
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.getElementById(id);
+            if (note !== null) {
+              const html = processXRef(id, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      } else {
+        // See if we can fetch a full url (with no hash to target)
+        // This is a special case and we should probably do some content thinning / targeting
+        fetch(url)
+        .then(res => res.text())
+        .then(html => {
+          const parser = new DOMParser();
+          const htmlDoc = parser.parseFromString(html, "text/html");
+          const note = htmlDoc.querySelector('main.content');
+          if (note !== null) {
+            // This should only happen for chapter cross references
+            // (since there is no id in the URL)
+            // remove the first header
+            if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+              note.children[0].remove();
+            }
+            const html = processXRef(null, note);
+            instance.setContent(html);
+          } 
+        }).finally(() => {
+          instance.enable();
+          instance.show();
+        });
+      }
+    }, function(instance) {
+    });
+  }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            div.style.left = 0;
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+        // Handle positioning of the toggle
+    window.addEventListener(
+      "resize",
+      throttle(() => {
+        elRect = undefined;
+        if (selectedAnnoteEl) {
+          selectCodeLines(selectedAnnoteEl);
+        }
+      }, 10)
+    );
+    function throttle(fn, ms) {
+    let throttle = false;
+    let timer;
+      return (...args) => {
+        if(!throttle) { // first call gets through
+            fn.apply(this, args);
+            throttle = true;
+        } else { // all the others get throttled
+            if(timer) clearTimeout(timer); // cancel #2
+            timer = setTimeout(() => {
+              fn.apply(this, args);
+              timer = throttle = false;
+            }, ms);
+        }
+      };
+    }
+      // Attach click handler to the DT
+      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+      for (const annoteDlNode of annoteDls) {
+        annoteDlNode.addEventListener('click', (event) => {
+          const clickedEl = event.target;
+          if (clickedEl !== selectedAnnoteEl) {
+            unselectCodeLines();
+            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+            if (activeEl) {
+              activeEl.classList.remove('code-annotation-active');
+            }
+            selectCodeLines(clickedEl);
+            clickedEl.classList.add('code-annotation-active');
+          } else {
+            // Unselect the line
+            unselectCodeLines();
+            clickedEl.classList.remove('code-annotation-active');
+          }
+        });
+      }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+</div> <!-- /content -->
+
+
+
+
+</body></html>

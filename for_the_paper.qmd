@@ -1,0 +1,260 @@
+---
+title: "Kirikou NLP"
+date: today
+date-format: D.MM.YYYY
+format: 
+  html:
+    toc: true
+df-print: paged
+execute:
+  warning: false
+  message: false
+fig-height: 6
+fig-width: 10
+editor: source
+code-fold: true
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r}
+#| message: false
+
+# setwd("/home/agricolamz/work/articles/2025_kirikou/repo/")
+library(tidyverse)
+theme_set(theme_minimal()+theme(legend.position = "bottom", 
+                                text = element_text(size = 16)))
+library(tidytext)
+
+readxl::read_xlsx("kirikou_annotations.xlsx", sheet = "kirikou Mano") |>
+  select(-elicitation_date) |> 
+  mutate(text_type = "kirikou") |>
+  bind_rows(readxl::read_xlsx("kirikou_annotations.xlsx", sheet = "folktales Mano children") |> 
+              mutate(text_type = "folktales")) |> 
+  rename(chunk_structure = `chunk structure`,
+         time_end = `temps de fin - hh:mm:ss.ms`, 
+         time_start =`Temps de départ - hh:mm:ss.ms`) |> 
+  mutate(txenfant = str_remove_all(txenfant , "[/+]"),
+         txenfant = str_remove_all(txenfant, "\\[.*?\\]"),
+         txenfant = if_else(is.na(txenfant), "", txenfant),
+         ft = if_else(is.na(ft), "", ft),
+         comment = if_else(is.na(comment), "", comment),
+         chunk_structure = if_else(is.na(chunk_structure), "", chunk_structure)) |>
+  add_count(name, age, source) |> 
+  rename(n_chunks = n) |> 
+  group_by(name, age, source, socio_family_adoptive, text_type, residence_place, n_chunks) |> 
+  summarize(text = str_c(txenfant, collapse = " "),
+            chunk_structure = str_c(chunk_structure, collapse = " "),
+            ft = str_c(ft, collapse = " "),
+            comment = str_c(comment, collapse = " "),
+            time_start = min(time_start),
+            time_end = max(time_end),
+            duration = time_end - time_start) |> 
+  mutate(age_group = "children") |> 
+  select(-time_start, -time_end) |> 
+  ungroup() ->
+  mano_chi_corpus
+
+readxl::read_xlsx("kirikou_annotations.xlsx", sheet = "folktales Mano adults") |> 
+  mutate(age = 100,
+         text_type = "folktales") |> 
+  rename(txenfant = `txenfant = tx`,
+         chunk_structure = `chunk structure`,
+         time_end = `temps de fin - hh:mm:ss.ms`, 
+         time_start =`Temps de départ - hh:mm:ss.ms`) |> 
+  mutate(txenfant = str_remove_all(txenfant , "[/+]"),
+         txenfant = str_remove_all(txenfant, "\\[.*?\\]"),
+         txenfant = if_else(is.na(txenfant), "", txenfant),
+         ft = if_else(is.na(ft), "", ft),
+         comment = if_else(is.na(comment), "", comment),
+         chunk_structure = if_else(is.na(chunk_structure), "", chunk_structure)) |>
+  add_count(name, age, source) |> 
+  rename(n_chunks = n) |> 
+  group_by(name, age, source, socio_family_adoptive, text_type, residence_place, n_chunks) |> 
+  summarize(text = str_c(txenfant, collapse = " "),
+            chunk_structure = str_c(chunk_structure, collapse = " "),
+            ft = str_c(ft, collapse = " "),
+            comment = str_c(comment, collapse = " "),
+            time_start = min(time_start),
+            time_end = max(time_end),
+            duration = time_end - time_start,
+            duration = lubridate::as.duration(duration)) |> 
+  select(-time_start, -time_end) |> 
+  mutate(age_group = "adults") |> 
+  bind_rows(mano_chi_corpus) |> 
+  mutate(group_var = case_when(text_type == "kirikou" & residence_place == "Nzerekore" & socio_family_adoptive == "Mano" ~ "Kirikou (Nzerekore): Mano",
+                               text_type == "kirikou" & residence_place == "Nzerekore" & socio_family_adoptive == "Bilingual" ~ "Kirikou (Nzerekore): Bilingual",
+                               text_type == "kirikou" & residence_place != "Nzerekore" ~ "Kirikou (other)",
+                               text_type == "folktales" & age_group == "children" ~ "folktales (children)",
+                               text_type == "folktales" & age_group == "adults" ~ "folktales (adults)")) |> 
+  ungroup() |> 
+  mutate(new_name = name |> factor() |> as.integer(),
+         new_name = str_c("s_", new_name)) |> 
+  group_by(new_name) |> 
+  mutate(new_source = source |> factor() |> as.integer(),
+         new_source = str_c(new_name, "_t_", new_source)) |> 
+  relocate(new_name, .after = name) |> 
+  relocate(new_source, .after = source) |> 
+  ungroup() ->
+  mano_corpus
+
+rm(mano_chi_corpus)
+```
+
+## Общая информация про корпус Мано
+
+Соответствие кодов:
+
+```{r}
+mano_corpus |> 
+  select(new_source, name, age, source)
+```
+
+Длительность в чанках, в количестве предикаций и в секундах.
+
+```{r}
+mano_corpus |> 
+  mutate(n_predecations = str_count(chunk_structure, "\\[")) |> 
+  select(new_source, group_var, n_chunks, n_predecations, duration) |>
+  arrange(-n_predecations) ->
+  total_stats
+
+total_stats
+
+n_predecations <- sum(total_stats$n_predecations)
+n_duration <- sum(total_stats$duration)
+hours <- floor(n_duration/60/60)
+minutes <- ceiling(n_duration/60 - hours*60)
+```
+
+Общая длительность корпуса `r hours` часа `r minutes` минут. Всего в корпусе `r n_predecations` предикаций.
+
+## Narrative chain
+
+```{r}
+mano_corpus |> 
+  select(new_source, age, group_var, chunk_structure) |> 
+  mutate(PST = str_count(chunk_structure, "PST"),
+         JNT = str_count(chunk_structure, "JNT"),
+         IPFV = str_count(chunk_structure, "IPFV"),
+         PRED = str_count(chunk_structure, "PRED"),
+         EXI = str_count(chunk_structure, "EXI"),
+         CONJ = str_count(chunk_structure, "CONJ"),
+         PRF = str_count(chunk_structure, "PRF"),
+         FUT = str_count(chunk_structure, "FUT"),
+         NEG.COND = str_count(chunk_structure, "NEG.COND"),
+         NEG = str_count(chunk_structure, "NEG") - NEG.COND,
+         COND = str_count(chunk_structure, "COND"),
+         IMP = str_count(chunk_structure, "IMP"),
+         PROSP = str_count(chunk_structure, "PROSP"),
+         PROT.IRR = str_count(chunk_structure, "PROT.IRR"),
+         APOD.IRR = str_count(chunk_structure, "APOD.IRR"),
+         IRR = str_count(chunk_structure, "APOD.IRR"),
+         PROH = str_count(chunk_structure, "PROH")) |> 
+  select(-chunk_structure) ->
+  tense
+
+perc_pst <- floor(sum(tense$PST)/n_predecations*100)
+perc_jnt <- floor(sum(tense$JNT)/n_predecations*100)
+```
+
+Overall, in our corpus they were used `r sum(tense$PST)` and `r sum(tense$JNT)`  times respectively, or `r perc_pst`% and `r perc_jnt`%, out of `r n_predecations` finite predications total. 
+
+The individual breakdown of TAMP constructions (note that some constructions are put into thematic groups to simplify representation, see Supplement for details on the groups) in individual texts looks as follows, where the speakers are sorted by their age:
+
+```{r}
+tense |> 
+  pivot_longer(names_to = "tense", values_to = "n", -c(new_source, age, group_var)) |> 
+  mutate(tense = case_when(tense %in% c("COND", "IRR", "PROT.IRR", "APOD.IRR", "NEG.COND") ~ "CONDs",
+                           tense %in% c("PROH", "IMP") ~ "PROH or IMP",
+                           tense %in% c("EXI", "PRED", "IPFV", "FUT", "PROSP") ~ "non-past",
+                           TRUE ~ tense)) |> 
+  group_by(new_source, age, group_var, tense) |>
+  summarise(n = sum(n)) |> 
+  group_by(new_source, age, group_var) |> 
+  mutate(total = sum(n),
+         ratio = n/total) |> 
+  select(-n, -total) |> 
+  ungroup() |> 
+  mutate(age2 = if_else(age == 100, "ad", as.character(age)),
+         new_source = str_c(new_source, " (", age2, ")"),
+         new_source = fct_reorder(new_source, age),
+         tense = factor(tense, levels = c("CONDs", "PROH or IMP",
+                                          "non-past","NEG", "CONJ",
+                                          "PRF", "JNT", "PST")),
+         label = str_c(round(ratio * 100), "%")) |>
+  filter(ratio > 0) |>
+  ggplot(aes(x = ratio, y = new_source, label = label, color = tense))+
+  geom_col(aes(fill = tense))+
+  geom_label(position = position_fill(vjust = 0.5), fill = "white")+
+  scale_x_continuous(label = scales::percent)+
+  labs(x = NULL, y = NULL)
+```
+
+
+```{r}
+mano_corpus |> 
+  mutate(chunk_structure = str_remove_all(chunk_structure, "rs%.*?%"),
+         n_predecations = str_count(chunk_structure, "\\[")) |> 
+  select(new_source, age, group_var, chunk_structure, n_predecations) |> 
+  mutate(PST = str_count(chunk_structure, "PST"),
+         JNT = str_count(chunk_structure, "JNT"),
+         IPFV = str_count(chunk_structure, "IPFV"),
+         PRED = str_count(chunk_structure, "PRED"),
+         EXI = str_count(chunk_structure, "EXI"),
+         CONJ = str_count(chunk_structure, "CONJ"),
+         PRF = str_count(chunk_structure, "PRF"),
+         FUT = str_count(chunk_structure, "FUT"),
+         NEG.COND = str_count(chunk_structure, "NEG.COND"),
+         NEG = str_count(chunk_structure, "NEG") - NEG.COND,
+         COND = str_count(chunk_structure, "COND"),
+         IMP = str_count(chunk_structure, "IMP"),
+         PROSP = str_count(chunk_structure, "PROSP"),
+         PROT.IRR = str_count(chunk_structure, "PROT.IRR"),
+         APOD.IRR = str_count(chunk_structure, "APOD.IRR"),
+         IRR = str_count(chunk_structure, "APOD.IRR"),
+         PROH = str_count(chunk_structure, "PROH")) |> 
+  select(-chunk_structure) ->
+  tense_without_RS
+
+n_predecations_without_RS <- sum(tense_without_RS$n_predecations)
+
+perc_pst_without_RS <- floor(sum(tense_without_RS$PST)/n_predecations_without_RS*100)
+perc_jnt_without_RS <- floor(sum(tense_without_RS$JNT)/n_predecations_without_RS*100)
+```
+
+
+By excluding reported speech we arrive at an even higher proportion: `r sum(tense_without_RS$PST)` and `r sum(tense_without_RS$JNT)` tokens of PST and JNT, respectively, representing `r perc_pst_without_RS`% and `r perc_jnt_without_RS`% of predications.
+
+The difference between distributions of TAMP constructions within reported speech and in the narrative chain alone indicates that PST and JNT are indeed mostly narrative tenses, while other forms are used in both and some are mostly restricted to the conversational domain, such as the imperative which was used outside reported speech only `r sum(tense_without_RS$IMP)` times out of `r sum(tense$IMP)`.
+
+```{r}
+tense_without_RS |> 
+  select(-n_predecations) |> 
+  pivot_longer(names_to = "tense", values_to = "n", -c(new_source, age, group_var)) |> 
+  mutate(tense = case_when(tense %in% c("COND", "IRR", "PROT.IRR", "APOD.IRR", "NEG.COND") ~ "CONDs",
+                           tense %in% c("PROH", "IMP") ~ "PROH or IMP",
+                           tense %in% c("EXI", "PRED", "IPFV", "FUT", "PROSP") ~ "non-past",
+                           TRUE ~ tense)) |>  
+  group_by(new_source, age, group_var, tense) |>
+  summarise(n = sum(n)) |> 
+  group_by(new_source, age, group_var) |> 
+  mutate(total = sum(n),
+         ratio = n/total) |> 
+  select(-n, -total) |> 
+  ungroup() |> 
+  mutate(age2 = if_else(age == 100, "ad", as.character(age)),
+         new_source = str_c(new_source, " (", age2, ")"),
+         new_source = fct_reorder(new_source, age),
+         tense = factor(tense, levels = c("CONDs", "PROH or IMP",
+                                          "non-past","NEG", "CONJ",
+                                          "PRF", "JNT", "PST")),
+         label = str_c(round(ratio * 100), "%")) |>
+  filter(ratio > 0) |>
+  ggplot(aes(x = ratio, y = new_source, label = label, color = tense))+
+  geom_col(aes(fill = tense))+
+  geom_label(position = position_fill(vjust = 0.5), fill = "white")+
+  scale_x_continuous(label = scales::percent)+
+  labs(x = NULL, y = NULL)
+```
+

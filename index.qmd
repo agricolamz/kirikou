@@ -40,9 +40,9 @@ readxl::read_xlsx("kirikou_annotations.xlsx", sheet = "kirikou Mano") |>
          ft = if_else(is.na(ft), "", ft),
          comment = if_else(is.na(comment), "", comment),
          chunk_structure = if_else(is.na(chunk_structure), "", chunk_structure)) |>
-  add_count(name, age) |> 
+  add_count(name, age, source) |> 
   rename(n_chunks = n) |> 
-  group_by(name, age, socio_family_adoptive, text_type, residence_place, n_chunks) |> 
+  group_by(name, age, source, socio_family_adoptive, text_type, residence_place, n_chunks) |> 
   summarize(text = str_c(txenfant, collapse = " "),
             chunk_structure = str_c(chunk_structure, collapse = " "),
             ft = str_c(ft, collapse = " "),
@@ -62,9 +62,9 @@ readxl::read_xlsx("kirikou_annotations.xlsx", sheet = "folktales Mano adults") |
          ft = if_else(is.na(ft), "", ft),
          comment = if_else(is.na(comment), "", comment),
          chunk_structure = if_else(is.na(chunk_structure), "", chunk_structure)) |>
-  add_count(name, age) |> 
+  add_count(name, age, source) |> 
   rename(n_chunks = n) |> 
-  group_by(name, age, socio_family_adoptive, text_type, residence_place, n_chunks) |> 
+  group_by(name, age, source, socio_family_adoptive, text_type, residence_place, n_chunks) |> 
   summarize(text = str_c(txenfant, collapse = " "),
             chunk_structure = str_c(chunk_structure, collapse = " "),
             ft = str_c(ft, collapse = " "),
@@ -1408,16 +1408,18 @@ mano_corpus |>
   select(name, age, group_var, chunk_structure) |> 
   mutate(ors = str_remove_all(chunk_structure, "rs%.*?%"),
          pst = str_count(ors, "PST"),
-         jnt = str_count(ors, "JNT")) |> 
+         jnt = str_count(ors, "JNT"),
+         n_predicates = str_count(ors, "\\[")) |> 
   select(-chunk_structure, -ors) |> 
   summarise(pst = sum(pst),
-            jnt = sum(jnt))->
+            jnt = sum(jnt),
+            n_predicates = sum(n_predicates))->
   pst_jnt_ors
 
-percantage_ors <- round((pst_jnt_ors$pst + pst_jnt_ors$jnt)/n_predecations$n_predecations*100)
+percantage_ors <- round((pst_jnt_ors$pst + pst_jnt_ors$jnt)/pst_jnt_ors$n_predicates*100)
 ```
 
-By excluding reported speech we arrive at an even **LOWER** proportion: `r pst_jnt_ors$pst` and `r pst_jnt_ors$jnt` tokens of PST and JNT, respectively, representing `r pst_jnt_ors$pst+pst_jnt_ors$jnt` and `r percantage_ors`% of predications.
+By excluding reported speech we arrive at an even higher proportion: `r pst_jnt_ors$pst` and `r pst_jnt_ors$jnt` tokens of PST and JNT, respectively, representing `r pst_jnt_ors$pst+pst_jnt_ors$jnt` and `r percantage_ors`% of predications.
 
 > Is it true that IMP is only used in RS? what about PROH?
 
