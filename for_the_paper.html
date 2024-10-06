@@ -91,6 +91,11 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <li><a href="#mano" id="toc-mano" class="nav-link" data-scroll-target="#mano">Mano</a></li>
   <li><a href="#kpelle" id="toc-kpelle" class="nav-link" data-scroll-target="#kpelle">Kpelle</a></li>
   </ul></li>
+  <li><a href="#imp-vs-proh" id="toc-imp-vs-proh" class="nav-link" data-scroll-target="#imp-vs-proh">IMP vs PROH</a>
+  <ul class="collapse">
+  <li><a href="#mano-1" id="toc-mano-1" class="nav-link" data-scroll-target="#mano-1">Mano</a></li>
+  <li><a href="#kpelle-1" id="toc-kpelle-1" class="nav-link" data-scroll-target="#kpelle-1">Kpelle</a></li>
+  </ul></li>
   </ul>
 </nav>
 </div>
@@ -717,6 +722,51 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 </div>
 </div>
+</section>
+</section>
+<section id="imp-vs-proh" class="level2">
+<h2 class="anchored" data-anchor-id="imp-vs-proh">IMP vs PROH</h2>
+<section id="mano-1" class="level3">
+<h3 class="anchored" data-anchor-id="mano-1">Mano</h3>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>mano_corpus <span class="sc">|&gt;</span> </span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(new_source, group_var, chunk_structure) <span class="sc">|&gt;</span> </span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">imp =</span> <span class="fu">str_count</span>(chunk_structure, <span class="st">"IMP"</span>),</span>
+<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a>         <span class="at">proh =</span> <span class="fu">str_count</span>(chunk_structure, <span class="st">"PROH"</span>),</span>
+<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a>         <span class="at">ors =</span> <span class="fu">str_remove_all</span>(chunk_structure, <span class="st">"rs%.*?%"</span>),</span>
+<span id="cb16-6"><a href="#cb16-6" aria-hidden="true" tabindex="-1"></a>         <span class="at">imp_ors =</span> <span class="fu">str_count</span>(ors, <span class="st">"IMP"</span>),</span>
+<span id="cb16-7"><a href="#cb16-7" aria-hidden="true" tabindex="-1"></a>         <span class="at">proh_ors =</span> <span class="fu">str_count</span>(ors, <span class="st">"PROH"</span>)) <span class="sc">|&gt;</span> </span>
+<span id="cb16-8"><a href="#cb16-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">imp =</span> <span class="fu">sum</span>(imp),</span>
+<span id="cb16-9"><a href="#cb16-9" aria-hidden="true" tabindex="-1"></a>            <span class="at">proh =</span> <span class="fu">sum</span>(proh),</span>
+<span id="cb16-10"><a href="#cb16-10" aria-hidden="true" tabindex="-1"></a>            <span class="at">imp_ors =</span> <span class="fu">sum</span>(imp_ors),</span>
+<span id="cb16-11"><a href="#cb16-11" aria-hidden="true" tabindex="-1"></a>            <span class="at">proh_ors =</span> <span class="fu">sum</span>(proh_ors)) <span class="ot">-&gt;</span></span>
+<span id="cb16-12"><a href="#cb16-12" aria-hidden="true" tabindex="-1"></a>  imp_proh_m</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+<p>There are only 6 utterances of IMP outside of RS out of 146 total utterances. There are only 2 utterances of PROH outside of RS out of 6 total utterances.</p>
+</section>
+<section id="kpelle-1" class="level3">
+<h3 class="anchored" data-anchor-id="kpelle-1">Kpelle</h3>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>kpelle_corpus <span class="sc">|&gt;</span> </span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(new_source, group_var, chunk_structure) <span class="sc">|&gt;</span> </span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">imp =</span> <span class="fu">str_count</span>(chunk_structure, <span class="st">"IMP"</span>),</span>
+<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a>         <span class="at">proh =</span> <span class="fu">str_count</span>(chunk_structure, <span class="st">"PROH"</span>),</span>
+<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a>         <span class="at">ors =</span> <span class="fu">str_remove_all</span>(chunk_structure, <span class="st">"rs%.*?%"</span>),</span>
+<span id="cb17-6"><a href="#cb17-6" aria-hidden="true" tabindex="-1"></a>         <span class="at">imp_ors =</span> <span class="fu">str_count</span>(ors, <span class="st">"IMP"</span>),</span>
+<span id="cb17-7"><a href="#cb17-7" aria-hidden="true" tabindex="-1"></a>         <span class="at">proh_ors =</span> <span class="fu">str_count</span>(ors, <span class="st">"PROH"</span>)) <span class="sc">|&gt;</span> </span>
+<span id="cb17-8"><a href="#cb17-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">imp =</span> <span class="fu">sum</span>(imp),</span>
+<span id="cb17-9"><a href="#cb17-9" aria-hidden="true" tabindex="-1"></a>            <span class="at">proh =</span> <span class="fu">sum</span>(proh),</span>
+<span id="cb17-10"><a href="#cb17-10" aria-hidden="true" tabindex="-1"></a>            <span class="at">imp_ors =</span> <span class="fu">sum</span>(imp_ors),</span>
+<span id="cb17-11"><a href="#cb17-11" aria-hidden="true" tabindex="-1"></a>            <span class="at">proh_ors =</span> <span class="fu">sum</span>(proh_ors)) <span class="ot">-&gt;</span></span>
+<span id="cb17-12"><a href="#cb17-12" aria-hidden="true" tabindex="-1"></a>  imp_proh_k</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+<p>There are only 24 utterances of IMP outside of RS out of 51 total utterances. There are only 1 utterances of PROH outside of RS out of 2 total utterances.</p>
 </section>
 </section>
 

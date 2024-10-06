@@ -527,3 +527,44 @@ tense_without_RS_k |>
   labs(x = NULL, y = NULL)
 ```
 
+## IMP vs PROH
+
+### Mano
+
+```{r}
+mano_corpus |> 
+  select(new_source, group_var, chunk_structure) |> 
+  mutate(imp = str_count(chunk_structure, "IMP"),
+         proh = str_count(chunk_structure, "PROH"),
+         ors = str_remove_all(chunk_structure, "rs%.*?%"),
+         imp_ors = str_count(ors, "IMP"),
+         proh_ors = str_count(ors, "PROH")) |> 
+  summarise(imp = sum(imp),
+            proh = sum(proh),
+            imp_ors = sum(imp_ors),
+            proh_ors = sum(proh_ors)) ->
+  imp_proh_m
+```
+
+There are only `r imp_proh_m$imp_ors` utterances of IMP outside of RS out of `r imp_proh_m$imp` total utterances. There are only `r imp_proh_m$proh_ors` utterances of PROH outside of RS out of `r imp_proh_m$proh` total utterances.
+
+### Kpelle
+
+```{r}
+kpelle_corpus |> 
+  select(new_source, group_var, chunk_structure) |> 
+  mutate(imp = str_count(chunk_structure, "IMP"),
+         proh = str_count(chunk_structure, "PROH"),
+         ors = str_remove_all(chunk_structure, "rs%.*?%"),
+         imp_ors = str_count(ors, "IMP"),
+         proh_ors = str_count(ors, "PROH")) |> 
+  summarise(imp = sum(imp),
+            proh = sum(proh),
+            imp_ors = sum(imp_ors),
+            proh_ors = sum(proh_ors)) ->
+  imp_proh_k
+```
+
+There are only `r imp_proh_k$imp_ors` utterances of IMP outside of RS out of `r imp_proh_k$imp` total utterances. There are only `r imp_proh_k$proh_ors` utterances of PROH outside of RS out of `r imp_proh_k$proh` total utterances.
+
+
