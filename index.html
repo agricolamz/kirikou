@@ -2106,6 +2106,64 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <blockquote class="blockquote">
 <p>visualize which TAMP constructions are used with DUR (check all forms that have the _DUR extension, such as PST_DUR, separate DUR and regroup the remainder of the forms in the same way as you did when visualizing tense diversity)</p>
 </blockquote>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb74"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb74-1"><a href="#cb74-1" aria-hidden="true" tabindex="-1"></a>mano_corpus <span class="sc">|&gt;</span> </span>
+<span id="cb74-2"><a href="#cb74-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(name, age, group_var, chunk_structure) <span class="sc">|&gt;</span> </span>
+<span id="cb74-3"><a href="#cb74-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">chunk_structure =</span> <span class="fu">str_remove_all</span>(chunk_structure, <span class="st">"rs%.*?%"</span>),</span>
+<span id="cb74-4"><a href="#cb74-4" aria-hidden="true" tabindex="-1"></a>         <span class="at">dur =</span> <span class="fu">str_extract_all</span>(chunk_structure, <span class="st">"_[A-Z]*?_DUR"</span>)) <span class="sc">|&gt;</span> </span>
+<span id="cb74-5"><a href="#cb74-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="sc">-</span>chunk_structure) <span class="sc">|&gt;</span> </span>
+<span id="cb74-6"><a href="#cb74-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">unnest_longer</span>(dur) <span class="sc">|&gt;</span> </span>
+<span id="cb74-7"><a href="#cb74-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">dur =</span> <span class="fu">str_remove_all</span>(dur, <span class="st">"_DUR"</span>),</span>
+<span id="cb74-8"><a href="#cb74-8" aria-hidden="true" tabindex="-1"></a>         <span class="at">dur =</span> <span class="fu">str_remove_all</span>(dur, <span class="st">"_"</span>)) <span class="sc">|&gt;</span> </span>
+<span id="cb74-9"><a href="#cb74-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count</span>(name, age, group_var, dur) <span class="sc">|&gt;</span> </span>
+<span id="cb74-10"><a href="#cb74-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_wider</span>(<span class="at">names_from =</span> dur, <span class="at">values_from =</span> n, <span class="at">values_fill =</span> <span class="dv">0</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output-display">
+<div data-pagedtable="false">
+  <script data-pagedtable-source="" type="application/json">
+{"columns":[{"label":["name"],"name":[1],"type":["chr"],"align":["left"]},{"label":["age"],"name":[2],"type":["dbl"],"align":["right"]},{"label":["group_var"],"name":[3],"type":["chr"],"align":["left"]},{"label":["PST"],"name":[4],"type":["int"],"align":["right"]},{"label":["EXI"],"name":[5],"type":["int"],"align":["right"]},{"label":["PRF"],"name":[6],"type":["int"],"align":["right"]},{"label":["NEG"],"name":[7],"type":["int"],"align":["right"]},{"label":["COND"],"name":[8],"type":["int"],"align":["right"]},{"label":["CONJ"],"name":[9],"type":["int"],"align":["right"]}],"data":[{"1":"Andrey_Mamy","2":"4","3":"Kirikou (Nzerekore): Bilingual","4":"1","5":"0","6":"0","7":"0","8":"0","9":"0"},{"1":"CS","2":"100","3":"folktales (adults)","4":"16","5":"2","6":"1","7":"0","8":"0","9":"0"},{"1":"Cecile_Mamy","2":"9","3":"folktales (children)","4":"3","5":"1","6":"0","7":"0","8":"0","9":"0"},{"1":"Cecile_Mamy","2":"12","3":"Kirikou (Nzerekore): Bilingual","4":"38","5":"0","6":"0","7":"0","8":"0","9":"0"},{"1":"Christine","2":"9","3":"Kirikou (Nzerekore): Mano","4":"11","5":"0","6":"0","7":"0","8":"0","9":"0"},{"1":"EL","2":"100","3":"folktales (adults)","4":"5","5":"0","6":"0","7":"0","8":"0","9":"0"},{"1":"Etienne_Mamy","2":"9","3":"Kirikou (other)","4":"9","5":"0","6":"0","7":"0","8":"0","9":"0"},{"1":"Eugenie_Mamy","2":"10","3":"Kirikou (Nzerekore): Bilingual","4":"3","5":"0","6":"0","7":"0","8":"0","9":"0"},{"1":"Gbamon_Kpomy","2":"10","3":"Kirikou (Nzerekore): Mano","4":"12","5":"0","6":"0","7":"0","8":"0","9":"0"},{"1":"Gilbert_Kolie","2":"8","3":"Kirikou (Nzerekore): Mano","4":"6","5":"0","6":"0","7":"0","8":"0","9":"0"},{"1":"Jean-Pierre_Mamy","2":"12","3":"Kirikou (Nzerekore): Bilingual","4":"16","5":"1","6":"0","7":"1","8":"0","9":"0"},{"1":"Jean_Mamy","2":"16","3":"Kirikou (other)","4":"3","5":"1","6":"0","7":"0","8":"0","9":"0"},{"1":"Josephine","2":"15","3":"folktales (children)","4":"3","5":"5","6":"0","7":"2","8":"3","9":"0"},{"1":"Marie_mamy","2":"13","3":"Kirikou (other)","4":"3","5":"0","6":"0","7":"0","8":"0","9":"0"},{"1":"Michel_Sonomy","2":"15","3":"Kirikou (Nzerekore): Mano","4":"15","5":"2","6":"0","7":"0","8":"1","9":"2"},{"1":"Nestor_Mamy","2":"10","3":"Kirikou (other)","4":"9","5":"0","6":"0","7":"1","8":"0","9":"0"},{"1":"PM","2":"100","3":"folktales (adults)","4":"4","5":"0","6":"0","7":"0","8":"0","9":"0"},{"1":"Prospere_Mamy","2":"11","3":"Kirikou (Nzerekore): Bilingual","4":"1","5":"1","6":"0","7":"0","8":"0","9":"0"},{"1":"To","2":"19","3":"folktales (children)","4":"1","5":"0","6":"0","7":"0","8":"0","9":"0"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
+  </script>
+</div>
+</div>
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb75"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb75-1"><a href="#cb75-1" aria-hidden="true" tabindex="-1"></a>mano_corpus <span class="sc">|&gt;</span> </span>
+<span id="cb75-2"><a href="#cb75-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(name, age, group_var, chunk_structure) <span class="sc">|&gt;</span> </span>
+<span id="cb75-3"><a href="#cb75-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">chunk_structure =</span> <span class="fu">str_remove_all</span>(chunk_structure, <span class="st">"rs%.*?%"</span>),</span>
+<span id="cb75-4"><a href="#cb75-4" aria-hidden="true" tabindex="-1"></a>         <span class="at">dur =</span> <span class="fu">str_extract_all</span>(chunk_structure, <span class="st">"_[A-Z]*?_DUR"</span>)) <span class="sc">|&gt;</span> </span>
+<span id="cb75-5"><a href="#cb75-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="sc">-</span>chunk_structure) <span class="sc">|&gt;</span> </span>
+<span id="cb75-6"><a href="#cb75-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">unnest_longer</span>(dur) <span class="sc">|&gt;</span> </span>
+<span id="cb75-7"><a href="#cb75-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">dur =</span> <span class="fu">str_remove_all</span>(dur, <span class="st">"_DUR"</span>),</span>
+<span id="cb75-8"><a href="#cb75-8" aria-hidden="true" tabindex="-1"></a>         <span class="at">dur =</span> <span class="fu">str_remove_all</span>(dur, <span class="st">"_"</span>)) <span class="sc">|&gt;</span> </span>
+<span id="cb75-9"><a href="#cb75-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count</span>(name, age, group_var, dur) <span class="sc">|&gt;</span> </span>
+<span id="cb75-10"><a href="#cb75-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(name, age, group_var, dur) <span class="sc">|&gt;</span></span>
+<span id="cb75-11"><a href="#cb75-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">n =</span> <span class="fu">sum</span>(n)) <span class="sc">|&gt;</span> </span>
+<span id="cb75-12"><a href="#cb75-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(name, age, group_var) <span class="sc">|&gt;</span> </span>
+<span id="cb75-13"><a href="#cb75-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">total =</span> <span class="fu">sum</span>(n),</span>
+<span id="cb75-14"><a href="#cb75-14" aria-hidden="true" tabindex="-1"></a>         <span class="at">ratio =</span> n<span class="sc">/</span>total) <span class="sc">|&gt;</span> </span>
+<span id="cb75-15"><a href="#cb75-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="sc">-</span>n, <span class="sc">-</span>total) <span class="sc">|&gt;</span> </span>
+<span id="cb75-16"><a href="#cb75-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ungroup</span>() <span class="sc">|&gt;</span> </span>
+<span id="cb75-17"><a href="#cb75-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">name =</span> <span class="fu">str_c</span>(name, <span class="st">" ("</span>, age, <span class="st">")"</span>),</span>
+<span id="cb75-18"><a href="#cb75-18" aria-hidden="true" tabindex="-1"></a>         <span class="at">name =</span> <span class="fu">fct_reorder</span>(name, age),</span>
+<span id="cb75-19"><a href="#cb75-19" aria-hidden="true" tabindex="-1"></a>         <span class="at">label =</span> <span class="fu">str_c</span>(<span class="fu">round</span>(ratio <span class="sc">*</span> <span class="dv">100</span>), <span class="st">"%"</span>)) <span class="sc">|&gt;</span></span>
+<span id="cb75-20"><a href="#cb75-20" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(ratio <span class="sc">&gt;</span> <span class="dv">0</span>) <span class="sc">|&gt;</span></span>
+<span id="cb75-21"><a href="#cb75-21" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> ratio, <span class="at">y =</span> name, <span class="at">label =</span> label, <span class="at">color =</span> dur))<span class="sc">+</span></span>
+<span id="cb75-22"><a href="#cb75-22" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_col</span>(<span class="fu">aes</span>(<span class="at">fill =</span> dur))<span class="sc">+</span></span>
+<span id="cb75-23"><a href="#cb75-23" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_label</span>(<span class="at">position =</span> <span class="fu">position_fill</span>(<span class="at">vjust =</span> <span class="fl">0.5</span>), <span class="at">fill =</span> <span class="st">"white"</span>)<span class="sc">+</span></span>
+<span id="cb75-24"><a href="#cb75-24" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_x_continuous</span>(<span class="at">label =</span> scales<span class="sc">::</span>percent)<span class="sc">+</span></span>
+<span id="cb75-25"><a href="#cb75-25" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="cn">NULL</span>, <span class="at">y =</span> <span class="cn">NULL</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="index_files/figure-html/unnamed-chunk-51-1.png" class="img-fluid figure-img" width="960"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>Oh, it is Barbie time…</p>
 </section>
 
 </main>

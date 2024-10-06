@@ -1532,3 +1532,44 @@ mano_corpus |>
 ```
 
 > visualize which TAMP constructions are used with DUR (check all forms that have the _DUR extension, such as PST_DUR, separate DUR and regroup the remainder of the forms in the same way as you did when visualizing tense diversity)
+
+```{r}
+mano_corpus |> 
+  select(name, age, group_var, chunk_structure) |> 
+  mutate(chunk_structure = str_remove_all(chunk_structure, "rs%.*?%"),
+         dur = str_extract_all(chunk_structure, "_[A-Z]*?_DUR")) |> 
+  select(-chunk_structure) |> 
+  unnest_longer(dur) |> 
+  mutate(dur = str_remove_all(dur, "_DUR"),
+         dur = str_remove_all(dur, "_")) |> 
+  count(name, age, group_var, dur) |> 
+  pivot_wider(names_from = dur, values_from = n, values_fill = 0)
+
+mano_corpus |> 
+  select(name, age, group_var, chunk_structure) |> 
+  mutate(chunk_structure = str_remove_all(chunk_structure, "rs%.*?%"),
+         dur = str_extract_all(chunk_structure, "_[A-Z]*?_DUR")) |> 
+  select(-chunk_structure) |> 
+  unnest_longer(dur) |> 
+  mutate(dur = str_remove_all(dur, "_DUR"),
+         dur = str_remove_all(dur, "_")) |> 
+  count(name, age, group_var, dur) |> 
+  group_by(name, age, group_var, dur) |>
+  summarise(n = sum(n)) |> 
+  group_by(name, age, group_var) |> 
+  mutate(total = sum(n),
+         ratio = n/total) |> 
+  select(-n, -total) |> 
+  ungroup() |> 
+  mutate(name = str_c(name, " (", age, ")"),
+         name = fct_reorder(name, age),
+         label = str_c(round(ratio * 100), "%")) |>
+  filter(ratio > 0) |>
+  ggplot(aes(x = ratio, y = name, label = label, color = dur))+
+  geom_col(aes(fill = dur))+
+  geom_label(position = position_fill(vjust = 0.5), fill = "white")+
+  scale_x_continuous(label = scales::percent)+
+  labs(x = NULL, y = NULL)
+```
+
+Oh, it is Barbie time...
