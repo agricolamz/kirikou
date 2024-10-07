@@ -878,3 +878,49 @@ kpelle_corpus |>
   geom_col()+
   labs(y = NULL, fill = NULL)
 ```
+
+## PURP
+
+### Mano
+
+> Mano & Kpelle: check purp (prefix) + PURP to all predications, without filtering
+
+```{r}
+mano_corpus |> 
+  select(new_source, age, group_var, chunk_structure) |> 
+  mutate(purp_gloss = str_count(chunk_structure, "PURP"),
+         purp_prefix = str_count(chunk_structure, "purp"),
+         n_predecations = str_count(chunk_structure, "\\["),
+         ratio = (purp_gloss+purp_prefix)/n_predecations) |> 
+  arrange(ratio) |> 
+  mutate(age2 = if_else(age == 100, "ad", as.character(age)),
+         new_source = str_c(new_source, " (", age2, ")"),
+         new_source = fct_inorder(new_source)) |> 
+  ggplot(aes(ratio, new_source, fill = group_var)) +
+  geom_col() +
+  labs(y = NULL,
+       x = "ratio of PURP",
+       fill = NULL)
+```
+
+### Kpelle
+
+> Mano & Kpelle: check purp (prefix) + PURP to all predications, without filtering
+
+```{r}
+kpelle_corpus |> 
+  select(new_source, age, group_var, chunk_structure) |> 
+  mutate(purp_gloss = str_count(chunk_structure, "PURP"),
+         purp_prefix = str_count(chunk_structure, "purp"),
+         n_predecations = str_count(chunk_structure, "\\["),
+         ratio = (purp_gloss+purp_prefix)/n_predecations) |> 
+  arrange(ratio) |> 
+  mutate(age2 = if_else(age == 100, "ad", as.character(age)),
+         new_source = str_c(new_source, " (", age2, ")"),
+         new_source = fct_inorder(new_source)) |> 
+  ggplot(aes(ratio, new_source, fill = group_var)) +
+  geom_col() +
+  labs(y = NULL,
+       x = "ratio of PURP",
+       fill = NULL)
+```

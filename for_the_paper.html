@@ -111,6 +111,11 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <li><a href="#mano-4" id="toc-mano-4" class="nav-link" data-scroll-target="#mano-4">Mano</a></li>
   <li><a href="#kpelle-4" id="toc-kpelle-4" class="nav-link" data-scroll-target="#kpelle-4">Kpelle</a></li>
   </ul></li>
+  <li><a href="#purp" id="toc-purp" class="nav-link" data-scroll-target="#purp">PURP</a>
+  <ul class="collapse">
+  <li><a href="#mano-5" id="toc-mano-5" class="nav-link" data-scroll-target="#mano-5">Mano</a></li>
+  <li><a href="#kpelle-5" id="toc-kpelle-5" class="nav-link" data-scroll-target="#kpelle-5">Kpelle</a></li>
+  </ul></li>
   </ul>
 </nav>
 </div>
@@ -1221,6 +1226,75 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <div>
 <figure class="figure">
 <p><img src="for_the_paper_files/figure-html/unnamed-chunk-25-1.png" class="img-fluid figure-img" width="960"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="purp" class="level2">
+<h2 class="anchored" data-anchor-id="purp">PURP</h2>
+<section id="mano-5" class="level3">
+<h3 class="anchored" data-anchor-id="mano-5">Mano</h3>
+<blockquote class="blockquote">
+<p>Mano &amp; Kpelle: check purp (prefix) + PURP to all predications, without filtering</p>
+</blockquote>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb32"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a>mano_corpus <span class="sc">|&gt;</span> </span>
+<span id="cb32-2"><a href="#cb32-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(new_source, age, group_var, chunk_structure) <span class="sc">|&gt;</span> </span>
+<span id="cb32-3"><a href="#cb32-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">purp_gloss =</span> <span class="fu">str_count</span>(chunk_structure, <span class="st">"PURP"</span>),</span>
+<span id="cb32-4"><a href="#cb32-4" aria-hidden="true" tabindex="-1"></a>         <span class="at">purp_prefix =</span> <span class="fu">str_count</span>(chunk_structure, <span class="st">"purp"</span>),</span>
+<span id="cb32-5"><a href="#cb32-5" aria-hidden="true" tabindex="-1"></a>         <span class="at">n_predecations =</span> <span class="fu">str_count</span>(chunk_structure, <span class="st">"</span><span class="sc">\\</span><span class="st">["</span>),</span>
+<span id="cb32-6"><a href="#cb32-6" aria-hidden="true" tabindex="-1"></a>         <span class="at">ratio =</span> (purp_gloss<span class="sc">+</span>purp_prefix)<span class="sc">/</span>n_predecations) <span class="sc">|&gt;</span> </span>
+<span id="cb32-7"><a href="#cb32-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(ratio) <span class="sc">|&gt;</span> </span>
+<span id="cb32-8"><a href="#cb32-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">age2 =</span> <span class="fu">if_else</span>(age <span class="sc">==</span> <span class="dv">100</span>, <span class="st">"ad"</span>, <span class="fu">as.character</span>(age)),</span>
+<span id="cb32-9"><a href="#cb32-9" aria-hidden="true" tabindex="-1"></a>         <span class="at">new_source =</span> <span class="fu">str_c</span>(new_source, <span class="st">" ("</span>, age2, <span class="st">")"</span>),</span>
+<span id="cb32-10"><a href="#cb32-10" aria-hidden="true" tabindex="-1"></a>         <span class="at">new_source =</span> <span class="fu">fct_inorder</span>(new_source)) <span class="sc">|&gt;</span> </span>
+<span id="cb32-11"><a href="#cb32-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(ratio, new_source, <span class="at">fill =</span> group_var)) <span class="sc">+</span></span>
+<span id="cb32-12"><a href="#cb32-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_col</span>() <span class="sc">+</span></span>
+<span id="cb32-13"><a href="#cb32-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">y =</span> <span class="cn">NULL</span>,</span>
+<span id="cb32-14"><a href="#cb32-14" aria-hidden="true" tabindex="-1"></a>       <span class="at">x =</span> <span class="st">"ratio of PURP"</span>,</span>
+<span id="cb32-15"><a href="#cb32-15" aria-hidden="true" tabindex="-1"></a>       <span class="at">fill =</span> <span class="cn">NULL</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="for_the_paper_files/figure-html/unnamed-chunk-26-1.png" class="img-fluid figure-img" width="960"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="kpelle-5" class="level3">
+<h3 class="anchored" data-anchor-id="kpelle-5">Kpelle</h3>
+<blockquote class="blockquote">
+<p>Mano &amp; Kpelle: check purp (prefix) + PURP to all predications, without filtering</p>
+</blockquote>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb33"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a>kpelle_corpus <span class="sc">|&gt;</span> </span>
+<span id="cb33-2"><a href="#cb33-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(new_source, age, group_var, chunk_structure) <span class="sc">|&gt;</span> </span>
+<span id="cb33-3"><a href="#cb33-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">purp_gloss =</span> <span class="fu">str_count</span>(chunk_structure, <span class="st">"PURP"</span>),</span>
+<span id="cb33-4"><a href="#cb33-4" aria-hidden="true" tabindex="-1"></a>         <span class="at">purp_prefix =</span> <span class="fu">str_count</span>(chunk_structure, <span class="st">"purp"</span>),</span>
+<span id="cb33-5"><a href="#cb33-5" aria-hidden="true" tabindex="-1"></a>         <span class="at">n_predecations =</span> <span class="fu">str_count</span>(chunk_structure, <span class="st">"</span><span class="sc">\\</span><span class="st">["</span>),</span>
+<span id="cb33-6"><a href="#cb33-6" aria-hidden="true" tabindex="-1"></a>         <span class="at">ratio =</span> (purp_gloss<span class="sc">+</span>purp_prefix)<span class="sc">/</span>n_predecations) <span class="sc">|&gt;</span> </span>
+<span id="cb33-7"><a href="#cb33-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(ratio) <span class="sc">|&gt;</span> </span>
+<span id="cb33-8"><a href="#cb33-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">age2 =</span> <span class="fu">if_else</span>(age <span class="sc">==</span> <span class="dv">100</span>, <span class="st">"ad"</span>, <span class="fu">as.character</span>(age)),</span>
+<span id="cb33-9"><a href="#cb33-9" aria-hidden="true" tabindex="-1"></a>         <span class="at">new_source =</span> <span class="fu">str_c</span>(new_source, <span class="st">" ("</span>, age2, <span class="st">")"</span>),</span>
+<span id="cb33-10"><a href="#cb33-10" aria-hidden="true" tabindex="-1"></a>         <span class="at">new_source =</span> <span class="fu">fct_inorder</span>(new_source)) <span class="sc">|&gt;</span> </span>
+<span id="cb33-11"><a href="#cb33-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(ratio, new_source, <span class="at">fill =</span> group_var)) <span class="sc">+</span></span>
+<span id="cb33-12"><a href="#cb33-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_col</span>() <span class="sc">+</span></span>
+<span id="cb33-13"><a href="#cb33-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">y =</span> <span class="cn">NULL</span>,</span>
+<span id="cb33-14"><a href="#cb33-14" aria-hidden="true" tabindex="-1"></a>       <span class="at">x =</span> <span class="st">"ratio of PURP"</span>,</span>
+<span id="cb33-15"><a href="#cb33-15" aria-hidden="true" tabindex="-1"></a>       <span class="at">fill =</span> <span class="cn">NULL</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="for_the_paper_files/figure-html/unnamed-chunk-27-1.png" class="img-fluid figure-img" width="960"></p>
 </figure>
 </div>
 </div>
