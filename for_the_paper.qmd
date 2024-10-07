@@ -22,6 +22,7 @@ editor_options:
 
 # setwd("/home/agricolamz/work/articles/2025_kirikou/repo/")
 library(tidyverse)
+library(tidytext)
 theme_set(theme_minimal() +theme(legend.position = "bottom", 
                                 text = element_text(size = 16)))
 
@@ -1211,6 +1212,886 @@ kpelle_corpus |>
 
 > visualize complex syntax: all prefixes divided by the text length in predications; same thing within and outside RS
 
+```{r}
+mano_corpus |> 
+  select(new_source, age, group_var, chunk_structure) |> 
+  mutate(foc = str_count(chunk_structure, "foc"),
+         rel = str_count(chunk_structure, "rel"),
+         temp = str_count(chunk_structure, "temp"),
+         cond = str_count(chunk_structure, "cond"),
+         purp = str_count(chunk_structure, "purp"),
+         prec = str_count(chunk_structure, "prec"),
+         compar = str_count(chunk_structure, "compar"),
+         mod = str_count(chunk_structure, "mod"),
+         sa = str_count(chunk_structure, "sa"),
+         le = str_count(chunk_structure, "le"),
+         ht = str_count(chunk_structure, "ht"),
+         at = str_count(chunk_structure, "at"),
+         top = str_count(chunk_structure, "top"),
+         voc = str_count(chunk_structure, "voc")) |> 
+  select(-chunk_structure)
+
+prefix <- "foc"
+
+mano_corpus |> 
+  select(new_source, age, group_var, chunk_structure) |> 
+  mutate(total = str_count(chunk_structure, prefix),
+         predecations_total = str_count(chunk_structure, "\\["),
+         cs_ors = str_remove_all(chunk_structure, "rs%.*?%"),
+         predecations_ors = str_count(cs_ors, "\\["),
+         predecations_wrs = predecations_total - predecations_ors,
+         ors = str_count(cs_ors, prefix),
+         wrs = total - ors,
+         total = total/predecations_total,
+         ors = ors/predecations_ors,
+         wrs = wrs/predecations_wrs,
+         total = if_else(is.nan(total), 0, total),
+         ors = if_else(is.nan(ors), 0, ors),
+         wrs = if_else(is.nan(wrs), 0, wrs)) |> 
+  select(-chunk_structure, -cs_ors, -predecations_total, -predecations_ors, -predecations_wrs) |> 
+  pivot_longer(names_to = "type", values_to = "value", total:wrs) |> 
+  mutate(type = case_when(type == "total" ~ str_c("overall ratio of ", prefix),
+                          type == "ors" ~ str_c("ratio of ", prefix, " outside RS"),
+                          type == "wrs" ~ str_c("ratio of ", prefix, " within RS"))) |> 
+  mutate(age2 = if_else(age == 100, "ad", as.character(age)),
+         new_source = str_c(new_source, " (", age2, ")"),
+         new_source = reorder_within(new_source, within = type, by = value)) |> 
+  ggplot(aes(value, new_source, fill = group_var))+
+  geom_col()+
+  facet_wrap(~type, nrow = 1, scales = "free")+
+  scale_y_reordered()
+
+prefix <- "rel"
+
+mano_corpus |> 
+  select(new_source, age, group_var, chunk_structure) |> 
+  mutate(total = str_count(chunk_structure, prefix),
+         predecations_total = str_count(chunk_structure, "\\["),
+         cs_ors = str_remove_all(chunk_structure, "rs%.*?%"),
+         predecations_ors = str_count(cs_ors, "\\["),
+         predecations_wrs = predecations_total - predecations_ors,
+         ors = str_count(cs_ors, prefix),
+         wrs = total - ors,
+         total = total/predecations_total,
+         ors = ors/predecations_ors,
+         wrs = wrs/predecations_wrs,
+         total = if_else(is.nan(total), 0, total),
+         ors = if_else(is.nan(ors), 0, ors),
+         wrs = if_else(is.nan(wrs), 0, wrs)) |> 
+  select(-chunk_structure, -cs_ors, -predecations_total, -predecations_ors, -predecations_wrs) |> 
+  pivot_longer(names_to = "type", values_to = "value", total:wrs) |> 
+  mutate(type = case_when(type == "total" ~ str_c("overall ratio of ", prefix),
+                          type == "ors" ~ str_c("ratio of ", prefix, " outside RS"),
+                          type == "wrs" ~ str_c("ratio of ", prefix, " within RS"))) |> 
+  mutate(age2 = if_else(age == 100, "ad", as.character(age)),
+         new_source = str_c(new_source, " (", age2, ")"),
+         new_source = reorder_within(new_source, within = type, by = value)) |> 
+  ggplot(aes(value, new_source, fill = group_var))+
+  geom_col()+
+  facet_wrap(~type, nrow = 1, scales = "free")+
+  scale_y_reordered()
+
+prefix <- "temp"
+
+mano_corpus |> 
+  select(new_source, age, group_var, chunk_structure) |> 
+  mutate(total = str_count(chunk_structure, prefix),
+         predecations_total = str_count(chunk_structure, "\\["),
+         cs_ors = str_remove_all(chunk_structure, "rs%.*?%"),
+         predecations_ors = str_count(cs_ors, "\\["),
+         predecations_wrs = predecations_total - predecations_ors,
+         ors = str_count(cs_ors, prefix),
+         wrs = total - ors,
+         total = total/predecations_total,
+         ors = ors/predecations_ors,
+         wrs = wrs/predecations_wrs,
+         total = if_else(is.nan(total), 0, total),
+         ors = if_else(is.nan(ors), 0, ors),
+         wrs = if_else(is.nan(wrs), 0, wrs)) |> 
+  select(-chunk_structure, -cs_ors, -predecations_total, -predecations_ors, -predecations_wrs) |> 
+  pivot_longer(names_to = "type", values_to = "value", total:wrs) |> 
+  mutate(type = case_when(type == "total" ~ str_c("overall ratio of ", prefix),
+                          type == "ors" ~ str_c("ratio of ", prefix, " outside RS"),
+                          type == "wrs" ~ str_c("ratio of ", prefix, " within RS"))) |> 
+  mutate(age2 = if_else(age == 100, "ad", as.character(age)),
+         new_source = str_c(new_source, " (", age2, ")"),
+         new_source = reorder_within(new_source, within = type, by = value)) |> 
+  ggplot(aes(value, new_source, fill = group_var))+
+  geom_col()+
+  facet_wrap(~type, nrow = 1, scales = "free")+
+  scale_y_reordered()
+
+prefix <- "cond"
+
+mano_corpus |> 
+  select(new_source, age, group_var, chunk_structure) |> 
+  mutate(total = str_count(chunk_structure, prefix),
+         predecations_total = str_count(chunk_structure, "\\["),
+         cs_ors = str_remove_all(chunk_structure, "rs%.*?%"),
+         predecations_ors = str_count(cs_ors, "\\["),
+         predecations_wrs = predecations_total - predecations_ors,
+         ors = str_count(cs_ors, prefix),
+         wrs = total - ors,
+         total = total/predecations_total,
+         ors = ors/predecations_ors,
+         wrs = wrs/predecations_wrs,
+         total = if_else(is.nan(total), 0, total),
+         ors = if_else(is.nan(ors), 0, ors),
+         wrs = if_else(is.nan(wrs), 0, wrs)) |> 
+  select(-chunk_structure, -cs_ors, -predecations_total, -predecations_ors, -predecations_wrs) |> 
+  pivot_longer(names_to = "type", values_to = "value", total:wrs) |> 
+  mutate(type = case_when(type == "total" ~ str_c("overall ratio of ", prefix),
+                          type == "ors" ~ str_c("ratio of ", prefix, " outside RS"),
+                          type == "wrs" ~ str_c("ratio of ", prefix, " within RS"))) |> 
+  mutate(age2 = if_else(age == 100, "ad", as.character(age)),
+         new_source = str_c(new_source, " (", age2, ")"),
+         new_source = reorder_within(new_source, within = type, by = value)) |> 
+  ggplot(aes(value, new_source, fill = group_var))+
+  geom_col()+
+  facet_wrap(~type, nrow = 1, scales = "free")+
+  scale_y_reordered()
+
+prefix <- "purp"
+
+mano_corpus |> 
+  select(new_source, age, group_var, chunk_structure) |> 
+  mutate(total = str_count(chunk_structure, prefix),
+         predecations_total = str_count(chunk_structure, "\\["),
+         cs_ors = str_remove_all(chunk_structure, "rs%.*?%"),
+         predecations_ors = str_count(cs_ors, "\\["),
+         predecations_wrs = predecations_total - predecations_ors,
+         ors = str_count(cs_ors, prefix),
+         wrs = total - ors,
+         total = total/predecations_total,
+         ors = ors/predecations_ors,
+         wrs = wrs/predecations_wrs,
+         total = if_else(is.nan(total), 0, total),
+         ors = if_else(is.nan(ors), 0, ors),
+         wrs = if_else(is.nan(wrs), 0, wrs)) |> 
+  select(-chunk_structure, -cs_ors, -predecations_total, -predecations_ors, -predecations_wrs) |> 
+  pivot_longer(names_to = "type", values_to = "value", total:wrs) |> 
+  mutate(type = case_when(type == "total" ~ str_c("overall ratio of ", prefix),
+                          type == "ors" ~ str_c("ratio of ", prefix, " outside RS"),
+                          type == "wrs" ~ str_c("ratio of ", prefix, " within RS"))) |> 
+  mutate(age2 = if_else(age == 100, "ad", as.character(age)),
+         new_source = str_c(new_source, " (", age2, ")"),
+         new_source = reorder_within(new_source, within = type, by = value)) |> 
+  ggplot(aes(value, new_source, fill = group_var))+
+  geom_col()+
+  facet_wrap(~type, nrow = 1, scales = "free")+
+  scale_y_reordered()
+
+prefix <- "prec"
+
+mano_corpus |> 
+  select(new_source, age, group_var, chunk_structure) |> 
+  mutate(total = str_count(chunk_structure, prefix),
+         predecations_total = str_count(chunk_structure, "\\["),
+         cs_ors = str_remove_all(chunk_structure, "rs%.*?%"),
+         predecations_ors = str_count(cs_ors, "\\["),
+         predecations_wrs = predecations_total - predecations_ors,
+         ors = str_count(cs_ors, prefix),
+         wrs = total - ors,
+         total = total/predecations_total,
+         ors = ors/predecations_ors,
+         wrs = wrs/predecations_wrs,
+         total = if_else(is.nan(total), 0, total),
+         ors = if_else(is.nan(ors), 0, ors),
+         wrs = if_else(is.nan(wrs), 0, wrs)) |> 
+  select(-chunk_structure, -cs_ors, -predecations_total, -predecations_ors, -predecations_wrs) |> 
+  pivot_longer(names_to = "type", values_to = "value", total:wrs) |> 
+  mutate(type = case_when(type == "total" ~ str_c("overall ratio of ", prefix),
+                          type == "ors" ~ str_c("ratio of ", prefix, " outside RS"),
+                          type == "wrs" ~ str_c("ratio of ", prefix, " within RS"))) |> 
+  mutate(age2 = if_else(age == 100, "ad", as.character(age)),
+         new_source = str_c(new_source, " (", age2, ")"),
+         new_source = reorder_within(new_source, within = type, by = value)) |> 
+  ggplot(aes(value, new_source, fill = group_var))+
+  geom_col()+
+  facet_wrap(~type, nrow = 1, scales = "free")+
+  scale_y_reordered()
+
+prefix <- "compar"
+
+mano_corpus |> 
+  select(new_source, age, group_var, chunk_structure) |> 
+  mutate(total = str_count(chunk_structure, prefix),
+         predecations_total = str_count(chunk_structure, "\\["),
+         cs_ors = str_remove_all(chunk_structure, "rs%.*?%"),
+         predecations_ors = str_count(cs_ors, "\\["),
+         predecations_wrs = predecations_total - predecations_ors,
+         ors = str_count(cs_ors, prefix),
+         wrs = total - ors,
+         total = total/predecations_total,
+         ors = ors/predecations_ors,
+         wrs = wrs/predecations_wrs,
+         total = if_else(is.nan(total), 0, total),
+         ors = if_else(is.nan(ors), 0, ors),
+         wrs = if_else(is.nan(wrs), 0, wrs)) |> 
+  select(-chunk_structure, -cs_ors, -predecations_total, -predecations_ors, -predecations_wrs) |> 
+  pivot_longer(names_to = "type", values_to = "value", total:wrs) |> 
+  mutate(type = case_when(type == "total" ~ str_c("overall ratio of ", prefix),
+                          type == "ors" ~ str_c("ratio of ", prefix, " outside RS"),
+                          type == "wrs" ~ str_c("ratio of ", prefix, " within RS"))) |> 
+  mutate(age2 = if_else(age == 100, "ad", as.character(age)),
+         new_source = str_c(new_source, " (", age2, ")"),
+         new_source = reorder_within(new_source, within = type, by = value)) |> 
+  ggplot(aes(value, new_source, fill = group_var))+
+  geom_col()+
+  facet_wrap(~type, nrow = 1, scales = "free")+
+  scale_y_reordered()
+
+prefix <- "mod"
+
+mano_corpus |> 
+  select(new_source, age, group_var, chunk_structure) |> 
+  mutate(total = str_count(chunk_structure, prefix),
+         predecations_total = str_count(chunk_structure, "\\["),
+         cs_ors = str_remove_all(chunk_structure, "rs%.*?%"),
+         predecations_ors = str_count(cs_ors, "\\["),
+         predecations_wrs = predecations_total - predecations_ors,
+         ors = str_count(cs_ors, prefix),
+         wrs = total - ors,
+         total = total/predecations_total,
+         ors = ors/predecations_ors,
+         wrs = wrs/predecations_wrs,
+         total = if_else(is.nan(total), 0, total),
+         ors = if_else(is.nan(ors), 0, ors),
+         wrs = if_else(is.nan(wrs), 0, wrs)) |> 
+  select(-chunk_structure, -cs_ors, -predecations_total, -predecations_ors, -predecations_wrs) |> 
+  pivot_longer(names_to = "type", values_to = "value", total:wrs) |> 
+  mutate(type = case_when(type == "total" ~ str_c("overall ratio of ", prefix),
+                          type == "ors" ~ str_c("ratio of ", prefix, " outside RS"),
+                          type == "wrs" ~ str_c("ratio of ", prefix, " within RS"))) |> 
+  mutate(age2 = if_else(age == 100, "ad", as.character(age)),
+         new_source = str_c(new_source, " (", age2, ")"),
+         new_source = reorder_within(new_source, within = type, by = value)) |> 
+  ggplot(aes(value, new_source, fill = group_var))+
+  geom_col()+
+  facet_wrap(~type, nrow = 1, scales = "free")+
+  scale_y_reordered()
+
+prefix <- "sa"
+
+mano_corpus |> 
+  select(new_source, age, group_var, chunk_structure) |> 
+  mutate(total = str_count(chunk_structure, prefix),
+         predecations_total = str_count(chunk_structure, "\\["),
+         cs_ors = str_remove_all(chunk_structure, "rs%.*?%"),
+         predecations_ors = str_count(cs_ors, "\\["),
+         predecations_wrs = predecations_total - predecations_ors,
+         ors = str_count(cs_ors, prefix),
+         wrs = total - ors,
+         total = total/predecations_total,
+         ors = ors/predecations_ors,
+         wrs = wrs/predecations_wrs,
+         total = if_else(is.nan(total), 0, total),
+         ors = if_else(is.nan(ors), 0, ors),
+         wrs = if_else(is.nan(wrs), 0, wrs)) |> 
+  select(-chunk_structure, -cs_ors, -predecations_total, -predecations_ors, -predecations_wrs) |> 
+  pivot_longer(names_to = "type", values_to = "value", total:wrs) |> 
+  mutate(type = case_when(type == "total" ~ str_c("overall ratio of ", prefix),
+                          type == "ors" ~ str_c("ratio of ", prefix, " outside RS"),
+                          type == "wrs" ~ str_c("ratio of ", prefix, " within RS"))) |> 
+  mutate(age2 = if_else(age == 100, "ad", as.character(age)),
+         new_source = str_c(new_source, " (", age2, ")"),
+         new_source = reorder_within(new_source, within = type, by = value)) |> 
+  ggplot(aes(value, new_source, fill = group_var))+
+  geom_col()+
+  facet_wrap(~type, nrow = 1, scales = "free")+
+  scale_y_reordered()
+
+prefix <- "le"
+
+mano_corpus |> 
+  select(new_source, age, group_var, chunk_structure) |> 
+  mutate(total = str_count(chunk_structure, prefix),
+         predecations_total = str_count(chunk_structure, "\\["),
+         cs_ors = str_remove_all(chunk_structure, "rs%.*?%"),
+         predecations_ors = str_count(cs_ors, "\\["),
+         predecations_wrs = predecations_total - predecations_ors,
+         ors = str_count(cs_ors, prefix),
+         wrs = total - ors,
+         total = total/predecations_total,
+         ors = ors/predecations_ors,
+         wrs = wrs/predecations_wrs,
+         total = if_else(is.nan(total), 0, total),
+         ors = if_else(is.nan(ors), 0, ors),
+         wrs = if_else(is.nan(wrs), 0, wrs)) |> 
+  select(-chunk_structure, -cs_ors, -predecations_total, -predecations_ors, -predecations_wrs) |> 
+  pivot_longer(names_to = "type", values_to = "value", total:wrs) |> 
+  mutate(type = case_when(type == "total" ~ str_c("overall ratio of ", prefix),
+                          type == "ors" ~ str_c("ratio of ", prefix, " outside RS"),
+                          type == "wrs" ~ str_c("ratio of ", prefix, " within RS"))) |> 
+  mutate(age2 = if_else(age == 100, "ad", as.character(age)),
+         new_source = str_c(new_source, " (", age2, ")"),
+         new_source = reorder_within(new_source, within = type, by = value)) |> 
+  ggplot(aes(value, new_source, fill = group_var))+
+  geom_col()+
+  facet_wrap(~type, nrow = 1, scales = "free")+
+  scale_y_reordered()
+
+prefix <- "ht"
+
+mano_corpus |> 
+  select(new_source, age, group_var, chunk_structure) |> 
+  mutate(total = str_count(chunk_structure, prefix),
+         predecations_total = str_count(chunk_structure, "\\["),
+         cs_ors = str_remove_all(chunk_structure, "rs%.*?%"),
+         predecations_ors = str_count(cs_ors, "\\["),
+         predecations_wrs = predecations_total - predecations_ors,
+         ors = str_count(cs_ors, prefix),
+         wrs = total - ors,
+         total = total/predecations_total,
+         ors = ors/predecations_ors,
+         wrs = wrs/predecations_wrs,
+         total = if_else(is.nan(total), 0, total),
+         ors = if_else(is.nan(ors), 0, ors),
+         wrs = if_else(is.nan(wrs), 0, wrs)) |> 
+  select(-chunk_structure, -cs_ors, -predecations_total, -predecations_ors, -predecations_wrs) |> 
+  pivot_longer(names_to = "type", values_to = "value", total:wrs) |> 
+  mutate(type = case_when(type == "total" ~ str_c("overall ratio of ", prefix),
+                          type == "ors" ~ str_c("ratio of ", prefix, " outside RS"),
+                          type == "wrs" ~ str_c("ratio of ", prefix, " within RS"))) |> 
+  mutate(age2 = if_else(age == 100, "ad", as.character(age)),
+         new_source = str_c(new_source, " (", age2, ")"),
+         new_source = reorder_within(new_source, within = type, by = value)) |> 
+  ggplot(aes(value, new_source, fill = group_var))+
+  geom_col()+
+  facet_wrap(~type, nrow = 1, scales = "free")+
+  scale_y_reordered()
+
+prefix <- "at"
+
+mano_corpus |> 
+  select(new_source, age, group_var, chunk_structure) |> 
+  mutate(total = str_count(chunk_structure, prefix),
+         predecations_total = str_count(chunk_structure, "\\["),
+         cs_ors = str_remove_all(chunk_structure, "rs%.*?%"),
+         predecations_ors = str_count(cs_ors, "\\["),
+         predecations_wrs = predecations_total - predecations_ors,
+         ors = str_count(cs_ors, prefix),
+         wrs = total - ors,
+         total = total/predecations_total,
+         ors = ors/predecations_ors,
+         wrs = wrs/predecations_wrs,
+         total = if_else(is.nan(total), 0, total),
+         ors = if_else(is.nan(ors), 0, ors),
+         wrs = if_else(is.nan(wrs), 0, wrs)) |> 
+  select(-chunk_structure, -cs_ors, -predecations_total, -predecations_ors, -predecations_wrs) |> 
+  pivot_longer(names_to = "type", values_to = "value", total:wrs) |> 
+  mutate(type = case_when(type == "total" ~ str_c("overall ratio of ", prefix),
+                          type == "ors" ~ str_c("ratio of ", prefix, " outside RS"),
+                          type == "wrs" ~ str_c("ratio of ", prefix, " within RS"))) |> 
+  mutate(age2 = if_else(age == 100, "ad", as.character(age)),
+         new_source = str_c(new_source, " (", age2, ")"),
+         new_source = reorder_within(new_source, within = type, by = value)) |> 
+  ggplot(aes(value, new_source, fill = group_var))+
+  geom_col()+
+  facet_wrap(~type, nrow = 1, scales = "free")+
+  scale_y_reordered()
+
+prefix <- "top"
+
+mano_corpus |> 
+  select(new_source, age, group_var, chunk_structure) |> 
+  mutate(total = str_count(chunk_structure, prefix),
+         predecations_total = str_count(chunk_structure, "\\["),
+         cs_ors = str_remove_all(chunk_structure, "rs%.*?%"),
+         predecations_ors = str_count(cs_ors, "\\["),
+         predecations_wrs = predecations_total - predecations_ors,
+         ors = str_count(cs_ors, prefix),
+         wrs = total - ors,
+         total = total/predecations_total,
+         ors = ors/predecations_ors,
+         wrs = wrs/predecations_wrs,
+         total = if_else(is.nan(total), 0, total),
+         ors = if_else(is.nan(ors), 0, ors),
+         wrs = if_else(is.nan(wrs), 0, wrs)) |> 
+  select(-chunk_structure, -cs_ors, -predecations_total, -predecations_ors, -predecations_wrs) |> 
+  pivot_longer(names_to = "type", values_to = "value", total:wrs) |> 
+  mutate(type = case_when(type == "total" ~ str_c("overall ratio of ", prefix),
+                          type == "ors" ~ str_c("ratio of ", prefix, " outside RS"),
+                          type == "wrs" ~ str_c("ratio of ", prefix, " within RS"))) |> 
+  mutate(age2 = if_else(age == 100, "ad", as.character(age)),
+         new_source = str_c(new_source, " (", age2, ")"),
+         new_source = reorder_within(new_source, within = type, by = value)) |> 
+  ggplot(aes(value, new_source, fill = group_var))+
+  geom_col()+
+  facet_wrap(~type, nrow = 1, scales = "free")+
+  scale_y_reordered()
+
+prefix <- "voc"
+
+mano_corpus |> 
+  select(new_source, age, group_var, chunk_structure) |> 
+  mutate(total = str_count(chunk_structure, prefix),
+         predecations_total = str_count(chunk_structure, "\\["),
+         cs_ors = str_remove_all(chunk_structure, "rs%.*?%"),
+         predecations_ors = str_count(cs_ors, "\\["),
+         predecations_wrs = predecations_total - predecations_ors,
+         ors = str_count(cs_ors, prefix),
+         wrs = total - ors,
+         total = total/predecations_total,
+         ors = ors/predecations_ors,
+         wrs = wrs/predecations_wrs,
+         total = if_else(is.nan(total), 0, total),
+         ors = if_else(is.nan(ors), 0, ors),
+         wrs = if_else(is.nan(wrs), 0, wrs)) |> 
+  select(-chunk_structure, -cs_ors, -predecations_total, -predecations_ors, -predecations_wrs) |> 
+  pivot_longer(names_to = "type", values_to = "value", total:wrs) |> 
+  mutate(type = case_when(type == "total" ~ str_c("overall ratio of ", prefix),
+                          type == "ors" ~ str_c("ratio of ", prefix, " outside RS"),
+                          type == "wrs" ~ str_c("ratio of ", prefix, " within RS"))) |> 
+  mutate(age2 = if_else(age == 100, "ad", as.character(age)),
+         new_source = str_c(new_source, " (", age2, ")"),
+         new_source = reorder_within(new_source, within = type, by = value)) |> 
+  ggplot(aes(value, new_source, fill = group_var))+
+  geom_col()+
+  facet_wrap(~type, nrow = 1, scales = "free")+
+  scale_y_reordered()
+```
+
 ### Kpelle
 
 > visualize complex syntax: all prefixes divided by the text length in predications; same thing within and outside RS
+
+```{r}
+kpelle_corpus |> 
+  select(new_source, age, group_var, chunk_structure) |> 
+  mutate(foc = str_count(chunk_structure, "foc"),
+         rel = str_count(chunk_structure, "rel"),
+         temp = str_count(chunk_structure, "temp"),
+         cond = str_count(chunk_structure, "cond"),
+         purp = str_count(chunk_structure, "purp"),
+         prec = str_count(chunk_structure, "prec"),
+         compar = str_count(chunk_structure, "compar"),
+         mod = str_count(chunk_structure, "mod"),
+         sa = str_count(chunk_structure, "sa"),
+         le = str_count(chunk_structure, "le"),
+         ht = str_count(chunk_structure, "ht"),
+         at = str_count(chunk_structure, "at"),
+         top = str_count(chunk_structure, "top"),
+         voc = str_count(chunk_structure, "voc")) |> 
+  select(-chunk_structure)
+
+prefix <- "foc"
+
+kpelle_corpus |> 
+  select(new_source, age, group_var, chunk_structure) |> 
+  mutate(total = str_count(chunk_structure, prefix),
+         predecations_total = str_count(chunk_structure, "\\["),
+         cs_ors = str_remove_all(chunk_structure, "rs%.*?%"),
+         predecations_ors = str_count(cs_ors, "\\["),
+         predecations_wrs = predecations_total - predecations_ors,
+         ors = str_count(cs_ors, prefix),
+         wrs = total - ors,
+         total = total/predecations_total,
+         ors = ors/predecations_ors,
+         wrs = wrs/predecations_wrs,
+         total = if_else(is.nan(total), 0, total),
+         ors = if_else(is.nan(ors), 0, ors),
+         wrs = if_else(is.nan(wrs), 0, wrs)) |> 
+  select(-chunk_structure, -cs_ors, -predecations_total, -predecations_ors, -predecations_wrs) |> 
+  pivot_longer(names_to = "type", values_to = "value", total:wrs) |> 
+  mutate(type = case_when(type == "total" ~ str_c("overall ratio of ", prefix),
+                          type == "ors" ~ str_c("ratio of ", prefix, " outside RS"),
+                          type == "wrs" ~ str_c("ratio of ", prefix, " within RS"))) |> 
+  mutate(
+         new_source = str_c(new_source, " (", age, ")"),
+         new_source = reorder_within(new_source, within = type, by = value)) |> 
+  ggplot(aes(value, new_source, fill = group_var))+
+  geom_col()+
+  facet_wrap(~type, nrow = 1, scales = "free")+
+  scale_y_reordered()
+
+prefix <- "rel"
+
+kpelle_corpus |> 
+  select(new_source, age, group_var, chunk_structure) |> 
+  mutate(total = str_count(chunk_structure, prefix),
+         predecations_total = str_count(chunk_structure, "\\["),
+         cs_ors = str_remove_all(chunk_structure, "rs%.*?%"),
+         predecations_ors = str_count(cs_ors, "\\["),
+         predecations_wrs = predecations_total - predecations_ors,
+         ors = str_count(cs_ors, prefix),
+         wrs = total - ors,
+         total = total/predecations_total,
+         ors = ors/predecations_ors,
+         wrs = wrs/predecations_wrs,
+         total = if_else(is.nan(total), 0, total),
+         ors = if_else(is.nan(ors), 0, ors),
+         wrs = if_else(is.nan(wrs), 0, wrs)) |> 
+  select(-chunk_structure, -cs_ors, -predecations_total, -predecations_ors, -predecations_wrs) |> 
+  pivot_longer(names_to = "type", values_to = "value", total:wrs) |> 
+  mutate(type = case_when(type == "total" ~ str_c("overall ratio of ", prefix),
+                          type == "ors" ~ str_c("ratio of ", prefix, " outside RS"),
+                          type == "wrs" ~ str_c("ratio of ", prefix, " within RS"))) |> 
+  mutate(
+         new_source = str_c(new_source, " (", age, ")"),
+         new_source = reorder_within(new_source, within = type, by = value)) |> 
+  ggplot(aes(value, new_source, fill = group_var))+
+  geom_col()+
+  facet_wrap(~type, nrow = 1, scales = "free")+
+  scale_y_reordered()
+
+prefix <- "temp"
+
+kpelle_corpus |> 
+  select(new_source, age, group_var, chunk_structure) |> 
+  mutate(total = str_count(chunk_structure, prefix),
+         predecations_total = str_count(chunk_structure, "\\["),
+         cs_ors = str_remove_all(chunk_structure, "rs%.*?%"),
+         predecations_ors = str_count(cs_ors, "\\["),
+         predecations_wrs = predecations_total - predecations_ors,
+         ors = str_count(cs_ors, prefix),
+         wrs = total - ors,
+         total = total/predecations_total,
+         ors = ors/predecations_ors,
+         wrs = wrs/predecations_wrs,
+         total = if_else(is.nan(total), 0, total),
+         ors = if_else(is.nan(ors), 0, ors),
+         wrs = if_else(is.nan(wrs), 0, wrs)) |> 
+  select(-chunk_structure, -cs_ors, -predecations_total, -predecations_ors, -predecations_wrs) |> 
+  pivot_longer(names_to = "type", values_to = "value", total:wrs) |> 
+  mutate(type = case_when(type == "total" ~ str_c("overall ratio of ", prefix),
+                          type == "ors" ~ str_c("ratio of ", prefix, " outside RS"),
+                          type == "wrs" ~ str_c("ratio of ", prefix, " within RS"))) |> 
+  mutate(
+         new_source = str_c(new_source, " (", age, ")"),
+         new_source = reorder_within(new_source, within = type, by = value)) |> 
+  ggplot(aes(value, new_source, fill = group_var))+
+  geom_col()+
+  facet_wrap(~type, nrow = 1, scales = "free")+
+  scale_y_reordered()
+
+prefix <- "cond"
+
+kpelle_corpus |> 
+  select(new_source, age, group_var, chunk_structure) |> 
+  mutate(total = str_count(chunk_structure, prefix),
+         predecations_total = str_count(chunk_structure, "\\["),
+         cs_ors = str_remove_all(chunk_structure, "rs%.*?%"),
+         predecations_ors = str_count(cs_ors, "\\["),
+         predecations_wrs = predecations_total - predecations_ors,
+         ors = str_count(cs_ors, prefix),
+         wrs = total - ors,
+         total = total/predecations_total,
+         ors = ors/predecations_ors,
+         wrs = wrs/predecations_wrs,
+         total = if_else(is.nan(total), 0, total),
+         ors = if_else(is.nan(ors), 0, ors),
+         wrs = if_else(is.nan(wrs), 0, wrs)) |> 
+  select(-chunk_structure, -cs_ors, -predecations_total, -predecations_ors, -predecations_wrs) |> 
+  pivot_longer(names_to = "type", values_to = "value", total:wrs) |> 
+  mutate(type = case_when(type == "total" ~ str_c("overall ratio of ", prefix),
+                          type == "ors" ~ str_c("ratio of ", prefix, " outside RS"),
+                          type == "wrs" ~ str_c("ratio of ", prefix, " within RS"))) |> 
+  mutate(
+         new_source = str_c(new_source, " (", age, ")"),
+         new_source = reorder_within(new_source, within = type, by = value)) |> 
+  ggplot(aes(value, new_source, fill = group_var))+
+  geom_col()+
+  facet_wrap(~type, nrow = 1, scales = "free")+
+  scale_y_reordered()
+
+prefix <- "purp"
+
+kpelle_corpus |> 
+  select(new_source, age, group_var, chunk_structure) |> 
+  mutate(total = str_count(chunk_structure, prefix),
+         predecations_total = str_count(chunk_structure, "\\["),
+         cs_ors = str_remove_all(chunk_structure, "rs%.*?%"),
+         predecations_ors = str_count(cs_ors, "\\["),
+         predecations_wrs = predecations_total - predecations_ors,
+         ors = str_count(cs_ors, prefix),
+         wrs = total - ors,
+         total = total/predecations_total,
+         ors = ors/predecations_ors,
+         wrs = wrs/predecations_wrs,
+         total = if_else(is.nan(total), 0, total),
+         ors = if_else(is.nan(ors), 0, ors),
+         wrs = if_else(is.nan(wrs), 0, wrs)) |> 
+  select(-chunk_structure, -cs_ors, -predecations_total, -predecations_ors, -predecations_wrs) |> 
+  pivot_longer(names_to = "type", values_to = "value", total:wrs) |> 
+  mutate(type = case_when(type == "total" ~ str_c("overall ratio of ", prefix),
+                          type == "ors" ~ str_c("ratio of ", prefix, " outside RS"),
+                          type == "wrs" ~ str_c("ratio of ", prefix, " within RS"))) |> 
+  mutate(
+         new_source = str_c(new_source, " (", age, ")"),
+         new_source = reorder_within(new_source, within = type, by = value)) |> 
+  ggplot(aes(value, new_source, fill = group_var))+
+  geom_col()+
+  facet_wrap(~type, nrow = 1, scales = "free")+
+  scale_y_reordered()
+
+prefix <- "prec"
+
+kpelle_corpus |> 
+  select(new_source, age, group_var, chunk_structure) |> 
+  mutate(total = str_count(chunk_structure, prefix),
+         predecations_total = str_count(chunk_structure, "\\["),
+         cs_ors = str_remove_all(chunk_structure, "rs%.*?%"),
+         predecations_ors = str_count(cs_ors, "\\["),
+         predecations_wrs = predecations_total - predecations_ors,
+         ors = str_count(cs_ors, prefix),
+         wrs = total - ors,
+         total = total/predecations_total,
+         ors = ors/predecations_ors,
+         wrs = wrs/predecations_wrs,
+         total = if_else(is.nan(total), 0, total),
+         ors = if_else(is.nan(ors), 0, ors),
+         wrs = if_else(is.nan(wrs), 0, wrs)) |> 
+  select(-chunk_structure, -cs_ors, -predecations_total, -predecations_ors, -predecations_wrs) |> 
+  pivot_longer(names_to = "type", values_to = "value", total:wrs) |> 
+  mutate(type = case_when(type == "total" ~ str_c("overall ratio of ", prefix),
+                          type == "ors" ~ str_c("ratio of ", prefix, " outside RS"),
+                          type == "wrs" ~ str_c("ratio of ", prefix, " within RS"))) |> 
+  mutate(
+         new_source = str_c(new_source, " (", age, ")"),
+         new_source = reorder_within(new_source, within = type, by = value)) |> 
+  ggplot(aes(value, new_source, fill = group_var))+
+  geom_col()+
+  facet_wrap(~type, nrow = 1, scales = "free")+
+  scale_y_reordered()
+
+prefix <- "compar"
+
+kpelle_corpus |> 
+  select(new_source, age, group_var, chunk_structure) |> 
+  mutate(total = str_count(chunk_structure, prefix),
+         predecations_total = str_count(chunk_structure, "\\["),
+         cs_ors = str_remove_all(chunk_structure, "rs%.*?%"),
+         predecations_ors = str_count(cs_ors, "\\["),
+         predecations_wrs = predecations_total - predecations_ors,
+         ors = str_count(cs_ors, prefix),
+         wrs = total - ors,
+         total = total/predecations_total,
+         ors = ors/predecations_ors,
+         wrs = wrs/predecations_wrs,
+         total = if_else(is.nan(total), 0, total),
+         ors = if_else(is.nan(ors), 0, ors),
+         wrs = if_else(is.nan(wrs), 0, wrs)) |> 
+  select(-chunk_structure, -cs_ors, -predecations_total, -predecations_ors, -predecations_wrs) |> 
+  pivot_longer(names_to = "type", values_to = "value", total:wrs) |> 
+  mutate(type = case_when(type == "total" ~ str_c("overall ratio of ", prefix),
+                          type == "ors" ~ str_c("ratio of ", prefix, " outside RS"),
+                          type == "wrs" ~ str_c("ratio of ", prefix, " within RS"))) |> 
+  mutate(
+         new_source = str_c(new_source, " (", age, ")"),
+         new_source = reorder_within(new_source, within = type, by = value)) |> 
+  ggplot(aes(value, new_source, fill = group_var))+
+  geom_col()+
+  facet_wrap(~type, nrow = 1, scales = "free")+
+  scale_y_reordered()
+
+prefix <- "mod"
+
+kpelle_corpus |> 
+  select(new_source, age, group_var, chunk_structure) |> 
+  mutate(total = str_count(chunk_structure, prefix),
+         predecations_total = str_count(chunk_structure, "\\["),
+         cs_ors = str_remove_all(chunk_structure, "rs%.*?%"),
+         predecations_ors = str_count(cs_ors, "\\["),
+         predecations_wrs = predecations_total - predecations_ors,
+         ors = str_count(cs_ors, prefix),
+         wrs = total - ors,
+         total = total/predecations_total,
+         ors = ors/predecations_ors,
+         wrs = wrs/predecations_wrs,
+         total = if_else(is.nan(total), 0, total),
+         ors = if_else(is.nan(ors), 0, ors),
+         wrs = if_else(is.nan(wrs), 0, wrs)) |> 
+  select(-chunk_structure, -cs_ors, -predecations_total, -predecations_ors, -predecations_wrs) |> 
+  pivot_longer(names_to = "type", values_to = "value", total:wrs) |> 
+  mutate(type = case_when(type == "total" ~ str_c("overall ratio of ", prefix),
+                          type == "ors" ~ str_c("ratio of ", prefix, " outside RS"),
+                          type == "wrs" ~ str_c("ratio of ", prefix, " within RS"))) |> 
+  mutate(
+         new_source = str_c(new_source, " (", age, ")"),
+         new_source = reorder_within(new_source, within = type, by = value)) |> 
+  ggplot(aes(value, new_source, fill = group_var))+
+  geom_col()+
+  facet_wrap(~type, nrow = 1, scales = "free")+
+  scale_y_reordered()
+
+prefix <- "sa"
+
+kpelle_corpus |> 
+  select(new_source, age, group_var, chunk_structure) |> 
+  mutate(total = str_count(chunk_structure, prefix),
+         predecations_total = str_count(chunk_structure, "\\["),
+         cs_ors = str_remove_all(chunk_structure, "rs%.*?%"),
+         predecations_ors = str_count(cs_ors, "\\["),
+         predecations_wrs = predecations_total - predecations_ors,
+         ors = str_count(cs_ors, prefix),
+         wrs = total - ors,
+         total = total/predecations_total,
+         ors = ors/predecations_ors,
+         wrs = wrs/predecations_wrs,
+         total = if_else(is.nan(total), 0, total),
+         ors = if_else(is.nan(ors), 0, ors),
+         wrs = if_else(is.nan(wrs), 0, wrs)) |> 
+  select(-chunk_structure, -cs_ors, -predecations_total, -predecations_ors, -predecations_wrs) |> 
+  pivot_longer(names_to = "type", values_to = "value", total:wrs) |> 
+  mutate(type = case_when(type == "total" ~ str_c("overall ratio of ", prefix),
+                          type == "ors" ~ str_c("ratio of ", prefix, " outside RS"),
+                          type == "wrs" ~ str_c("ratio of ", prefix, " within RS"))) |> 
+  mutate(
+         new_source = str_c(new_source, " (", age, ")"),
+         new_source = reorder_within(new_source, within = type, by = value)) |> 
+  ggplot(aes(value, new_source, fill = group_var))+
+  geom_col()+
+  facet_wrap(~type, nrow = 1, scales = "free")+
+  scale_y_reordered()
+
+prefix <- "le"
+
+kpelle_corpus |> 
+  select(new_source, age, group_var, chunk_structure) |> 
+  mutate(total = str_count(chunk_structure, prefix),
+         predecations_total = str_count(chunk_structure, "\\["),
+         cs_ors = str_remove_all(chunk_structure, "rs%.*?%"),
+         predecations_ors = str_count(cs_ors, "\\["),
+         predecations_wrs = predecations_total - predecations_ors,
+         ors = str_count(cs_ors, prefix),
+         wrs = total - ors,
+         total = total/predecations_total,
+         ors = ors/predecations_ors,
+         wrs = wrs/predecations_wrs,
+         total = if_else(is.nan(total), 0, total),
+         ors = if_else(is.nan(ors), 0, ors),
+         wrs = if_else(is.nan(wrs), 0, wrs)) |> 
+  select(-chunk_structure, -cs_ors, -predecations_total, -predecations_ors, -predecations_wrs) |> 
+  pivot_longer(names_to = "type", values_to = "value", total:wrs) |> 
+  mutate(type = case_when(type == "total" ~ str_c("overall ratio of ", prefix),
+                          type == "ors" ~ str_c("ratio of ", prefix, " outside RS"),
+                          type == "wrs" ~ str_c("ratio of ", prefix, " within RS"))) |> 
+  mutate(
+         new_source = str_c(new_source, " (", age, ")"),
+         new_source = reorder_within(new_source, within = type, by = value)) |> 
+  ggplot(aes(value, new_source, fill = group_var))+
+  geom_col()+
+  facet_wrap(~type, nrow = 1, scales = "free")+
+  scale_y_reordered()
+
+prefix <- "ht"
+
+kpelle_corpus |> 
+  select(new_source, age, group_var, chunk_structure) |> 
+  mutate(total = str_count(chunk_structure, prefix),
+         predecations_total = str_count(chunk_structure, "\\["),
+         cs_ors = str_remove_all(chunk_structure, "rs%.*?%"),
+         predecations_ors = str_count(cs_ors, "\\["),
+         predecations_wrs = predecations_total - predecations_ors,
+         ors = str_count(cs_ors, prefix),
+         wrs = total - ors,
+         total = total/predecations_total,
+         ors = ors/predecations_ors,
+         wrs = wrs/predecations_wrs,
+         total = if_else(is.nan(total), 0, total),
+         ors = if_else(is.nan(ors), 0, ors),
+         wrs = if_else(is.nan(wrs), 0, wrs)) |> 
+  select(-chunk_structure, -cs_ors, -predecations_total, -predecations_ors, -predecations_wrs) |> 
+  pivot_longer(names_to = "type", values_to = "value", total:wrs) |> 
+  mutate(type = case_when(type == "total" ~ str_c("overall ratio of ", prefix),
+                          type == "ors" ~ str_c("ratio of ", prefix, " outside RS"),
+                          type == "wrs" ~ str_c("ratio of ", prefix, " within RS"))) |> 
+  mutate(
+         new_source = str_c(new_source, " (", age, ")"),
+         new_source = reorder_within(new_source, within = type, by = value)) |> 
+  ggplot(aes(value, new_source, fill = group_var))+
+  geom_col()+
+  facet_wrap(~type, nrow = 1, scales = "free")+
+  scale_y_reordered()
+
+prefix <- "at"
+
+kpelle_corpus |> 
+  select(new_source, age, group_var, chunk_structure) |> 
+  mutate(total = str_count(chunk_structure, prefix),
+         predecations_total = str_count(chunk_structure, "\\["),
+         cs_ors = str_remove_all(chunk_structure, "rs%.*?%"),
+         predecations_ors = str_count(cs_ors, "\\["),
+         predecations_wrs = predecations_total - predecations_ors,
+         ors = str_count(cs_ors, prefix),
+         wrs = total - ors,
+         total = total/predecations_total,
+         ors = ors/predecations_ors,
+         wrs = wrs/predecations_wrs,
+         total = if_else(is.nan(total), 0, total),
+         ors = if_else(is.nan(ors), 0, ors),
+         wrs = if_else(is.nan(wrs), 0, wrs)) |> 
+  select(-chunk_structure, -cs_ors, -predecations_total, -predecations_ors, -predecations_wrs) |> 
+  pivot_longer(names_to = "type", values_to = "value", total:wrs) |> 
+  mutate(type = case_when(type == "total" ~ str_c("overall ratio of ", prefix),
+                          type == "ors" ~ str_c("ratio of ", prefix, " outside RS"),
+                          type == "wrs" ~ str_c("ratio of ", prefix, " within RS"))) |> 
+  mutate(
+         new_source = str_c(new_source, " (", age, ")"),
+         new_source = reorder_within(new_source, within = type, by = value)) |> 
+  ggplot(aes(value, new_source, fill = group_var))+
+  geom_col()+
+  facet_wrap(~type, nrow = 1, scales = "free")+
+  scale_y_reordered()
+
+prefix <- "top"
+
+kpelle_corpus |> 
+  select(new_source, age, group_var, chunk_structure) |> 
+  mutate(total = str_count(chunk_structure, prefix),
+         predecations_total = str_count(chunk_structure, "\\["),
+         cs_ors = str_remove_all(chunk_structure, "rs%.*?%"),
+         predecations_ors = str_count(cs_ors, "\\["),
+         predecations_wrs = predecations_total - predecations_ors,
+         ors = str_count(cs_ors, prefix),
+         wrs = total - ors,
+         total = total/predecations_total,
+         ors = ors/predecations_ors,
+         wrs = wrs/predecations_wrs,
+         total = if_else(is.nan(total), 0, total),
+         ors = if_else(is.nan(ors), 0, ors),
+         wrs = if_else(is.nan(wrs), 0, wrs)) |> 
+  select(-chunk_structure, -cs_ors, -predecations_total, -predecations_ors, -predecations_wrs) |> 
+  pivot_longer(names_to = "type", values_to = "value", total:wrs) |> 
+  mutate(type = case_when(type == "total" ~ str_c("overall ratio of ", prefix),
+                          type == "ors" ~ str_c("ratio of ", prefix, " outside RS"),
+                          type == "wrs" ~ str_c("ratio of ", prefix, " within RS"))) |> 
+  mutate(
+         new_source = str_c(new_source, " (", age, ")"),
+         new_source = reorder_within(new_source, within = type, by = value)) |> 
+  ggplot(aes(value, new_source, fill = group_var))+
+  geom_col()+
+  facet_wrap(~type, nrow = 1, scales = "free")+
+  scale_y_reordered()
+
+prefix <- "voc"
+
+kpelle_corpus |> 
+  select(new_source, age, group_var, chunk_structure) |> 
+  mutate(total = str_count(chunk_structure, prefix),
+         predecations_total = str_count(chunk_structure, "\\["),
+         cs_ors = str_remove_all(chunk_structure, "rs%.*?%"),
+         predecations_ors = str_count(cs_ors, "\\["),
+         predecations_wrs = predecations_total - predecations_ors,
+         ors = str_count(cs_ors, prefix),
+         wrs = total - ors,
+         total = total/predecations_total,
+         ors = ors/predecations_ors,
+         wrs = wrs/predecations_wrs,
+         total = if_else(is.nan(total), 0, total),
+         ors = if_else(is.nan(ors), 0, ors),
+         wrs = if_else(is.nan(wrs), 0, wrs)) |> 
+  select(-chunk_structure, -cs_ors, -predecations_total, -predecations_ors, -predecations_wrs) |> 
+  pivot_longer(names_to = "type", values_to = "value", total:wrs) |> 
+  mutate(type = case_when(type == "total" ~ str_c("overall ratio of ", prefix),
+                          type == "ors" ~ str_c("ratio of ", prefix, " outside RS"),
+                          type == "wrs" ~ str_c("ratio of ", prefix, " within RS"))) |> 
+  mutate(
+         new_source = str_c(new_source, " (", age, ")"),
+         new_source = reorder_within(new_source, within = type, by = value)) |> 
+  ggplot(aes(value, new_source, fill = group_var))+
+  geom_col()+
+  facet_wrap(~type, nrow = 1, scales = "free")+
+  scale_y_reordered()
+```
