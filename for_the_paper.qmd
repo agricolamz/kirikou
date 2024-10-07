@@ -924,3 +924,86 @@ kpelle_corpus |>
        x = "ratio of PURP",
        fill = NULL)
 ```
+
+## quot and jnt
+
+### Mano
+
+> Visualize ratios of jnt vs jnt.say
+> Visualize ratios of jnt.say vs other.say
+> Visualize different .say constructions (visualize like the initial visualisations in the paper, with a color plot)
+
+### Kpelle
+
+> Visualize ratios of quot vs jnt.say
+> Visualize ratios of jnt vs quot + jnt.say
+> Visualize ratios of quot+jnt.say vs other.say
+> Visualize ratios quot + different .say constructions (visualize like the initial visualisations in the paper, with a color plot) 
+
+## reference tracking
+
+### Mano
+
+> Mano & Kpelle: visualize reference tracking: pro(CR) to pro(SR)
+
+```{r}
+mano_corpus |> 
+  select(new_source, age, group_var, chunk_structure) |> 
+  mutate(cr = str_count(chunk_structure, "pro\\(CR\\)"),
+         sr = str_count(chunk_structure, "pro\\(SR\\)"),
+         ratio = cr/(sr+cr)) |> 
+  arrange(ratio) 
+
+mano_corpus |> 
+  select(new_source, age, group_var, chunk_structure) |> 
+  mutate(cr = str_count(chunk_structure, "pro\\(CR\\)"),
+         sr = str_count(chunk_structure, "pro\\(SR\\)"),
+         ratio = cr/(sr+cr)) |> 
+  arrange(ratio)  |> 
+  mutate(age2 = if_else(age == 100, "ad", as.character(age)),
+         new_source = str_c(new_source, " (", age2, ")"),
+         new_source = fct_inorder(new_source)) |> 
+  ggplot(aes(ratio, new_source, fill = group_var)) +
+  geom_col() +
+  labs(y = NULL,
+       x = "ratio of CR",
+       fill = NULL)
+```
+
+
+### Kpelle
+
+> Mano & Kpelle: visualize reference tracking: pro(CR) to pro(SR)
+
+```{r}
+kpelle_corpus |> 
+  select(new_source, age, group_var, chunk_structure) |> 
+  mutate(cr = str_count(chunk_structure, "pro\\(CR\\)"),
+         sr = str_count(chunk_structure, "pro\\(SR\\)"),
+         ratio = cr/(sr+cr)) |> 
+  arrange(ratio) 
+
+kpelle_corpus |> 
+  select(new_source, age, group_var, chunk_structure) |> 
+  mutate(cr = str_count(chunk_structure, "pro\\(CR\\)"),
+         sr = str_count(chunk_structure, "pro\\(SR\\)"),
+         ratio = cr/(sr+cr)) |> 
+  arrange(ratio)  |> 
+  mutate(new_source = str_c(new_source, " (", age, ")"),
+         new_source = fct_inorder(new_source)) |> 
+  ggplot(aes(ratio, new_source, fill = group_var)) +
+  geom_col() +
+  labs(y = NULL,
+       x = "ratio of CR",
+       fill = NULL)
+```
+
+## complex syntax
+
+### Mano
+
+> visualize complex syntax: all prefixes divided by the text length in predications; same thing within and outside RS
+
+### Kpelle
+
+> visualize complex syntax: all prefixes divided by the text length in predications; same thing within and outside RS
