@@ -730,8 +730,6 @@ mano_corpus |>
   guides(color="none")
 ```
 
-
-
 ### Kpelle
 
 > Kpelle: calculate individual ratios of DUR+STATni to text length in predications outside RS
@@ -754,3 +752,40 @@ kpelle_corpus |>
 ```
 
 > Mano & Kpelle: visualize which TAMP constructions are used with DUR (check all forms that have the _DUR extension, such as PST_DUR, separate DUR and regroup the remainder of the forms in the same way as you did when visualizing tense diversity)
+
+```{r}
+kpelle_corpus |> 
+  select(new_source, group_var, chunk_structure) |> 
+  mutate(dur_ext = str_extract_all(chunk_structure, "_[A-Z]*?_DUR")) |> 
+  select(-chunk_structure) |> 
+  unnest_longer(dur_ext) |> 
+  mutate(dur_ext = str_remove_all(dur_ext, "_DUR"),
+         dur_ext = str_remove_all(dur_ext, "_")) |> 
+  count(new_source, group_var, dur_ext) |> 
+  pivot_wider(names_from = dur_ext, values_from = n, values_fill = 0)
+
+kpelle_corpus |> 
+  select(new_source, age, group_var, chunk_structure) |> 
+  mutate(dur_ext = str_extract_all(chunk_structure, "_[A-Z]*?_DUR")) |> 
+  select(-chunk_structure) |> 
+  unnest_longer(dur_ext) |> 
+  mutate(dur_ext = str_remove_all(dur_ext, "_DUR"),
+         dur_ext = str_remove_all(dur_ext, "_")) |> 
+  count(new_source, age, group_var, dur_ext) |> 
+  group_by(new_source, age, group_var) |> 
+  mutate(total = sum(n),
+         ratio = n/total) |> 
+  select(-n, -total) |> 
+  ungroup() |> 
+  mutate(age2 = if_else(age == 100, "ad", as.character(age)),
+         new_source = str_c(new_source, " (", age2, ")"),
+         new_source = fct_reorder(new_source, age),
+         label = str_c(round(ratio * 100), "%")) |>
+  filter(ratio > 0) |>
+  ggplot(aes(x = ratio, y = new_source, label = label, color = dur_ext)) +
+  geom_col(aes(fill = dur_ext)) +
+  geom_label(position = position_fill(vjust = 0.5), fill = "white") +
+  scale_x_continuous(label = scales::percent) +
+  labs(x = NULL, y = NULL, fill = NULL, color = NULL) +
+  guides(color="none")
+```
