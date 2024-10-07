@@ -22,9 +22,8 @@ editor_options:
 
 # setwd("/home/agricolamz/work/articles/2025_kirikou/repo/")
 library(tidyverse)
-theme_set(theme_minimal()+theme(legend.position = "bottom", 
+theme_set(theme_minimal() +theme(legend.position = "bottom", 
                                 text = element_text(size = 16)))
-library(tidytext)
 
 readxl::read_xlsx("kirikou_annotations.xlsx", sheet = "kirikou Mano") |>
   select(-elicitation_date) |> 
@@ -318,12 +317,13 @@ tense_m |>
                                           "PRF", "JNT", "PST")),
          label = str_c(round(ratio * 100), "%")) |>
   filter(ratio > 0) |>
-  ggplot(aes(x = ratio, y = new_source, label = label, color = tense))+
-  geom_col(aes(fill = tense))+
-  geom_label(position = position_fill(vjust = 0.5), fill = "white")+
-  scale_x_continuous(label = scales::percent)+
-  labs(x = NULL, y = NULL)+
-  theme(axis.text.y = element_text(colour = people_text_color_m))
+  ggplot(aes(x = ratio, y = new_source, label = label, color = tense)) +
+  geom_col(aes(fill = tense)) +
+  geom_label(position = position_fill(vjust = 0.5), fill = "white") +
+  scale_x_continuous(label = scales::percent) +
+  labs(x = NULL, y = NULL, fill = NULL) +
+  theme(axis.text.y = element_text(colour = people_text_color_m)) +
+  guides(color = "none")
 ```
 
 
@@ -385,12 +385,13 @@ tense_without_RS_m |>
                                           "PRF", "JNT", "PST")),
          label = str_c(round(ratio * 100), "%")) |>
   filter(ratio > 0) |>
-  ggplot(aes(x = ratio, y = new_source, label = label, color = tense))+
-  geom_col(aes(fill = tense))+
-  geom_label(position = position_fill(vjust = 0.5), fill = "white")+
-  scale_x_continuous(label = scales::percent)+
-  labs(x = NULL, y = NULL)+
-  theme(axis.text.y = element_text(colour = people_text_color_m))
+  ggplot(aes(x = ratio, y = new_source, label = label, color = tense)) +
+  geom_col(aes(fill = tense)) +
+  geom_label(position = position_fill(vjust = 0.5), fill = "white") +
+  scale_x_continuous(label = scales::percent) +
+  labs(x = NULL, y = NULL, fill = NULL) +
+  theme(axis.text.y = element_text(colour = people_text_color_m)) +
+  guides(color = "none")
 ```
 
 ### Kpelle
@@ -453,11 +454,12 @@ tense_k |>
                                           "CONJ", "PST")),
          label = str_c(round(ratio * 100), "%")) |>
   filter(ratio > 0) |>
-  ggplot(aes(x = ratio, y = new_source, label = label, color = tense))+
-  geom_col(aes(fill = tense))+
-  geom_label(position = position_fill(vjust = 0.5), fill = "white")+
-  scale_x_continuous(label = scales::percent)+
-  labs(x = NULL, y = NULL)
+  ggplot(aes(x = ratio, y = new_source, label = label, color = tense)) +
+  geom_col(aes(fill = tense)) +
+  geom_label(position = position_fill(vjust = 0.5), fill = "white") +
+  scale_x_continuous(label = scales::percent) +
+  labs(x = NULL, y = NULL, fill = NULL) +
+  guides(color = "none")
 ```
 
 > Kpelle: how many times PST, CONJ, CONJ/PST and JNT excluding RS in Kpelle, how many total predications excluding RS
@@ -520,11 +522,12 @@ tense_without_RS_k |>
                                           "CONJ", "PST")),
          label = str_c(round(ratio * 100), "%")) |>
   filter(ratio > 0) |>
-  ggplot(aes(x = ratio, y = new_source, label = label, color = tense))+
-  geom_col(aes(fill = tense))+
-  geom_label(position = position_fill(vjust = 0.5), fill = "white")+
-  scale_x_continuous(label = scales::percent)+
-  labs(x = NULL, y = NULL)
+  ggplot(aes(x = ratio, y = new_source, label = label, color = tense)) +
+  geom_col(aes(fill = tense)) +
+  geom_label(position = position_fill(vjust = 0.5), fill = "white") +
+  scale_x_continuous(label = scales::percent) +
+  labs(x = NULL, y = NULL, fill = NULL) + 
+  guides(color = NULL)
 ```
 
 ## IMP vs PROH
@@ -600,21 +603,7 @@ percantage_res_phas_retr_m <- round((res_phas_retr_sum_m)/n_predecations_without
 
 ```{r}
 mano_corpus |> 
-  select(name, age, group_var, chunk_structure) |> 
-  mutate(chunk_structure = str_remove_all(chunk_structure, "rs%.*?%"),
-         res = str_count(chunk_structure, "RES"),
-         phas = str_count(chunk_structure, "PHAS"),
-         retr = str_count(chunk_structure, "RETR"),
-         res_phas_retr = res + phas + retr,
-         n_predecations = str_count(chunk_structure, "\\[")) |> 
-  ggplot(aes(n_predecations, res_phas_retr, color = group_var))+
-  geom_smooth(method = "lm", se = FALSE, color = "grey60", linetype = 2)+
-  geom_point()+
-  scale_x_log10()+
-  labs(x = "n predications (log)")
-
-mano_corpus |> 
-  select(name, age, group_var, chunk_structure) |> 
+  select(new_source, group_var, chunk_structure) |> 
   mutate(chunk_structure = str_remove_all(chunk_structure, "rs%.*?%"),
          res = str_count(chunk_structure, "RES"),
          phas = str_count(chunk_structure, "PHAS"),
@@ -622,9 +611,13 @@ mano_corpus |>
          res_phas_retr = res + phas + retr,
          n_predecations = str_count(chunk_structure, "\\["),
          ratio = res_phas_retr/n_predecations) |> 
-  ggplot(aes(ratio, group_var))+
-  geom_point(alpha = 0.4)+
-  labs(y = NULL)
+  arrange(ratio) |> 
+  mutate(new_source = fct_inorder(new_source)) |> 
+  ggplot(aes(ratio, new_source, fill = group_var)) +
+  geom_col() +
+  labs(y = NULL,
+       x = "ratio of RES, PHAS or RETR forms",
+       fill = NULL)
 ```
 
 ### Kpelle
@@ -664,24 +657,100 @@ kpelle_corpus |>
          impf = str_count(chunk_structure, "IMPF"),
          retr = str_count(chunk_structure, "RETR"),
          res_impf_retr = res + impf + retr,
-         n_predecations = str_count(chunk_structure, "\\[")) |> 
-  ggplot(aes(n_predecations, res_impf_retr, color = group_var))+
-  geom_smooth(method = "lm", se = FALSE, color = "grey60", linetype = 2)+
-  geom_point()+
-  scale_x_log10()+
-  labs(x = "n predications (log)")
+         n_predecations = str_count(chunk_structure, "\\["),
+         ratio = res_impf_retr/n_predecations) |> 
+  arrange(ratio) |> 
+  mutate(new_source = fct_inorder(new_source)) |> 
+  ggplot(aes(ratio, new_source, fill = group_var)) +
+  geom_col() +
+  labs(y = NULL,
+       x = "ratio of RES, PHAS or RETR forms",
+       fill = NULL)
+```
 
+## DUR
+
+### Mano
+
+> Mano: calculate and visualize individual ratios of DUR to text length in predications outside RS
+
+```{r}
+mano_corpus |> 
+  select(new_source, group_var, chunk_structure) |> 
+  mutate(chunk_structure = str_remove_all(chunk_structure, "rs%.*?%"),
+         dur = str_count(chunk_structure, "DUR"),
+         n_predecations = str_count(chunk_structure, "\\["),
+         ratio = dur/n_predecations) |> 
+  arrange(ratio) |> 
+  mutate(new_source = fct_inorder(new_source)) |> 
+  ggplot(aes(ratio, new_source, fill = group_var)) +
+  geom_col() +
+  labs(y = NULL,
+       x = "ratio of DUR forms",
+       fill = NULL)
+```
+
+> Mano & Kpelle: visualize which TAMP constructions are used with DUR (check all forms that have the _DUR extension, such as PST_DUR, separate DUR and regroup the remainder of the forms in the same way as you did when visualizing tense diversity)
+
+```{r}
+mano_corpus |> 
+  select(new_source, group_var, chunk_structure) |> 
+  mutate(dur_ext = str_extract_all(chunk_structure, "_[A-Z]*?_DUR")) |> 
+  select(-chunk_structure) |> 
+  unnest_longer(dur_ext) |> 
+  mutate(dur_ext = str_remove_all(dur_ext, "_DUR"),
+         dur_ext = str_remove_all(dur_ext, "_")) |> 
+  count(new_source, group_var, dur_ext) |> 
+  pivot_wider(names_from = dur_ext, values_from = n, values_fill = 0)
+
+mano_corpus |> 
+  select(new_source, age, group_var, chunk_structure) |> 
+  mutate(dur_ext = str_extract_all(chunk_structure, "_[A-Z]*?_DUR")) |> 
+  select(-chunk_structure) |> 
+  unnest_longer(dur_ext) |> 
+  mutate(dur_ext = str_remove_all(dur_ext, "_DUR"),
+         dur_ext = str_remove_all(dur_ext, "_")) |> 
+  count(new_source, age, group_var, dur_ext) |> 
+  group_by(new_source, age, group_var) |> 
+  mutate(total = sum(n),
+         ratio = n/total) |> 
+  select(-n, -total) |> 
+  ungroup() |> 
+  mutate(age2 = if_else(age == 100, "ad", as.character(age)),
+         new_source = str_c(new_source, " (", age2, ")"),
+         new_source = fct_reorder(new_source, age),
+         label = str_c(round(ratio * 100), "%")) |>
+  filter(ratio > 0) |>
+  ggplot(aes(x = ratio, y = new_source, label = label, color = dur_ext)) +
+  geom_col(aes(fill = dur_ext)) +
+  geom_label(position = position_fill(vjust = 0.5), fill = "white") +
+  scale_x_continuous(label = scales::percent) +
+  labs(x = NULL, y = NULL, fill = NULL, color = NULL) +
+  theme(axis.text.y = element_text(colour = people_text_color_m)) +
+  guides(color="none")
+```
+
+
+
+### Kpelle
+
+> Kpelle: calculate individual ratios of DUR+STATni to text length in predications outside RS
+
+```{r}
 kpelle_corpus |> 
   select(new_source, group_var, chunk_structure) |> 
   mutate(chunk_structure = str_remove_all(chunk_structure, "rs%.*?%"),
-         res = str_count(chunk_structure, "RES"),
-         impf = str_count(chunk_structure, "IMPF"),
-         retr = str_count(chunk_structure, "RETR"),
-         res_impf_retr = res + impf + retr,
+         dur = str_count(chunk_structure, "DUR"),
+         statni = str_count(chunk_structure, "STATni"),
          n_predecations = str_count(chunk_structure, "\\["),
-         ratio = res_impf_retr/n_predecations) |> 
-  ggplot(aes(ratio, group_var))+
-  geom_point(alpha = 0.4)+
-  labs(y = NULL)
+         ratio = (dur+statni)/n_predecations) |> 
+  arrange(ratio) |> 
+  mutate(new_source = fct_inorder(new_source)) |> 
+  ggplot(aes(ratio, new_source, fill = group_var)) +
+  geom_col() +
+  labs(y = NULL,
+       x = "ratio of DUR or STATni forms",
+       fill = NULL)
 ```
 
+> Mano & Kpelle: visualize which TAMP constructions are used with DUR (check all forms that have the _DUR extension, such as PST_DUR, separate DUR and regroup the remainder of the forms in the same way as you did when visualizing tense diversity)

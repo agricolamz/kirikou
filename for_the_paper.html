@@ -101,6 +101,11 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <li><a href="#mano-2" id="toc-mano-2" class="nav-link" data-scroll-target="#mano-2">Mano</a></li>
   <li><a href="#kpelle-2" id="toc-kpelle-2" class="nav-link" data-scroll-target="#kpelle-2">Kpelle</a></li>
   </ul></li>
+  <li><a href="#dur" id="toc-dur" class="nav-link" data-scroll-target="#dur">DUR</a>
+  <ul class="collapse">
+  <li><a href="#mano-3" id="toc-mano-3" class="nav-link" data-scroll-target="#mano-3">Mano</a></li>
+  <li><a href="#kpelle-3" id="toc-kpelle-3" class="nav-link" data-scroll-target="#kpelle-3">Kpelle</a></li>
+  </ul></li>
   </ul>
 </nav>
 </div>
@@ -119,7 +124,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <div>
     <div class="quarto-title-meta-heading">Published</div>
     <div class="quarto-title-meta-contents">
-      <p class="date">6.10.2024</p>
+      <p class="date">7.10.2024</p>
     </div>
   </div>
   
@@ -136,186 +141,185 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co"># setwd("/home/agricolamz/work/articles/2025_kirikou/repo/")</span></span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="fu">theme_set</span>(<span class="fu">theme_minimal</span>()<span class="sc">+</span><span class="fu">theme</span>(<span class="at">legend.position =</span> <span class="st">"bottom"</span>, </span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="fu">theme_set</span>(<span class="fu">theme_minimal</span>() <span class="sc">+</span><span class="fu">theme</span>(<span class="at">legend.position =</span> <span class="st">"bottom"</span>, </span>
 <span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>                                <span class="at">text =</span> <span class="fu">element_text</span>(<span class="at">size =</span> <span class="dv">16</span>)))</span>
-<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidytext)</span>
-<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>readxl<span class="sc">::</span><span class="fu">read_xlsx</span>(<span class="st">"kirikou_annotations.xlsx"</span>, <span class="at">sheet =</span> <span class="st">"kirikou Mano"</span>) <span class="sc">|&gt;</span></span>
-<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="sc">-</span>elicitation_date) <span class="sc">|&gt;</span> </span>
-<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">text_type =</span> <span class="st">"kirikou"</span>) <span class="sc">|&gt;</span></span>
-<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">bind_rows</span>(readxl<span class="sc">::</span><span class="fu">read_xlsx</span>(<span class="st">"kirikou_annotations.xlsx"</span>, <span class="at">sheet =</span> <span class="st">"folktales Mano children"</span>) <span class="sc">|&gt;</span> </span>
-<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>              <span class="fu">mutate</span>(<span class="at">text_type =</span> <span class="st">"folktales"</span>)) <span class="sc">|&gt;</span> </span>
-<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rename</span>(<span class="at">chunk_structure =</span> <span class="st">`</span><span class="at">chunk structure</span><span class="st">`</span>,</span>
-<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>         <span class="at">time_end =</span> <span class="st">`</span><span class="at">temps de fin - hh:mm:ss.ms</span><span class="st">`</span>, </span>
-<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>         <span class="at">time_start =</span><span class="st">`</span><span class="at">Temps de départ - hh:mm:ss.ms</span><span class="st">`</span>) <span class="sc">|&gt;</span> </span>
-<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">txenfant =</span> <span class="fu">str_remove_all</span>(txenfant , <span class="st">"[/+]"</span>),</span>
-<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a>         <span class="at">txenfant =</span> <span class="fu">str_remove_all</span>(txenfant, <span class="st">"</span><span class="sc">\\</span><span class="st">[.*?</span><span class="sc">\\</span><span class="st">]"</span>),</span>
-<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a>         <span class="at">txenfant =</span> <span class="fu">if_else</span>(<span class="fu">is.na</span>(txenfant), <span class="st">""</span>, txenfant),</span>
-<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a>         <span class="at">ft =</span> <span class="fu">if_else</span>(<span class="fu">is.na</span>(ft), <span class="st">""</span>, ft),</span>
-<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a>         <span class="at">comment =</span> <span class="fu">if_else</span>(<span class="fu">is.na</span>(comment), <span class="st">""</span>, comment),</span>
-<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a>         <span class="at">chunk_structure =</span> <span class="fu">if_else</span>(<span class="fu">is.na</span>(chunk_structure), <span class="st">""</span>, chunk_structure)) <span class="sc">|&gt;</span></span>
-<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a>  <span class="fu">add_count</span>(name, age, source) <span class="sc">|&gt;</span> </span>
-<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rename</span>(<span class="at">n_chunks =</span> n) <span class="sc">|&gt;</span> </span>
-<span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(name, age, source, socio_family_adoptive, text_type, residence_place, n_chunks) <span class="sc">|&gt;</span> </span>
-<span id="cb1-24"><a href="#cb1-24" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarize</span>(<span class="at">text =</span> <span class="fu">str_c</span>(txenfant, <span class="at">collapse =</span> <span class="st">" "</span>),</span>
-<span id="cb1-25"><a href="#cb1-25" aria-hidden="true" tabindex="-1"></a>            <span class="at">chunk_structure =</span> <span class="fu">str_c</span>(chunk_structure, <span class="at">collapse =</span> <span class="st">" "</span>),</span>
-<span id="cb1-26"><a href="#cb1-26" aria-hidden="true" tabindex="-1"></a>            <span class="at">ft =</span> <span class="fu">str_c</span>(ft, <span class="at">collapse =</span> <span class="st">" "</span>),</span>
-<span id="cb1-27"><a href="#cb1-27" aria-hidden="true" tabindex="-1"></a>            <span class="at">comment =</span> <span class="fu">str_c</span>(comment, <span class="at">collapse =</span> <span class="st">" "</span>),</span>
-<span id="cb1-28"><a href="#cb1-28" aria-hidden="true" tabindex="-1"></a>            <span class="at">time_start =</span> <span class="fu">min</span>(time_start),</span>
-<span id="cb1-29"><a href="#cb1-29" aria-hidden="true" tabindex="-1"></a>            <span class="at">time_end =</span> <span class="fu">max</span>(time_end),</span>
-<span id="cb1-30"><a href="#cb1-30" aria-hidden="true" tabindex="-1"></a>            <span class="at">duration =</span> time_end <span class="sc">-</span> time_start) <span class="sc">|&gt;</span> </span>
-<span id="cb1-31"><a href="#cb1-31" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">age_group =</span> <span class="st">"children"</span>) <span class="sc">|&gt;</span> </span>
-<span id="cb1-32"><a href="#cb1-32" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="sc">-</span>time_start, <span class="sc">-</span>time_end) <span class="sc">|&gt;</span> </span>
-<span id="cb1-33"><a href="#cb1-33" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ungroup</span>() <span class="ot">-&gt;</span></span>
-<span id="cb1-34"><a href="#cb1-34" aria-hidden="true" tabindex="-1"></a>  mano_chi_corpus</span>
-<span id="cb1-35"><a href="#cb1-35" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-36"><a href="#cb1-36" aria-hidden="true" tabindex="-1"></a>readxl<span class="sc">::</span><span class="fu">read_xlsx</span>(<span class="st">"kirikou_annotations.xlsx"</span>, <span class="at">sheet =</span> <span class="st">"folktales Mano adults"</span>) <span class="sc">|&gt;</span> </span>
-<span id="cb1-37"><a href="#cb1-37" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">age =</span> <span class="dv">100</span>,</span>
-<span id="cb1-38"><a href="#cb1-38" aria-hidden="true" tabindex="-1"></a>         <span class="at">text_type =</span> <span class="st">"folktales"</span>) <span class="sc">|&gt;</span> </span>
-<span id="cb1-39"><a href="#cb1-39" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rename</span>(<span class="at">txenfant =</span> <span class="st">`</span><span class="at">txenfant = tx</span><span class="st">`</span>,</span>
-<span id="cb1-40"><a href="#cb1-40" aria-hidden="true" tabindex="-1"></a>         <span class="at">chunk_structure =</span> <span class="st">`</span><span class="at">chunk structure</span><span class="st">`</span>,</span>
-<span id="cb1-41"><a href="#cb1-41" aria-hidden="true" tabindex="-1"></a>         <span class="at">time_end =</span> <span class="st">`</span><span class="at">temps de fin - hh:mm:ss.ms</span><span class="st">`</span>, </span>
-<span id="cb1-42"><a href="#cb1-42" aria-hidden="true" tabindex="-1"></a>         <span class="at">time_start =</span><span class="st">`</span><span class="at">Temps de départ - hh:mm:ss.ms</span><span class="st">`</span>) <span class="sc">|&gt;</span> </span>
-<span id="cb1-43"><a href="#cb1-43" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">txenfant =</span> <span class="fu">str_remove_all</span>(txenfant , <span class="st">"[/+]"</span>),</span>
-<span id="cb1-44"><a href="#cb1-44" aria-hidden="true" tabindex="-1"></a>         <span class="at">txenfant =</span> <span class="fu">str_remove_all</span>(txenfant, <span class="st">"</span><span class="sc">\\</span><span class="st">[.*?</span><span class="sc">\\</span><span class="st">]"</span>),</span>
-<span id="cb1-45"><a href="#cb1-45" aria-hidden="true" tabindex="-1"></a>         <span class="at">txenfant =</span> <span class="fu">if_else</span>(<span class="fu">is.na</span>(txenfant), <span class="st">""</span>, txenfant),</span>
-<span id="cb1-46"><a href="#cb1-46" aria-hidden="true" tabindex="-1"></a>         <span class="at">ft =</span> <span class="fu">if_else</span>(<span class="fu">is.na</span>(ft), <span class="st">""</span>, ft),</span>
-<span id="cb1-47"><a href="#cb1-47" aria-hidden="true" tabindex="-1"></a>         <span class="at">comment =</span> <span class="fu">if_else</span>(<span class="fu">is.na</span>(comment), <span class="st">""</span>, comment),</span>
-<span id="cb1-48"><a href="#cb1-48" aria-hidden="true" tabindex="-1"></a>         <span class="at">chunk_structure =</span> <span class="fu">if_else</span>(<span class="fu">is.na</span>(chunk_structure), <span class="st">""</span>, chunk_structure)) <span class="sc">|&gt;</span></span>
-<span id="cb1-49"><a href="#cb1-49" aria-hidden="true" tabindex="-1"></a>  <span class="fu">add_count</span>(name, age, source) <span class="sc">|&gt;</span> </span>
-<span id="cb1-50"><a href="#cb1-50" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rename</span>(<span class="at">n_chunks =</span> n) <span class="sc">|&gt;</span> </span>
-<span id="cb1-51"><a href="#cb1-51" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(name, age, source, socio_family_adoptive, text_type, residence_place, n_chunks) <span class="sc">|&gt;</span> </span>
-<span id="cb1-52"><a href="#cb1-52" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarize</span>(<span class="at">text =</span> <span class="fu">str_c</span>(txenfant, <span class="at">collapse =</span> <span class="st">" "</span>),</span>
-<span id="cb1-53"><a href="#cb1-53" aria-hidden="true" tabindex="-1"></a>            <span class="at">chunk_structure =</span> <span class="fu">str_c</span>(chunk_structure, <span class="at">collapse =</span> <span class="st">" "</span>),</span>
-<span id="cb1-54"><a href="#cb1-54" aria-hidden="true" tabindex="-1"></a>            <span class="at">ft =</span> <span class="fu">str_c</span>(ft, <span class="at">collapse =</span> <span class="st">" "</span>),</span>
-<span id="cb1-55"><a href="#cb1-55" aria-hidden="true" tabindex="-1"></a>            <span class="at">comment =</span> <span class="fu">str_c</span>(comment, <span class="at">collapse =</span> <span class="st">" "</span>),</span>
-<span id="cb1-56"><a href="#cb1-56" aria-hidden="true" tabindex="-1"></a>            <span class="at">time_start =</span> <span class="fu">min</span>(time_start),</span>
-<span id="cb1-57"><a href="#cb1-57" aria-hidden="true" tabindex="-1"></a>            <span class="at">time_end =</span> <span class="fu">max</span>(time_end),</span>
-<span id="cb1-58"><a href="#cb1-58" aria-hidden="true" tabindex="-1"></a>            <span class="at">duration =</span> time_end <span class="sc">-</span> time_start,</span>
-<span id="cb1-59"><a href="#cb1-59" aria-hidden="true" tabindex="-1"></a>            <span class="at">duration =</span> lubridate<span class="sc">::</span><span class="fu">as.duration</span>(duration)) <span class="sc">|&gt;</span> </span>
-<span id="cb1-60"><a href="#cb1-60" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="sc">-</span>time_start, <span class="sc">-</span>time_end) <span class="sc">|&gt;</span> </span>
-<span id="cb1-61"><a href="#cb1-61" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">age_group =</span> <span class="st">"adults"</span>) <span class="sc">|&gt;</span> </span>
-<span id="cb1-62"><a href="#cb1-62" aria-hidden="true" tabindex="-1"></a>  <span class="fu">bind_rows</span>(mano_chi_corpus) <span class="sc">|&gt;</span> </span>
-<span id="cb1-63"><a href="#cb1-63" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">group_var =</span> <span class="fu">case_when</span>(text_type <span class="sc">==</span> <span class="st">"kirikou"</span> <span class="sc">&amp;</span> residence_place <span class="sc">==</span> <span class="st">"Nzerekore"</span> <span class="sc">&amp;</span> socio_family_adoptive <span class="sc">==</span> <span class="st">"Mano"</span> <span class="sc">~</span> <span class="st">"Kirikou (Nzerekore): Mano"</span>,</span>
-<span id="cb1-64"><a href="#cb1-64" aria-hidden="true" tabindex="-1"></a>                               text_type <span class="sc">==</span> <span class="st">"kirikou"</span> <span class="sc">&amp;</span> residence_place <span class="sc">==</span> <span class="st">"Nzerekore"</span> <span class="sc">&amp;</span> socio_family_adoptive <span class="sc">==</span> <span class="st">"Bilingual"</span> <span class="sc">~</span> <span class="st">"Kirikou (Nzerekore): Bilingual"</span>,</span>
-<span id="cb1-65"><a href="#cb1-65" aria-hidden="true" tabindex="-1"></a>                               text_type <span class="sc">==</span> <span class="st">"kirikou"</span> <span class="sc">&amp;</span> residence_place <span class="sc">!=</span> <span class="st">"Nzerekore"</span> <span class="sc">~</span> <span class="st">"Kirikou (other)"</span>,</span>
-<span id="cb1-66"><a href="#cb1-66" aria-hidden="true" tabindex="-1"></a>                               text_type <span class="sc">==</span> <span class="st">"folktales"</span> <span class="sc">&amp;</span> age_group <span class="sc">==</span> <span class="st">"children"</span> <span class="sc">~</span> <span class="st">"folktales (children)"</span>,</span>
-<span id="cb1-67"><a href="#cb1-67" aria-hidden="true" tabindex="-1"></a>                               text_type <span class="sc">==</span> <span class="st">"folktales"</span> <span class="sc">&amp;</span> age_group <span class="sc">==</span> <span class="st">"adults"</span> <span class="sc">~</span> <span class="st">"folktales (adults)"</span>)) <span class="sc">|&gt;</span> </span>
-<span id="cb1-68"><a href="#cb1-68" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ungroup</span>() <span class="sc">|&gt;</span> </span>
-<span id="cb1-69"><a href="#cb1-69" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">new_name =</span> name <span class="sc">|&gt;</span> <span class="fu">factor</span>() <span class="sc">|&gt;</span> <span class="fu">as.integer</span>(),</span>
-<span id="cb1-70"><a href="#cb1-70" aria-hidden="true" tabindex="-1"></a>         <span class="at">new_name =</span> <span class="fu">str_c</span>(<span class="st">"s_"</span>, new_name)) <span class="sc">|&gt;</span> </span>
-<span id="cb1-71"><a href="#cb1-71" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(new_name) <span class="sc">|&gt;</span> </span>
-<span id="cb1-72"><a href="#cb1-72" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">new_source =</span> source <span class="sc">|&gt;</span> <span class="fu">factor</span>() <span class="sc">|&gt;</span> <span class="fu">as.integer</span>(),</span>
-<span id="cb1-73"><a href="#cb1-73" aria-hidden="true" tabindex="-1"></a>         <span class="at">new_source =</span> <span class="fu">str_c</span>(new_name, <span class="st">"_t_"</span>, new_source)) <span class="sc">|&gt;</span> </span>
-<span id="cb1-74"><a href="#cb1-74" aria-hidden="true" tabindex="-1"></a>  <span class="fu">relocate</span>(new_name, <span class="at">.after =</span> name) <span class="sc">|&gt;</span> </span>
-<span id="cb1-75"><a href="#cb1-75" aria-hidden="true" tabindex="-1"></a>  <span class="fu">relocate</span>(new_source, <span class="at">.after =</span> source) <span class="sc">|&gt;</span> </span>
-<span id="cb1-76"><a href="#cb1-76" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ungroup</span>() <span class="ot">-&gt;</span></span>
-<span id="cb1-77"><a href="#cb1-77" aria-hidden="true" tabindex="-1"></a>  mano_corpus</span>
-<span id="cb1-78"><a href="#cb1-78" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-79"><a href="#cb1-79" aria-hidden="true" tabindex="-1"></a><span class="fu">rm</span>(mano_chi_corpus)</span>
-<span id="cb1-80"><a href="#cb1-80" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-81"><a href="#cb1-81" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(paletteer)</span>
-<span id="cb1-82"><a href="#cb1-82" aria-hidden="true" tabindex="-1"></a>colors_m <span class="ot">&lt;-</span> <span class="fu">paletteer_dynamic</span>(<span class="st">"ggthemes_ptol::qualitative"</span>, <span class="dv">5</span>)</span>
-<span id="cb1-83"><a href="#cb1-83" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-84"><a href="#cb1-84" aria-hidden="true" tabindex="-1"></a>people_text_color_m <span class="ot">&lt;-</span> </span>
-<span id="cb1-85"><a href="#cb1-85" aria-hidden="true" tabindex="-1"></a>  <span class="fu">c</span>(colors_m[<span class="dv">1</span>], <span class="co"># s_2_t_1  Kirikou (Nzerekore): Bilingual</span></span>
-<span id="cb1-86"><a href="#cb1-86" aria-hidden="true" tabindex="-1"></a>  colors_m[<span class="dv">3</span>], <span class="co"># s_3_t_1  Kirikou (other)</span></span>
-<span id="cb1-87"><a href="#cb1-87" aria-hidden="true" tabindex="-1"></a>  colors_m[<span class="dv">1</span>], <span class="co"># s_15_t_1 Kirikou (Nzerekore): Bilingual</span></span>
-<span id="cb1-88"><a href="#cb1-88" aria-hidden="true" tabindex="-1"></a>  colors_m[<span class="dv">2</span>], <span class="co"># s_11_t_1 Kirikou (Nzerekore): Mano</span></span>
-<span id="cb1-89"><a href="#cb1-89" aria-hidden="true" tabindex="-1"></a>  colors_m[<span class="dv">5</span>], <span class="co"># s_4_t_1  folktales (children)</span></span>
-<span id="cb1-90"><a href="#cb1-90" aria-hidden="true" tabindex="-1"></a>  colors_m[<span class="dv">5</span>], <span class="co"># s_4_t_2  folktales (children)</span></span>
-<span id="cb1-91"><a href="#cb1-91" aria-hidden="true" tabindex="-1"></a>  colors_m[<span class="dv">2</span>], <span class="co"># s_5_t_1  Kirikou (Nzerekore): Mano</span></span>
-<span id="cb1-92"><a href="#cb1-92" aria-hidden="true" tabindex="-1"></a>  colors_m[<span class="dv">3</span>], <span class="co"># s_8_t_1  Kirikou (other)</span></span>
-<span id="cb1-93"><a href="#cb1-93" aria-hidden="true" tabindex="-1"></a>  colors_m[<span class="dv">2</span>], <span class="co"># s_10_t_1 Kirikou (Nzerekore): Mano</span></span>
-<span id="cb1-94"><a href="#cb1-94" aria-hidden="true" tabindex="-1"></a>  colors_m[<span class="dv">3</span>], <span class="co"># s_18_t_1 Kirikou (other)</span></span>
-<span id="cb1-95"><a href="#cb1-95" aria-hidden="true" tabindex="-1"></a>  colors_m[<span class="dv">5</span>], <span class="co"># s_4_t_3  folktales (children)</span></span>
-<span id="cb1-96"><a href="#cb1-96" aria-hidden="true" tabindex="-1"></a>  colors_m[<span class="dv">1</span>], <span class="co"># s_9_t_1  Kirikou (Nzerekore): Bilingual</span></span>
-<span id="cb1-97"><a href="#cb1-97" aria-hidden="true" tabindex="-1"></a>  colors_m[<span class="dv">1</span>], <span class="co"># s_20_t_1 Kirikou (Nzerekore): Bilingual</span></span>
-<span id="cb1-98"><a href="#cb1-98" aria-hidden="true" tabindex="-1"></a>  colors_m[<span class="dv">1</span>], <span class="co"># s_13_t_1 Kirikou (Nzerekore): Bilingual</span></span>
-<span id="cb1-99"><a href="#cb1-99" aria-hidden="true" tabindex="-1"></a>  colors_m[<span class="dv">1</span>], <span class="co"># s_4_t_4  Kirikou (Nzerekore): Bilingual</span></span>
-<span id="cb1-100"><a href="#cb1-100" aria-hidden="true" tabindex="-1"></a>  colors_m[<span class="dv">3</span>], <span class="co"># s_16_t_1 Kirikou (other)</span></span>
-<span id="cb1-101"><a href="#cb1-101" aria-hidden="true" tabindex="-1"></a>  colors_m[<span class="dv">5</span>], <span class="co"># s_14_t_1 folktales (children)</span></span>
-<span id="cb1-102"><a href="#cb1-102" aria-hidden="true" tabindex="-1"></a>  colors_m[<span class="dv">5</span>], <span class="co"># s_14_t_2 folktales (children)</span></span>
-<span id="cb1-103"><a href="#cb1-103" aria-hidden="true" tabindex="-1"></a>  colors_m[<span class="dv">5</span>], <span class="co"># s_14_t_3 folktales (children)</span></span>
-<span id="cb1-104"><a href="#cb1-104" aria-hidden="true" tabindex="-1"></a>  colors_m[<span class="dv">2</span>], <span class="co"># s_17_t_1 Kirikou (Nzerekore): Mano</span></span>
-<span id="cb1-105"><a href="#cb1-105" aria-hidden="true" tabindex="-1"></a>  colors_m[<span class="dv">3</span>], <span class="co"># s_12_t_1 Kirikou (other)</span></span>
-<span id="cb1-106"><a href="#cb1-106" aria-hidden="true" tabindex="-1"></a>  colors_m[<span class="dv">5</span>], <span class="co"># s_21_t_1 folktales (children)</span></span>
-<span id="cb1-107"><a href="#cb1-107" aria-hidden="true" tabindex="-1"></a>  colors_m[<span class="dv">4</span>], <span class="co"># s_1_t_1  folktales (adults)</span></span>
-<span id="cb1-108"><a href="#cb1-108" aria-hidden="true" tabindex="-1"></a>  colors_m[<span class="dv">4</span>], <span class="co"># s_19_t_1 folktales (adults)</span></span>
-<span id="cb1-109"><a href="#cb1-109" aria-hidden="true" tabindex="-1"></a>  colors_m[<span class="dv">4</span>], <span class="co"># s_6_t_1  folktales (adults)</span></span>
-<span id="cb1-110"><a href="#cb1-110" aria-hidden="true" tabindex="-1"></a>  colors_m[<span class="dv">4</span>], <span class="co"># s_6_t_2  folktales (adults)</span></span>
-<span id="cb1-111"><a href="#cb1-111" aria-hidden="true" tabindex="-1"></a>  colors_m[<span class="dv">4</span>], <span class="co"># s_7_t_1  folktales (adults)</span></span>
-<span id="cb1-112"><a href="#cb1-112" aria-hidden="true" tabindex="-1"></a>  colors_m[<span class="dv">4</span>]  <span class="co"># s_7_t_2  folktales (adults)</span></span>
-<span id="cb1-113"><a href="#cb1-113" aria-hidden="true" tabindex="-1"></a>  )</span>
-<span id="cb1-114"><a href="#cb1-114" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-115"><a href="#cb1-115" aria-hidden="true" tabindex="-1"></a><span class="do">## Kpelle</span></span>
-<span id="cb1-116"><a href="#cb1-116" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-117"><a href="#cb1-117" aria-hidden="true" tabindex="-1"></a>readxl<span class="sc">::</span><span class="fu">read_xlsx</span>(<span class="st">"kirikou_annotations.xlsx"</span>, <span class="at">sheet =</span> <span class="st">"folktales Kpelle children"</span>) <span class="sc">|&gt;</span></span>
-<span id="cb1-118"><a href="#cb1-118" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="sc">-</span>elicitation_date) <span class="sc">|&gt;</span> </span>
-<span id="cb1-119"><a href="#cb1-119" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">text_type =</span> <span class="st">"folktales"</span>) <span class="sc">|&gt;</span></span>
-<span id="cb1-120"><a href="#cb1-120" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rename</span>(<span class="at">chunk_structure =</span> <span class="st">`</span><span class="at">chunk structure</span><span class="st">`</span>,</span>
-<span id="cb1-121"><a href="#cb1-121" aria-hidden="true" tabindex="-1"></a>         <span class="at">time_end =</span> <span class="st">`</span><span class="at">temps de fin - hh:mm:ss.ms</span><span class="st">`</span>, </span>
-<span id="cb1-122"><a href="#cb1-122" aria-hidden="true" tabindex="-1"></a>         <span class="at">time_start =</span><span class="st">`</span><span class="at">Temps de départ - hh:mm:ss.ms</span><span class="st">`</span>) <span class="sc">|&gt;</span> </span>
-<span id="cb1-123"><a href="#cb1-123" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">txenfant =</span> <span class="fu">str_remove_all</span>(txenfant , <span class="st">"[/+]"</span>),</span>
-<span id="cb1-124"><a href="#cb1-124" aria-hidden="true" tabindex="-1"></a>         <span class="at">txenfant =</span> <span class="fu">str_remove_all</span>(txenfant, <span class="st">"</span><span class="sc">\\</span><span class="st">[.*?</span><span class="sc">\\</span><span class="st">]"</span>),</span>
-<span id="cb1-125"><a href="#cb1-125" aria-hidden="true" tabindex="-1"></a>         <span class="at">txenfant =</span> <span class="fu">if_else</span>(<span class="fu">is.na</span>(txenfant), <span class="st">""</span>, txenfant),</span>
-<span id="cb1-126"><a href="#cb1-126" aria-hidden="true" tabindex="-1"></a>         <span class="at">ft =</span> <span class="fu">if_else</span>(<span class="fu">is.na</span>(ft), <span class="st">""</span>, ft),</span>
-<span id="cb1-127"><a href="#cb1-127" aria-hidden="true" tabindex="-1"></a>         <span class="at">comment =</span> <span class="fu">if_else</span>(<span class="fu">is.na</span>(comment), <span class="st">""</span>, comment),</span>
-<span id="cb1-128"><a href="#cb1-128" aria-hidden="true" tabindex="-1"></a>         <span class="at">chunk_structure =</span> <span class="fu">if_else</span>(<span class="fu">is.na</span>(chunk_structure), <span class="st">""</span>, chunk_structure)) <span class="sc">|&gt;</span></span>
-<span id="cb1-129"><a href="#cb1-129" aria-hidden="true" tabindex="-1"></a>  <span class="fu">add_count</span>(name, age, source) <span class="sc">|&gt;</span> </span>
-<span id="cb1-130"><a href="#cb1-130" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rename</span>(<span class="at">n_chunks =</span> n) <span class="sc">|&gt;</span> </span>
-<span id="cb1-131"><a href="#cb1-131" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(name, age, source, socio_family_adoptive, text_type, residence_place, n_chunks) <span class="sc">|&gt;</span> </span>
-<span id="cb1-132"><a href="#cb1-132" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarize</span>(<span class="at">text =</span> <span class="fu">str_c</span>(txenfant, <span class="at">collapse =</span> <span class="st">" "</span>),</span>
-<span id="cb1-133"><a href="#cb1-133" aria-hidden="true" tabindex="-1"></a>            <span class="at">chunk_structure =</span> <span class="fu">str_c</span>(chunk_structure, <span class="at">collapse =</span> <span class="st">" "</span>),</span>
-<span id="cb1-134"><a href="#cb1-134" aria-hidden="true" tabindex="-1"></a>            <span class="at">ft =</span> <span class="fu">str_c</span>(ft, <span class="at">collapse =</span> <span class="st">" "</span>),</span>
-<span id="cb1-135"><a href="#cb1-135" aria-hidden="true" tabindex="-1"></a>            <span class="at">comment =</span> <span class="fu">str_c</span>(comment, <span class="at">collapse =</span> <span class="st">" "</span>),</span>
-<span id="cb1-136"><a href="#cb1-136" aria-hidden="true" tabindex="-1"></a>            <span class="at">time_start =</span> <span class="fu">min</span>(time_start),</span>
-<span id="cb1-137"><a href="#cb1-137" aria-hidden="true" tabindex="-1"></a>            <span class="at">time_end =</span> <span class="fu">max</span>(time_end),</span>
-<span id="cb1-138"><a href="#cb1-138" aria-hidden="true" tabindex="-1"></a>            <span class="at">duration =</span> time_end <span class="sc">-</span> time_start) <span class="sc">|&gt;</span> </span>
-<span id="cb1-139"><a href="#cb1-139" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">age_group =</span> <span class="st">"children"</span>) <span class="sc">|&gt;</span> </span>
-<span id="cb1-140"><a href="#cb1-140" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="sc">-</span>time_start, <span class="sc">-</span>time_end) <span class="sc">|&gt;</span> </span>
-<span id="cb1-141"><a href="#cb1-141" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ungroup</span>() <span class="ot">-&gt;</span></span>
-<span id="cb1-142"><a href="#cb1-142" aria-hidden="true" tabindex="-1"></a>  kpelle_chi_corpus</span>
-<span id="cb1-143"><a href="#cb1-143" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-144"><a href="#cb1-144" aria-hidden="true" tabindex="-1"></a>readxl<span class="sc">::</span><span class="fu">read_xlsx</span>(<span class="st">"kirikou_annotations.xlsx"</span>, <span class="at">sheet =</span> <span class="st">"folktales Kpelle adults"</span>) <span class="sc">|&gt;</span></span>
-<span id="cb1-145"><a href="#cb1-145" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="sc">-</span>elicitation_date) <span class="sc">|&gt;</span> </span>
-<span id="cb1-146"><a href="#cb1-146" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">text_type =</span> <span class="st">"folktales"</span>) <span class="sc">|&gt;</span></span>
-<span id="cb1-147"><a href="#cb1-147" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rename</span>(<span class="at">chunk_structure =</span> <span class="st">`</span><span class="at">chunk structure</span><span class="st">`</span>,</span>
-<span id="cb1-148"><a href="#cb1-148" aria-hidden="true" tabindex="-1"></a>         <span class="at">time_end =</span> <span class="st">`</span><span class="at">temps de fin - hh:mm:ss.ms</span><span class="st">`</span>, </span>
-<span id="cb1-149"><a href="#cb1-149" aria-hidden="true" tabindex="-1"></a>         <span class="at">time_start =</span><span class="st">`</span><span class="at">Temps de départ - hh:mm:ss.ms</span><span class="st">`</span>) <span class="sc">|&gt;</span> </span>
-<span id="cb1-150"><a href="#cb1-150" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">txenfant =</span> <span class="fu">str_remove_all</span>(txenfant , <span class="st">"[/+]"</span>),</span>
-<span id="cb1-151"><a href="#cb1-151" aria-hidden="true" tabindex="-1"></a>         <span class="at">txenfant =</span> <span class="fu">str_remove_all</span>(txenfant, <span class="st">"</span><span class="sc">\\</span><span class="st">[.*?</span><span class="sc">\\</span><span class="st">]"</span>),</span>
-<span id="cb1-152"><a href="#cb1-152" aria-hidden="true" tabindex="-1"></a>         <span class="at">txenfant =</span> <span class="fu">if_else</span>(<span class="fu">is.na</span>(txenfant), <span class="st">""</span>, txenfant),</span>
-<span id="cb1-153"><a href="#cb1-153" aria-hidden="true" tabindex="-1"></a>         <span class="at">ft =</span> <span class="fu">if_else</span>(<span class="fu">is.na</span>(ft), <span class="st">""</span>, ft),</span>
-<span id="cb1-154"><a href="#cb1-154" aria-hidden="true" tabindex="-1"></a>         <span class="at">comment =</span> <span class="fu">if_else</span>(<span class="fu">is.na</span>(comment), <span class="st">""</span>, comment),</span>
-<span id="cb1-155"><a href="#cb1-155" aria-hidden="true" tabindex="-1"></a>         <span class="at">chunk_structure =</span> <span class="fu">if_else</span>(<span class="fu">is.na</span>(chunk_structure), <span class="st">""</span>, chunk_structure)) <span class="sc">|&gt;</span></span>
-<span id="cb1-156"><a href="#cb1-156" aria-hidden="true" tabindex="-1"></a>  <span class="fu">add_count</span>(name, age, source) <span class="sc">|&gt;</span> </span>
-<span id="cb1-157"><a href="#cb1-157" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rename</span>(<span class="at">n_chunks =</span> n) <span class="sc">|&gt;</span> </span>
-<span id="cb1-158"><a href="#cb1-158" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(name, age, source, socio_family_adoptive, text_type, residence_place, n_chunks) <span class="sc">|&gt;</span> </span>
-<span id="cb1-159"><a href="#cb1-159" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarize</span>(<span class="at">text =</span> <span class="fu">str_c</span>(txenfant, <span class="at">collapse =</span> <span class="st">" "</span>),</span>
-<span id="cb1-160"><a href="#cb1-160" aria-hidden="true" tabindex="-1"></a>            <span class="at">chunk_structure =</span> <span class="fu">str_c</span>(chunk_structure, <span class="at">collapse =</span> <span class="st">" "</span>),</span>
-<span id="cb1-161"><a href="#cb1-161" aria-hidden="true" tabindex="-1"></a>            <span class="at">ft =</span> <span class="fu">str_c</span>(ft, <span class="at">collapse =</span> <span class="st">" "</span>),</span>
-<span id="cb1-162"><a href="#cb1-162" aria-hidden="true" tabindex="-1"></a>            <span class="at">comment =</span> <span class="fu">str_c</span>(comment, <span class="at">collapse =</span> <span class="st">" "</span>),</span>
-<span id="cb1-163"><a href="#cb1-163" aria-hidden="true" tabindex="-1"></a>            <span class="at">time_start =</span> <span class="fu">min</span>(time_start),</span>
-<span id="cb1-164"><a href="#cb1-164" aria-hidden="true" tabindex="-1"></a>            <span class="at">time_end =</span> <span class="fu">max</span>(time_end),</span>
-<span id="cb1-165"><a href="#cb1-165" aria-hidden="true" tabindex="-1"></a>            <span class="at">duration =</span> time_end <span class="sc">-</span> time_start) <span class="sc">|&gt;</span> </span>
-<span id="cb1-166"><a href="#cb1-166" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">age_group =</span> <span class="st">"adults"</span>) <span class="sc">|&gt;</span> </span>
-<span id="cb1-167"><a href="#cb1-167" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="sc">-</span>time_start, <span class="sc">-</span>time_end) <span class="sc">|&gt;</span> </span>
-<span id="cb1-168"><a href="#cb1-168" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ungroup</span>() <span class="sc">|&gt;</span> </span>
-<span id="cb1-169"><a href="#cb1-169" aria-hidden="true" tabindex="-1"></a>  <span class="fu">bind_rows</span>(kpelle_chi_corpus) <span class="sc">|&gt;</span> </span>
-<span id="cb1-170"><a href="#cb1-170" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">group_var =</span> age_group) <span class="sc">|&gt;</span> </span>
-<span id="cb1-171"><a href="#cb1-171" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ungroup</span>() <span class="sc">|&gt;</span> </span>
-<span id="cb1-172"><a href="#cb1-172" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">new_name =</span> name <span class="sc">|&gt;</span> <span class="fu">factor</span>() <span class="sc">|&gt;</span> <span class="fu">as.integer</span>(),</span>
-<span id="cb1-173"><a href="#cb1-173" aria-hidden="true" tabindex="-1"></a>         <span class="at">new_name =</span> <span class="fu">str_c</span>(<span class="st">"s_"</span>, new_name)) <span class="sc">|&gt;</span> </span>
-<span id="cb1-174"><a href="#cb1-174" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(new_name) <span class="sc">|&gt;</span> </span>
-<span id="cb1-175"><a href="#cb1-175" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">new_source =</span> source <span class="sc">|&gt;</span> <span class="fu">factor</span>() <span class="sc">|&gt;</span> <span class="fu">as.integer</span>(),</span>
-<span id="cb1-176"><a href="#cb1-176" aria-hidden="true" tabindex="-1"></a>         <span class="at">new_source =</span> <span class="fu">str_c</span>(new_name, <span class="st">"_t_"</span>, new_source)) <span class="sc">|&gt;</span> </span>
-<span id="cb1-177"><a href="#cb1-177" aria-hidden="true" tabindex="-1"></a>  <span class="fu">relocate</span>(new_name, <span class="at">.after =</span> name) <span class="sc">|&gt;</span> </span>
-<span id="cb1-178"><a href="#cb1-178" aria-hidden="true" tabindex="-1"></a>  <span class="fu">relocate</span>(new_source, <span class="at">.after =</span> source) <span class="sc">|&gt;</span> </span>
-<span id="cb1-179"><a href="#cb1-179" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ungroup</span>() <span class="ot">-&gt;</span></span>
-<span id="cb1-180"><a href="#cb1-180" aria-hidden="true" tabindex="-1"></a>  kpelle_corpus</span>
-<span id="cb1-181"><a href="#cb1-181" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-182"><a href="#cb1-182" aria-hidden="true" tabindex="-1"></a><span class="fu">rm</span>(kpelle_chi_corpus)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>readxl<span class="sc">::</span><span class="fu">read_xlsx</span>(<span class="st">"kirikou_annotations.xlsx"</span>, <span class="at">sheet =</span> <span class="st">"kirikou Mano"</span>) <span class="sc">|&gt;</span></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="sc">-</span>elicitation_date) <span class="sc">|&gt;</span> </span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">text_type =</span> <span class="st">"kirikou"</span>) <span class="sc">|&gt;</span></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">bind_rows</span>(readxl<span class="sc">::</span><span class="fu">read_xlsx</span>(<span class="st">"kirikou_annotations.xlsx"</span>, <span class="at">sheet =</span> <span class="st">"folktales Mano children"</span>) <span class="sc">|&gt;</span> </span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>              <span class="fu">mutate</span>(<span class="at">text_type =</span> <span class="st">"folktales"</span>)) <span class="sc">|&gt;</span> </span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rename</span>(<span class="at">chunk_structure =</span> <span class="st">`</span><span class="at">chunk structure</span><span class="st">`</span>,</span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>         <span class="at">time_end =</span> <span class="st">`</span><span class="at">temps de fin - hh:mm:ss.ms</span><span class="st">`</span>, </span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>         <span class="at">time_start =</span><span class="st">`</span><span class="at">Temps de départ - hh:mm:ss.ms</span><span class="st">`</span>) <span class="sc">|&gt;</span> </span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">txenfant =</span> <span class="fu">str_remove_all</span>(txenfant , <span class="st">"[/+]"</span>),</span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a>         <span class="at">txenfant =</span> <span class="fu">str_remove_all</span>(txenfant, <span class="st">"</span><span class="sc">\\</span><span class="st">[.*?</span><span class="sc">\\</span><span class="st">]"</span>),</span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a>         <span class="at">txenfant =</span> <span class="fu">if_else</span>(<span class="fu">is.na</span>(txenfant), <span class="st">""</span>, txenfant),</span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a>         <span class="at">ft =</span> <span class="fu">if_else</span>(<span class="fu">is.na</span>(ft), <span class="st">""</span>, ft),</span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a>         <span class="at">comment =</span> <span class="fu">if_else</span>(<span class="fu">is.na</span>(comment), <span class="st">""</span>, comment),</span>
+<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a>         <span class="at">chunk_structure =</span> <span class="fu">if_else</span>(<span class="fu">is.na</span>(chunk_structure), <span class="st">""</span>, chunk_structure)) <span class="sc">|&gt;</span></span>
+<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a>  <span class="fu">add_count</span>(name, age, source) <span class="sc">|&gt;</span> </span>
+<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rename</span>(<span class="at">n_chunks =</span> n) <span class="sc">|&gt;</span> </span>
+<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(name, age, source, socio_family_adoptive, text_type, residence_place, n_chunks) <span class="sc">|&gt;</span> </span>
+<span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarize</span>(<span class="at">text =</span> <span class="fu">str_c</span>(txenfant, <span class="at">collapse =</span> <span class="st">" "</span>),</span>
+<span id="cb1-24"><a href="#cb1-24" aria-hidden="true" tabindex="-1"></a>            <span class="at">chunk_structure =</span> <span class="fu">str_c</span>(chunk_structure, <span class="at">collapse =</span> <span class="st">" "</span>),</span>
+<span id="cb1-25"><a href="#cb1-25" aria-hidden="true" tabindex="-1"></a>            <span class="at">ft =</span> <span class="fu">str_c</span>(ft, <span class="at">collapse =</span> <span class="st">" "</span>),</span>
+<span id="cb1-26"><a href="#cb1-26" aria-hidden="true" tabindex="-1"></a>            <span class="at">comment =</span> <span class="fu">str_c</span>(comment, <span class="at">collapse =</span> <span class="st">" "</span>),</span>
+<span id="cb1-27"><a href="#cb1-27" aria-hidden="true" tabindex="-1"></a>            <span class="at">time_start =</span> <span class="fu">min</span>(time_start),</span>
+<span id="cb1-28"><a href="#cb1-28" aria-hidden="true" tabindex="-1"></a>            <span class="at">time_end =</span> <span class="fu">max</span>(time_end),</span>
+<span id="cb1-29"><a href="#cb1-29" aria-hidden="true" tabindex="-1"></a>            <span class="at">duration =</span> time_end <span class="sc">-</span> time_start) <span class="sc">|&gt;</span> </span>
+<span id="cb1-30"><a href="#cb1-30" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">age_group =</span> <span class="st">"children"</span>) <span class="sc">|&gt;</span> </span>
+<span id="cb1-31"><a href="#cb1-31" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="sc">-</span>time_start, <span class="sc">-</span>time_end) <span class="sc">|&gt;</span> </span>
+<span id="cb1-32"><a href="#cb1-32" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ungroup</span>() <span class="ot">-&gt;</span></span>
+<span id="cb1-33"><a href="#cb1-33" aria-hidden="true" tabindex="-1"></a>  mano_chi_corpus</span>
+<span id="cb1-34"><a href="#cb1-34" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-35"><a href="#cb1-35" aria-hidden="true" tabindex="-1"></a>readxl<span class="sc">::</span><span class="fu">read_xlsx</span>(<span class="st">"kirikou_annotations.xlsx"</span>, <span class="at">sheet =</span> <span class="st">"folktales Mano adults"</span>) <span class="sc">|&gt;</span> </span>
+<span id="cb1-36"><a href="#cb1-36" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">age =</span> <span class="dv">100</span>,</span>
+<span id="cb1-37"><a href="#cb1-37" aria-hidden="true" tabindex="-1"></a>         <span class="at">text_type =</span> <span class="st">"folktales"</span>) <span class="sc">|&gt;</span> </span>
+<span id="cb1-38"><a href="#cb1-38" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rename</span>(<span class="at">txenfant =</span> <span class="st">`</span><span class="at">txenfant = tx</span><span class="st">`</span>,</span>
+<span id="cb1-39"><a href="#cb1-39" aria-hidden="true" tabindex="-1"></a>         <span class="at">chunk_structure =</span> <span class="st">`</span><span class="at">chunk structure</span><span class="st">`</span>,</span>
+<span id="cb1-40"><a href="#cb1-40" aria-hidden="true" tabindex="-1"></a>         <span class="at">time_end =</span> <span class="st">`</span><span class="at">temps de fin - hh:mm:ss.ms</span><span class="st">`</span>, </span>
+<span id="cb1-41"><a href="#cb1-41" aria-hidden="true" tabindex="-1"></a>         <span class="at">time_start =</span><span class="st">`</span><span class="at">Temps de départ - hh:mm:ss.ms</span><span class="st">`</span>) <span class="sc">|&gt;</span> </span>
+<span id="cb1-42"><a href="#cb1-42" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">txenfant =</span> <span class="fu">str_remove_all</span>(txenfant , <span class="st">"[/+]"</span>),</span>
+<span id="cb1-43"><a href="#cb1-43" aria-hidden="true" tabindex="-1"></a>         <span class="at">txenfant =</span> <span class="fu">str_remove_all</span>(txenfant, <span class="st">"</span><span class="sc">\\</span><span class="st">[.*?</span><span class="sc">\\</span><span class="st">]"</span>),</span>
+<span id="cb1-44"><a href="#cb1-44" aria-hidden="true" tabindex="-1"></a>         <span class="at">txenfant =</span> <span class="fu">if_else</span>(<span class="fu">is.na</span>(txenfant), <span class="st">""</span>, txenfant),</span>
+<span id="cb1-45"><a href="#cb1-45" aria-hidden="true" tabindex="-1"></a>         <span class="at">ft =</span> <span class="fu">if_else</span>(<span class="fu">is.na</span>(ft), <span class="st">""</span>, ft),</span>
+<span id="cb1-46"><a href="#cb1-46" aria-hidden="true" tabindex="-1"></a>         <span class="at">comment =</span> <span class="fu">if_else</span>(<span class="fu">is.na</span>(comment), <span class="st">""</span>, comment),</span>
+<span id="cb1-47"><a href="#cb1-47" aria-hidden="true" tabindex="-1"></a>         <span class="at">chunk_structure =</span> <span class="fu">if_else</span>(<span class="fu">is.na</span>(chunk_structure), <span class="st">""</span>, chunk_structure)) <span class="sc">|&gt;</span></span>
+<span id="cb1-48"><a href="#cb1-48" aria-hidden="true" tabindex="-1"></a>  <span class="fu">add_count</span>(name, age, source) <span class="sc">|&gt;</span> </span>
+<span id="cb1-49"><a href="#cb1-49" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rename</span>(<span class="at">n_chunks =</span> n) <span class="sc">|&gt;</span> </span>
+<span id="cb1-50"><a href="#cb1-50" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(name, age, source, socio_family_adoptive, text_type, residence_place, n_chunks) <span class="sc">|&gt;</span> </span>
+<span id="cb1-51"><a href="#cb1-51" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarize</span>(<span class="at">text =</span> <span class="fu">str_c</span>(txenfant, <span class="at">collapse =</span> <span class="st">" "</span>),</span>
+<span id="cb1-52"><a href="#cb1-52" aria-hidden="true" tabindex="-1"></a>            <span class="at">chunk_structure =</span> <span class="fu">str_c</span>(chunk_structure, <span class="at">collapse =</span> <span class="st">" "</span>),</span>
+<span id="cb1-53"><a href="#cb1-53" aria-hidden="true" tabindex="-1"></a>            <span class="at">ft =</span> <span class="fu">str_c</span>(ft, <span class="at">collapse =</span> <span class="st">" "</span>),</span>
+<span id="cb1-54"><a href="#cb1-54" aria-hidden="true" tabindex="-1"></a>            <span class="at">comment =</span> <span class="fu">str_c</span>(comment, <span class="at">collapse =</span> <span class="st">" "</span>),</span>
+<span id="cb1-55"><a href="#cb1-55" aria-hidden="true" tabindex="-1"></a>            <span class="at">time_start =</span> <span class="fu">min</span>(time_start),</span>
+<span id="cb1-56"><a href="#cb1-56" aria-hidden="true" tabindex="-1"></a>            <span class="at">time_end =</span> <span class="fu">max</span>(time_end),</span>
+<span id="cb1-57"><a href="#cb1-57" aria-hidden="true" tabindex="-1"></a>            <span class="at">duration =</span> time_end <span class="sc">-</span> time_start,</span>
+<span id="cb1-58"><a href="#cb1-58" aria-hidden="true" tabindex="-1"></a>            <span class="at">duration =</span> lubridate<span class="sc">::</span><span class="fu">as.duration</span>(duration)) <span class="sc">|&gt;</span> </span>
+<span id="cb1-59"><a href="#cb1-59" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="sc">-</span>time_start, <span class="sc">-</span>time_end) <span class="sc">|&gt;</span> </span>
+<span id="cb1-60"><a href="#cb1-60" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">age_group =</span> <span class="st">"adults"</span>) <span class="sc">|&gt;</span> </span>
+<span id="cb1-61"><a href="#cb1-61" aria-hidden="true" tabindex="-1"></a>  <span class="fu">bind_rows</span>(mano_chi_corpus) <span class="sc">|&gt;</span> </span>
+<span id="cb1-62"><a href="#cb1-62" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">group_var =</span> <span class="fu">case_when</span>(text_type <span class="sc">==</span> <span class="st">"kirikou"</span> <span class="sc">&amp;</span> residence_place <span class="sc">==</span> <span class="st">"Nzerekore"</span> <span class="sc">&amp;</span> socio_family_adoptive <span class="sc">==</span> <span class="st">"Mano"</span> <span class="sc">~</span> <span class="st">"Kirikou (Nzerekore): Mano"</span>,</span>
+<span id="cb1-63"><a href="#cb1-63" aria-hidden="true" tabindex="-1"></a>                               text_type <span class="sc">==</span> <span class="st">"kirikou"</span> <span class="sc">&amp;</span> residence_place <span class="sc">==</span> <span class="st">"Nzerekore"</span> <span class="sc">&amp;</span> socio_family_adoptive <span class="sc">==</span> <span class="st">"Bilingual"</span> <span class="sc">~</span> <span class="st">"Kirikou (Nzerekore): Bilingual"</span>,</span>
+<span id="cb1-64"><a href="#cb1-64" aria-hidden="true" tabindex="-1"></a>                               text_type <span class="sc">==</span> <span class="st">"kirikou"</span> <span class="sc">&amp;</span> residence_place <span class="sc">!=</span> <span class="st">"Nzerekore"</span> <span class="sc">~</span> <span class="st">"Kirikou (other)"</span>,</span>
+<span id="cb1-65"><a href="#cb1-65" aria-hidden="true" tabindex="-1"></a>                               text_type <span class="sc">==</span> <span class="st">"folktales"</span> <span class="sc">&amp;</span> age_group <span class="sc">==</span> <span class="st">"children"</span> <span class="sc">~</span> <span class="st">"folktales (children)"</span>,</span>
+<span id="cb1-66"><a href="#cb1-66" aria-hidden="true" tabindex="-1"></a>                               text_type <span class="sc">==</span> <span class="st">"folktales"</span> <span class="sc">&amp;</span> age_group <span class="sc">==</span> <span class="st">"adults"</span> <span class="sc">~</span> <span class="st">"folktales (adults)"</span>)) <span class="sc">|&gt;</span> </span>
+<span id="cb1-67"><a href="#cb1-67" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ungroup</span>() <span class="sc">|&gt;</span> </span>
+<span id="cb1-68"><a href="#cb1-68" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">new_name =</span> name <span class="sc">|&gt;</span> <span class="fu">factor</span>() <span class="sc">|&gt;</span> <span class="fu">as.integer</span>(),</span>
+<span id="cb1-69"><a href="#cb1-69" aria-hidden="true" tabindex="-1"></a>         <span class="at">new_name =</span> <span class="fu">str_c</span>(<span class="st">"s_"</span>, new_name)) <span class="sc">|&gt;</span> </span>
+<span id="cb1-70"><a href="#cb1-70" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(new_name) <span class="sc">|&gt;</span> </span>
+<span id="cb1-71"><a href="#cb1-71" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">new_source =</span> source <span class="sc">|&gt;</span> <span class="fu">factor</span>() <span class="sc">|&gt;</span> <span class="fu">as.integer</span>(),</span>
+<span id="cb1-72"><a href="#cb1-72" aria-hidden="true" tabindex="-1"></a>         <span class="at">new_source =</span> <span class="fu">str_c</span>(new_name, <span class="st">"_t_"</span>, new_source)) <span class="sc">|&gt;</span> </span>
+<span id="cb1-73"><a href="#cb1-73" aria-hidden="true" tabindex="-1"></a>  <span class="fu">relocate</span>(new_name, <span class="at">.after =</span> name) <span class="sc">|&gt;</span> </span>
+<span id="cb1-74"><a href="#cb1-74" aria-hidden="true" tabindex="-1"></a>  <span class="fu">relocate</span>(new_source, <span class="at">.after =</span> source) <span class="sc">|&gt;</span> </span>
+<span id="cb1-75"><a href="#cb1-75" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ungroup</span>() <span class="ot">-&gt;</span></span>
+<span id="cb1-76"><a href="#cb1-76" aria-hidden="true" tabindex="-1"></a>  mano_corpus</span>
+<span id="cb1-77"><a href="#cb1-77" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-78"><a href="#cb1-78" aria-hidden="true" tabindex="-1"></a><span class="fu">rm</span>(mano_chi_corpus)</span>
+<span id="cb1-79"><a href="#cb1-79" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-80"><a href="#cb1-80" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(paletteer)</span>
+<span id="cb1-81"><a href="#cb1-81" aria-hidden="true" tabindex="-1"></a>colors_m <span class="ot">&lt;-</span> <span class="fu">paletteer_dynamic</span>(<span class="st">"ggthemes_ptol::qualitative"</span>, <span class="dv">5</span>)</span>
+<span id="cb1-82"><a href="#cb1-82" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-83"><a href="#cb1-83" aria-hidden="true" tabindex="-1"></a>people_text_color_m <span class="ot">&lt;-</span> </span>
+<span id="cb1-84"><a href="#cb1-84" aria-hidden="true" tabindex="-1"></a>  <span class="fu">c</span>(colors_m[<span class="dv">1</span>], <span class="co"># s_2_t_1  Kirikou (Nzerekore): Bilingual</span></span>
+<span id="cb1-85"><a href="#cb1-85" aria-hidden="true" tabindex="-1"></a>  colors_m[<span class="dv">3</span>], <span class="co"># s_3_t_1  Kirikou (other)</span></span>
+<span id="cb1-86"><a href="#cb1-86" aria-hidden="true" tabindex="-1"></a>  colors_m[<span class="dv">1</span>], <span class="co"># s_15_t_1 Kirikou (Nzerekore): Bilingual</span></span>
+<span id="cb1-87"><a href="#cb1-87" aria-hidden="true" tabindex="-1"></a>  colors_m[<span class="dv">2</span>], <span class="co"># s_11_t_1 Kirikou (Nzerekore): Mano</span></span>
+<span id="cb1-88"><a href="#cb1-88" aria-hidden="true" tabindex="-1"></a>  colors_m[<span class="dv">5</span>], <span class="co"># s_4_t_1  folktales (children)</span></span>
+<span id="cb1-89"><a href="#cb1-89" aria-hidden="true" tabindex="-1"></a>  colors_m[<span class="dv">5</span>], <span class="co"># s_4_t_2  folktales (children)</span></span>
+<span id="cb1-90"><a href="#cb1-90" aria-hidden="true" tabindex="-1"></a>  colors_m[<span class="dv">2</span>], <span class="co"># s_5_t_1  Kirikou (Nzerekore): Mano</span></span>
+<span id="cb1-91"><a href="#cb1-91" aria-hidden="true" tabindex="-1"></a>  colors_m[<span class="dv">3</span>], <span class="co"># s_8_t_1  Kirikou (other)</span></span>
+<span id="cb1-92"><a href="#cb1-92" aria-hidden="true" tabindex="-1"></a>  colors_m[<span class="dv">2</span>], <span class="co"># s_10_t_1 Kirikou (Nzerekore): Mano</span></span>
+<span id="cb1-93"><a href="#cb1-93" aria-hidden="true" tabindex="-1"></a>  colors_m[<span class="dv">3</span>], <span class="co"># s_18_t_1 Kirikou (other)</span></span>
+<span id="cb1-94"><a href="#cb1-94" aria-hidden="true" tabindex="-1"></a>  colors_m[<span class="dv">5</span>], <span class="co"># s_4_t_3  folktales (children)</span></span>
+<span id="cb1-95"><a href="#cb1-95" aria-hidden="true" tabindex="-1"></a>  colors_m[<span class="dv">1</span>], <span class="co"># s_9_t_1  Kirikou (Nzerekore): Bilingual</span></span>
+<span id="cb1-96"><a href="#cb1-96" aria-hidden="true" tabindex="-1"></a>  colors_m[<span class="dv">1</span>], <span class="co"># s_20_t_1 Kirikou (Nzerekore): Bilingual</span></span>
+<span id="cb1-97"><a href="#cb1-97" aria-hidden="true" tabindex="-1"></a>  colors_m[<span class="dv">1</span>], <span class="co"># s_13_t_1 Kirikou (Nzerekore): Bilingual</span></span>
+<span id="cb1-98"><a href="#cb1-98" aria-hidden="true" tabindex="-1"></a>  colors_m[<span class="dv">1</span>], <span class="co"># s_4_t_4  Kirikou (Nzerekore): Bilingual</span></span>
+<span id="cb1-99"><a href="#cb1-99" aria-hidden="true" tabindex="-1"></a>  colors_m[<span class="dv">3</span>], <span class="co"># s_16_t_1 Kirikou (other)</span></span>
+<span id="cb1-100"><a href="#cb1-100" aria-hidden="true" tabindex="-1"></a>  colors_m[<span class="dv">5</span>], <span class="co"># s_14_t_1 folktales (children)</span></span>
+<span id="cb1-101"><a href="#cb1-101" aria-hidden="true" tabindex="-1"></a>  colors_m[<span class="dv">5</span>], <span class="co"># s_14_t_2 folktales (children)</span></span>
+<span id="cb1-102"><a href="#cb1-102" aria-hidden="true" tabindex="-1"></a>  colors_m[<span class="dv">5</span>], <span class="co"># s_14_t_3 folktales (children)</span></span>
+<span id="cb1-103"><a href="#cb1-103" aria-hidden="true" tabindex="-1"></a>  colors_m[<span class="dv">2</span>], <span class="co"># s_17_t_1 Kirikou (Nzerekore): Mano</span></span>
+<span id="cb1-104"><a href="#cb1-104" aria-hidden="true" tabindex="-1"></a>  colors_m[<span class="dv">3</span>], <span class="co"># s_12_t_1 Kirikou (other)</span></span>
+<span id="cb1-105"><a href="#cb1-105" aria-hidden="true" tabindex="-1"></a>  colors_m[<span class="dv">5</span>], <span class="co"># s_21_t_1 folktales (children)</span></span>
+<span id="cb1-106"><a href="#cb1-106" aria-hidden="true" tabindex="-1"></a>  colors_m[<span class="dv">4</span>], <span class="co"># s_1_t_1  folktales (adults)</span></span>
+<span id="cb1-107"><a href="#cb1-107" aria-hidden="true" tabindex="-1"></a>  colors_m[<span class="dv">4</span>], <span class="co"># s_19_t_1 folktales (adults)</span></span>
+<span id="cb1-108"><a href="#cb1-108" aria-hidden="true" tabindex="-1"></a>  colors_m[<span class="dv">4</span>], <span class="co"># s_6_t_1  folktales (adults)</span></span>
+<span id="cb1-109"><a href="#cb1-109" aria-hidden="true" tabindex="-1"></a>  colors_m[<span class="dv">4</span>], <span class="co"># s_6_t_2  folktales (adults)</span></span>
+<span id="cb1-110"><a href="#cb1-110" aria-hidden="true" tabindex="-1"></a>  colors_m[<span class="dv">4</span>], <span class="co"># s_7_t_1  folktales (adults)</span></span>
+<span id="cb1-111"><a href="#cb1-111" aria-hidden="true" tabindex="-1"></a>  colors_m[<span class="dv">4</span>]  <span class="co"># s_7_t_2  folktales (adults)</span></span>
+<span id="cb1-112"><a href="#cb1-112" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb1-113"><a href="#cb1-113" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-114"><a href="#cb1-114" aria-hidden="true" tabindex="-1"></a><span class="do">## Kpelle</span></span>
+<span id="cb1-115"><a href="#cb1-115" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-116"><a href="#cb1-116" aria-hidden="true" tabindex="-1"></a>readxl<span class="sc">::</span><span class="fu">read_xlsx</span>(<span class="st">"kirikou_annotations.xlsx"</span>, <span class="at">sheet =</span> <span class="st">"folktales Kpelle children"</span>) <span class="sc">|&gt;</span></span>
+<span id="cb1-117"><a href="#cb1-117" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="sc">-</span>elicitation_date) <span class="sc">|&gt;</span> </span>
+<span id="cb1-118"><a href="#cb1-118" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">text_type =</span> <span class="st">"folktales"</span>) <span class="sc">|&gt;</span></span>
+<span id="cb1-119"><a href="#cb1-119" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rename</span>(<span class="at">chunk_structure =</span> <span class="st">`</span><span class="at">chunk structure</span><span class="st">`</span>,</span>
+<span id="cb1-120"><a href="#cb1-120" aria-hidden="true" tabindex="-1"></a>         <span class="at">time_end =</span> <span class="st">`</span><span class="at">temps de fin - hh:mm:ss.ms</span><span class="st">`</span>, </span>
+<span id="cb1-121"><a href="#cb1-121" aria-hidden="true" tabindex="-1"></a>         <span class="at">time_start =</span><span class="st">`</span><span class="at">Temps de départ - hh:mm:ss.ms</span><span class="st">`</span>) <span class="sc">|&gt;</span> </span>
+<span id="cb1-122"><a href="#cb1-122" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">txenfant =</span> <span class="fu">str_remove_all</span>(txenfant , <span class="st">"[/+]"</span>),</span>
+<span id="cb1-123"><a href="#cb1-123" aria-hidden="true" tabindex="-1"></a>         <span class="at">txenfant =</span> <span class="fu">str_remove_all</span>(txenfant, <span class="st">"</span><span class="sc">\\</span><span class="st">[.*?</span><span class="sc">\\</span><span class="st">]"</span>),</span>
+<span id="cb1-124"><a href="#cb1-124" aria-hidden="true" tabindex="-1"></a>         <span class="at">txenfant =</span> <span class="fu">if_else</span>(<span class="fu">is.na</span>(txenfant), <span class="st">""</span>, txenfant),</span>
+<span id="cb1-125"><a href="#cb1-125" aria-hidden="true" tabindex="-1"></a>         <span class="at">ft =</span> <span class="fu">if_else</span>(<span class="fu">is.na</span>(ft), <span class="st">""</span>, ft),</span>
+<span id="cb1-126"><a href="#cb1-126" aria-hidden="true" tabindex="-1"></a>         <span class="at">comment =</span> <span class="fu">if_else</span>(<span class="fu">is.na</span>(comment), <span class="st">""</span>, comment),</span>
+<span id="cb1-127"><a href="#cb1-127" aria-hidden="true" tabindex="-1"></a>         <span class="at">chunk_structure =</span> <span class="fu">if_else</span>(<span class="fu">is.na</span>(chunk_structure), <span class="st">""</span>, chunk_structure)) <span class="sc">|&gt;</span></span>
+<span id="cb1-128"><a href="#cb1-128" aria-hidden="true" tabindex="-1"></a>  <span class="fu">add_count</span>(name, age, source) <span class="sc">|&gt;</span> </span>
+<span id="cb1-129"><a href="#cb1-129" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rename</span>(<span class="at">n_chunks =</span> n) <span class="sc">|&gt;</span> </span>
+<span id="cb1-130"><a href="#cb1-130" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(name, age, source, socio_family_adoptive, text_type, residence_place, n_chunks) <span class="sc">|&gt;</span> </span>
+<span id="cb1-131"><a href="#cb1-131" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarize</span>(<span class="at">text =</span> <span class="fu">str_c</span>(txenfant, <span class="at">collapse =</span> <span class="st">" "</span>),</span>
+<span id="cb1-132"><a href="#cb1-132" aria-hidden="true" tabindex="-1"></a>            <span class="at">chunk_structure =</span> <span class="fu">str_c</span>(chunk_structure, <span class="at">collapse =</span> <span class="st">" "</span>),</span>
+<span id="cb1-133"><a href="#cb1-133" aria-hidden="true" tabindex="-1"></a>            <span class="at">ft =</span> <span class="fu">str_c</span>(ft, <span class="at">collapse =</span> <span class="st">" "</span>),</span>
+<span id="cb1-134"><a href="#cb1-134" aria-hidden="true" tabindex="-1"></a>            <span class="at">comment =</span> <span class="fu">str_c</span>(comment, <span class="at">collapse =</span> <span class="st">" "</span>),</span>
+<span id="cb1-135"><a href="#cb1-135" aria-hidden="true" tabindex="-1"></a>            <span class="at">time_start =</span> <span class="fu">min</span>(time_start),</span>
+<span id="cb1-136"><a href="#cb1-136" aria-hidden="true" tabindex="-1"></a>            <span class="at">time_end =</span> <span class="fu">max</span>(time_end),</span>
+<span id="cb1-137"><a href="#cb1-137" aria-hidden="true" tabindex="-1"></a>            <span class="at">duration =</span> time_end <span class="sc">-</span> time_start) <span class="sc">|&gt;</span> </span>
+<span id="cb1-138"><a href="#cb1-138" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">age_group =</span> <span class="st">"children"</span>) <span class="sc">|&gt;</span> </span>
+<span id="cb1-139"><a href="#cb1-139" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="sc">-</span>time_start, <span class="sc">-</span>time_end) <span class="sc">|&gt;</span> </span>
+<span id="cb1-140"><a href="#cb1-140" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ungroup</span>() <span class="ot">-&gt;</span></span>
+<span id="cb1-141"><a href="#cb1-141" aria-hidden="true" tabindex="-1"></a>  kpelle_chi_corpus</span>
+<span id="cb1-142"><a href="#cb1-142" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-143"><a href="#cb1-143" aria-hidden="true" tabindex="-1"></a>readxl<span class="sc">::</span><span class="fu">read_xlsx</span>(<span class="st">"kirikou_annotations.xlsx"</span>, <span class="at">sheet =</span> <span class="st">"folktales Kpelle adults"</span>) <span class="sc">|&gt;</span></span>
+<span id="cb1-144"><a href="#cb1-144" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="sc">-</span>elicitation_date) <span class="sc">|&gt;</span> </span>
+<span id="cb1-145"><a href="#cb1-145" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">text_type =</span> <span class="st">"folktales"</span>) <span class="sc">|&gt;</span></span>
+<span id="cb1-146"><a href="#cb1-146" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rename</span>(<span class="at">chunk_structure =</span> <span class="st">`</span><span class="at">chunk structure</span><span class="st">`</span>,</span>
+<span id="cb1-147"><a href="#cb1-147" aria-hidden="true" tabindex="-1"></a>         <span class="at">time_end =</span> <span class="st">`</span><span class="at">temps de fin - hh:mm:ss.ms</span><span class="st">`</span>, </span>
+<span id="cb1-148"><a href="#cb1-148" aria-hidden="true" tabindex="-1"></a>         <span class="at">time_start =</span><span class="st">`</span><span class="at">Temps de départ - hh:mm:ss.ms</span><span class="st">`</span>) <span class="sc">|&gt;</span> </span>
+<span id="cb1-149"><a href="#cb1-149" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">txenfant =</span> <span class="fu">str_remove_all</span>(txenfant , <span class="st">"[/+]"</span>),</span>
+<span id="cb1-150"><a href="#cb1-150" aria-hidden="true" tabindex="-1"></a>         <span class="at">txenfant =</span> <span class="fu">str_remove_all</span>(txenfant, <span class="st">"</span><span class="sc">\\</span><span class="st">[.*?</span><span class="sc">\\</span><span class="st">]"</span>),</span>
+<span id="cb1-151"><a href="#cb1-151" aria-hidden="true" tabindex="-1"></a>         <span class="at">txenfant =</span> <span class="fu">if_else</span>(<span class="fu">is.na</span>(txenfant), <span class="st">""</span>, txenfant),</span>
+<span id="cb1-152"><a href="#cb1-152" aria-hidden="true" tabindex="-1"></a>         <span class="at">ft =</span> <span class="fu">if_else</span>(<span class="fu">is.na</span>(ft), <span class="st">""</span>, ft),</span>
+<span id="cb1-153"><a href="#cb1-153" aria-hidden="true" tabindex="-1"></a>         <span class="at">comment =</span> <span class="fu">if_else</span>(<span class="fu">is.na</span>(comment), <span class="st">""</span>, comment),</span>
+<span id="cb1-154"><a href="#cb1-154" aria-hidden="true" tabindex="-1"></a>         <span class="at">chunk_structure =</span> <span class="fu">if_else</span>(<span class="fu">is.na</span>(chunk_structure), <span class="st">""</span>, chunk_structure)) <span class="sc">|&gt;</span></span>
+<span id="cb1-155"><a href="#cb1-155" aria-hidden="true" tabindex="-1"></a>  <span class="fu">add_count</span>(name, age, source) <span class="sc">|&gt;</span> </span>
+<span id="cb1-156"><a href="#cb1-156" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rename</span>(<span class="at">n_chunks =</span> n) <span class="sc">|&gt;</span> </span>
+<span id="cb1-157"><a href="#cb1-157" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(name, age, source, socio_family_adoptive, text_type, residence_place, n_chunks) <span class="sc">|&gt;</span> </span>
+<span id="cb1-158"><a href="#cb1-158" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarize</span>(<span class="at">text =</span> <span class="fu">str_c</span>(txenfant, <span class="at">collapse =</span> <span class="st">" "</span>),</span>
+<span id="cb1-159"><a href="#cb1-159" aria-hidden="true" tabindex="-1"></a>            <span class="at">chunk_structure =</span> <span class="fu">str_c</span>(chunk_structure, <span class="at">collapse =</span> <span class="st">" "</span>),</span>
+<span id="cb1-160"><a href="#cb1-160" aria-hidden="true" tabindex="-1"></a>            <span class="at">ft =</span> <span class="fu">str_c</span>(ft, <span class="at">collapse =</span> <span class="st">" "</span>),</span>
+<span id="cb1-161"><a href="#cb1-161" aria-hidden="true" tabindex="-1"></a>            <span class="at">comment =</span> <span class="fu">str_c</span>(comment, <span class="at">collapse =</span> <span class="st">" "</span>),</span>
+<span id="cb1-162"><a href="#cb1-162" aria-hidden="true" tabindex="-1"></a>            <span class="at">time_start =</span> <span class="fu">min</span>(time_start),</span>
+<span id="cb1-163"><a href="#cb1-163" aria-hidden="true" tabindex="-1"></a>            <span class="at">time_end =</span> <span class="fu">max</span>(time_end),</span>
+<span id="cb1-164"><a href="#cb1-164" aria-hidden="true" tabindex="-1"></a>            <span class="at">duration =</span> time_end <span class="sc">-</span> time_start) <span class="sc">|&gt;</span> </span>
+<span id="cb1-165"><a href="#cb1-165" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">age_group =</span> <span class="st">"adults"</span>) <span class="sc">|&gt;</span> </span>
+<span id="cb1-166"><a href="#cb1-166" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="sc">-</span>time_start, <span class="sc">-</span>time_end) <span class="sc">|&gt;</span> </span>
+<span id="cb1-167"><a href="#cb1-167" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ungroup</span>() <span class="sc">|&gt;</span> </span>
+<span id="cb1-168"><a href="#cb1-168" aria-hidden="true" tabindex="-1"></a>  <span class="fu">bind_rows</span>(kpelle_chi_corpus) <span class="sc">|&gt;</span> </span>
+<span id="cb1-169"><a href="#cb1-169" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">group_var =</span> age_group) <span class="sc">|&gt;</span> </span>
+<span id="cb1-170"><a href="#cb1-170" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ungroup</span>() <span class="sc">|&gt;</span> </span>
+<span id="cb1-171"><a href="#cb1-171" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">new_name =</span> name <span class="sc">|&gt;</span> <span class="fu">factor</span>() <span class="sc">|&gt;</span> <span class="fu">as.integer</span>(),</span>
+<span id="cb1-172"><a href="#cb1-172" aria-hidden="true" tabindex="-1"></a>         <span class="at">new_name =</span> <span class="fu">str_c</span>(<span class="st">"s_"</span>, new_name)) <span class="sc">|&gt;</span> </span>
+<span id="cb1-173"><a href="#cb1-173" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(new_name) <span class="sc">|&gt;</span> </span>
+<span id="cb1-174"><a href="#cb1-174" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">new_source =</span> source <span class="sc">|&gt;</span> <span class="fu">factor</span>() <span class="sc">|&gt;</span> <span class="fu">as.integer</span>(),</span>
+<span id="cb1-175"><a href="#cb1-175" aria-hidden="true" tabindex="-1"></a>         <span class="at">new_source =</span> <span class="fu">str_c</span>(new_name, <span class="st">"_t_"</span>, new_source)) <span class="sc">|&gt;</span> </span>
+<span id="cb1-176"><a href="#cb1-176" aria-hidden="true" tabindex="-1"></a>  <span class="fu">relocate</span>(new_name, <span class="at">.after =</span> name) <span class="sc">|&gt;</span> </span>
+<span id="cb1-177"><a href="#cb1-177" aria-hidden="true" tabindex="-1"></a>  <span class="fu">relocate</span>(new_source, <span class="at">.after =</span> source) <span class="sc">|&gt;</span> </span>
+<span id="cb1-178"><a href="#cb1-178" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ungroup</span>() <span class="ot">-&gt;</span></span>
+<span id="cb1-179"><a href="#cb1-179" aria-hidden="true" tabindex="-1"></a>  kpelle_corpus</span>
+<span id="cb1-180"><a href="#cb1-180" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-181"><a href="#cb1-181" aria-hidden="true" tabindex="-1"></a><span class="fu">rm</span>(kpelle_chi_corpus)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 </div>
 <section id="общая-информация-про-корпус" class="level2">
@@ -470,12 +474,13 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb9-19"><a href="#cb9-19" aria-hidden="true" tabindex="-1"></a>                                          <span class="st">"PRF"</span>, <span class="st">"JNT"</span>, <span class="st">"PST"</span>)),</span>
 <span id="cb9-20"><a href="#cb9-20" aria-hidden="true" tabindex="-1"></a>         <span class="at">label =</span> <span class="fu">str_c</span>(<span class="fu">round</span>(ratio <span class="sc">*</span> <span class="dv">100</span>), <span class="st">"%"</span>)) <span class="sc">|&gt;</span></span>
 <span id="cb9-21"><a href="#cb9-21" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(ratio <span class="sc">&gt;</span> <span class="dv">0</span>) <span class="sc">|&gt;</span></span>
-<span id="cb9-22"><a href="#cb9-22" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> ratio, <span class="at">y =</span> new_source, <span class="at">label =</span> label, <span class="at">color =</span> tense))<span class="sc">+</span></span>
-<span id="cb9-23"><a href="#cb9-23" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_col</span>(<span class="fu">aes</span>(<span class="at">fill =</span> tense))<span class="sc">+</span></span>
-<span id="cb9-24"><a href="#cb9-24" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_label</span>(<span class="at">position =</span> <span class="fu">position_fill</span>(<span class="at">vjust =</span> <span class="fl">0.5</span>), <span class="at">fill =</span> <span class="st">"white"</span>)<span class="sc">+</span></span>
-<span id="cb9-25"><a href="#cb9-25" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_x_continuous</span>(<span class="at">label =</span> scales<span class="sc">::</span>percent)<span class="sc">+</span></span>
-<span id="cb9-26"><a href="#cb9-26" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="cn">NULL</span>, <span class="at">y =</span> <span class="cn">NULL</span>)<span class="sc">+</span></span>
-<span id="cb9-27"><a href="#cb9-27" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">axis.text.y =</span> <span class="fu">element_text</span>(<span class="at">colour =</span> people_text_color_m))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb9-22"><a href="#cb9-22" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> ratio, <span class="at">y =</span> new_source, <span class="at">label =</span> label, <span class="at">color =</span> tense)) <span class="sc">+</span></span>
+<span id="cb9-23"><a href="#cb9-23" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_col</span>(<span class="fu">aes</span>(<span class="at">fill =</span> tense)) <span class="sc">+</span></span>
+<span id="cb9-24"><a href="#cb9-24" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_label</span>(<span class="at">position =</span> <span class="fu">position_fill</span>(<span class="at">vjust =</span> <span class="fl">0.5</span>), <span class="at">fill =</span> <span class="st">"white"</span>) <span class="sc">+</span></span>
+<span id="cb9-25"><a href="#cb9-25" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_x_continuous</span>(<span class="at">label =</span> scales<span class="sc">::</span>percent) <span class="sc">+</span></span>
+<span id="cb9-26"><a href="#cb9-26" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="cn">NULL</span>, <span class="at">y =</span> <span class="cn">NULL</span>, <span class="at">fill =</span> <span class="cn">NULL</span>) <span class="sc">+</span></span>
+<span id="cb9-27"><a href="#cb9-27" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">axis.text.y =</span> <span class="fu">element_text</span>(<span class="at">colour =</span> people_text_color_m)) <span class="sc">+</span></span>
+<span id="cb9-28"><a href="#cb9-28" aria-hidden="true" tabindex="-1"></a>  <span class="fu">guides</span>(<span class="at">color =</span> <span class="st">"none"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output-display">
 <div>
@@ -545,12 +550,13 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb11-20"><a href="#cb11-20" aria-hidden="true" tabindex="-1"></a>                                          <span class="st">"PRF"</span>, <span class="st">"JNT"</span>, <span class="st">"PST"</span>)),</span>
 <span id="cb11-21"><a href="#cb11-21" aria-hidden="true" tabindex="-1"></a>         <span class="at">label =</span> <span class="fu">str_c</span>(<span class="fu">round</span>(ratio <span class="sc">*</span> <span class="dv">100</span>), <span class="st">"%"</span>)) <span class="sc">|&gt;</span></span>
 <span id="cb11-22"><a href="#cb11-22" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(ratio <span class="sc">&gt;</span> <span class="dv">0</span>) <span class="sc">|&gt;</span></span>
-<span id="cb11-23"><a href="#cb11-23" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> ratio, <span class="at">y =</span> new_source, <span class="at">label =</span> label, <span class="at">color =</span> tense))<span class="sc">+</span></span>
-<span id="cb11-24"><a href="#cb11-24" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_col</span>(<span class="fu">aes</span>(<span class="at">fill =</span> tense))<span class="sc">+</span></span>
-<span id="cb11-25"><a href="#cb11-25" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_label</span>(<span class="at">position =</span> <span class="fu">position_fill</span>(<span class="at">vjust =</span> <span class="fl">0.5</span>), <span class="at">fill =</span> <span class="st">"white"</span>)<span class="sc">+</span></span>
-<span id="cb11-26"><a href="#cb11-26" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_x_continuous</span>(<span class="at">label =</span> scales<span class="sc">::</span>percent)<span class="sc">+</span></span>
-<span id="cb11-27"><a href="#cb11-27" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="cn">NULL</span>, <span class="at">y =</span> <span class="cn">NULL</span>)<span class="sc">+</span></span>
-<span id="cb11-28"><a href="#cb11-28" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">axis.text.y =</span> <span class="fu">element_text</span>(<span class="at">colour =</span> people_text_color_m))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb11-23"><a href="#cb11-23" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> ratio, <span class="at">y =</span> new_source, <span class="at">label =</span> label, <span class="at">color =</span> tense)) <span class="sc">+</span></span>
+<span id="cb11-24"><a href="#cb11-24" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_col</span>(<span class="fu">aes</span>(<span class="at">fill =</span> tense)) <span class="sc">+</span></span>
+<span id="cb11-25"><a href="#cb11-25" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_label</span>(<span class="at">position =</span> <span class="fu">position_fill</span>(<span class="at">vjust =</span> <span class="fl">0.5</span>), <span class="at">fill =</span> <span class="st">"white"</span>) <span class="sc">+</span></span>
+<span id="cb11-26"><a href="#cb11-26" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_x_continuous</span>(<span class="at">label =</span> scales<span class="sc">::</span>percent) <span class="sc">+</span></span>
+<span id="cb11-27"><a href="#cb11-27" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="cn">NULL</span>, <span class="at">y =</span> <span class="cn">NULL</span>, <span class="at">fill =</span> <span class="cn">NULL</span>) <span class="sc">+</span></span>
+<span id="cb11-28"><a href="#cb11-28" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">axis.text.y =</span> <span class="fu">element_text</span>(<span class="at">colour =</span> people_text_color_m)) <span class="sc">+</span></span>
+<span id="cb11-29"><a href="#cb11-29" aria-hidden="true" tabindex="-1"></a>  <span class="fu">guides</span>(<span class="at">color =</span> <span class="st">"none"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output-display">
 <div>
@@ -633,11 +639,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb13-20"><a href="#cb13-20" aria-hidden="true" tabindex="-1"></a>                                          <span class="st">"CONJ"</span>, <span class="st">"PST"</span>)),</span>
 <span id="cb13-21"><a href="#cb13-21" aria-hidden="true" tabindex="-1"></a>         <span class="at">label =</span> <span class="fu">str_c</span>(<span class="fu">round</span>(ratio <span class="sc">*</span> <span class="dv">100</span>), <span class="st">"%"</span>)) <span class="sc">|&gt;</span></span>
 <span id="cb13-22"><a href="#cb13-22" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(ratio <span class="sc">&gt;</span> <span class="dv">0</span>) <span class="sc">|&gt;</span></span>
-<span id="cb13-23"><a href="#cb13-23" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> ratio, <span class="at">y =</span> new_source, <span class="at">label =</span> label, <span class="at">color =</span> tense))<span class="sc">+</span></span>
-<span id="cb13-24"><a href="#cb13-24" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_col</span>(<span class="fu">aes</span>(<span class="at">fill =</span> tense))<span class="sc">+</span></span>
-<span id="cb13-25"><a href="#cb13-25" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_label</span>(<span class="at">position =</span> <span class="fu">position_fill</span>(<span class="at">vjust =</span> <span class="fl">0.5</span>), <span class="at">fill =</span> <span class="st">"white"</span>)<span class="sc">+</span></span>
-<span id="cb13-26"><a href="#cb13-26" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_x_continuous</span>(<span class="at">label =</span> scales<span class="sc">::</span>percent)<span class="sc">+</span></span>
-<span id="cb13-27"><a href="#cb13-27" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="cn">NULL</span>, <span class="at">y =</span> <span class="cn">NULL</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb13-23"><a href="#cb13-23" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> ratio, <span class="at">y =</span> new_source, <span class="at">label =</span> label, <span class="at">color =</span> tense)) <span class="sc">+</span></span>
+<span id="cb13-24"><a href="#cb13-24" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_col</span>(<span class="fu">aes</span>(<span class="at">fill =</span> tense)) <span class="sc">+</span></span>
+<span id="cb13-25"><a href="#cb13-25" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_label</span>(<span class="at">position =</span> <span class="fu">position_fill</span>(<span class="at">vjust =</span> <span class="fl">0.5</span>), <span class="at">fill =</span> <span class="st">"white"</span>) <span class="sc">+</span></span>
+<span id="cb13-26"><a href="#cb13-26" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_x_continuous</span>(<span class="at">label =</span> scales<span class="sc">::</span>percent) <span class="sc">+</span></span>
+<span id="cb13-27"><a href="#cb13-27" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="cn">NULL</span>, <span class="at">y =</span> <span class="cn">NULL</span>, <span class="at">fill =</span> <span class="cn">NULL</span>) <span class="sc">+</span></span>
+<span id="cb13-28"><a href="#cb13-28" aria-hidden="true" tabindex="-1"></a>  <span class="fu">guides</span>(<span class="at">color =</span> <span class="st">"none"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output-display">
 <div>
@@ -713,11 +720,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb15-21"><a href="#cb15-21" aria-hidden="true" tabindex="-1"></a>                                          <span class="st">"CONJ"</span>, <span class="st">"PST"</span>)),</span>
 <span id="cb15-22"><a href="#cb15-22" aria-hidden="true" tabindex="-1"></a>         <span class="at">label =</span> <span class="fu">str_c</span>(<span class="fu">round</span>(ratio <span class="sc">*</span> <span class="dv">100</span>), <span class="st">"%"</span>)) <span class="sc">|&gt;</span></span>
 <span id="cb15-23"><a href="#cb15-23" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(ratio <span class="sc">&gt;</span> <span class="dv">0</span>) <span class="sc">|&gt;</span></span>
-<span id="cb15-24"><a href="#cb15-24" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> ratio, <span class="at">y =</span> new_source, <span class="at">label =</span> label, <span class="at">color =</span> tense))<span class="sc">+</span></span>
-<span id="cb15-25"><a href="#cb15-25" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_col</span>(<span class="fu">aes</span>(<span class="at">fill =</span> tense))<span class="sc">+</span></span>
-<span id="cb15-26"><a href="#cb15-26" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_label</span>(<span class="at">position =</span> <span class="fu">position_fill</span>(<span class="at">vjust =</span> <span class="fl">0.5</span>), <span class="at">fill =</span> <span class="st">"white"</span>)<span class="sc">+</span></span>
-<span id="cb15-27"><a href="#cb15-27" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_x_continuous</span>(<span class="at">label =</span> scales<span class="sc">::</span>percent)<span class="sc">+</span></span>
-<span id="cb15-28"><a href="#cb15-28" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="cn">NULL</span>, <span class="at">y =</span> <span class="cn">NULL</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb15-24"><a href="#cb15-24" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> ratio, <span class="at">y =</span> new_source, <span class="at">label =</span> label, <span class="at">color =</span> tense)) <span class="sc">+</span></span>
+<span id="cb15-25"><a href="#cb15-25" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_col</span>(<span class="fu">aes</span>(<span class="at">fill =</span> tense)) <span class="sc">+</span></span>
+<span id="cb15-26"><a href="#cb15-26" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_label</span>(<span class="at">position =</span> <span class="fu">position_fill</span>(<span class="at">vjust =</span> <span class="fl">0.5</span>), <span class="at">fill =</span> <span class="st">"white"</span>) <span class="sc">+</span></span>
+<span id="cb15-27"><a href="#cb15-27" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_x_continuous</span>(<span class="at">label =</span> scales<span class="sc">::</span>percent) <span class="sc">+</span></span>
+<span id="cb15-28"><a href="#cb15-28" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="cn">NULL</span>, <span class="at">y =</span> <span class="cn">NULL</span>, <span class="at">fill =</span> <span class="cn">NULL</span>) <span class="sc">+</span> </span>
+<span id="cb15-29"><a href="#cb15-29" aria-hidden="true" tabindex="-1"></a>  <span class="fu">guides</span>(<span class="at">color =</span> <span class="cn">NULL</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output-display">
 <div>
@@ -813,45 +821,26 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <details class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb19"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>mano_corpus <span class="sc">|&gt;</span> </span>
-<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(name, age, group_var, chunk_structure) <span class="sc">|&gt;</span> </span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(new_source, group_var, chunk_structure) <span class="sc">|&gt;</span> </span>
 <span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">chunk_structure =</span> <span class="fu">str_remove_all</span>(chunk_structure, <span class="st">"rs%.*?%"</span>),</span>
 <span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a>         <span class="at">res =</span> <span class="fu">str_count</span>(chunk_structure, <span class="st">"RES"</span>),</span>
 <span id="cb19-5"><a href="#cb19-5" aria-hidden="true" tabindex="-1"></a>         <span class="at">phas =</span> <span class="fu">str_count</span>(chunk_structure, <span class="st">"PHAS"</span>),</span>
 <span id="cb19-6"><a href="#cb19-6" aria-hidden="true" tabindex="-1"></a>         <span class="at">retr =</span> <span class="fu">str_count</span>(chunk_structure, <span class="st">"RETR"</span>),</span>
 <span id="cb19-7"><a href="#cb19-7" aria-hidden="true" tabindex="-1"></a>         <span class="at">res_phas_retr =</span> res <span class="sc">+</span> phas <span class="sc">+</span> retr,</span>
-<span id="cb19-8"><a href="#cb19-8" aria-hidden="true" tabindex="-1"></a>         <span class="at">n_predecations =</span> <span class="fu">str_count</span>(chunk_structure, <span class="st">"</span><span class="sc">\\</span><span class="st">["</span>)) <span class="sc">|&gt;</span> </span>
-<span id="cb19-9"><a href="#cb19-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(n_predecations, res_phas_retr, <span class="at">color =</span> group_var))<span class="sc">+</span></span>
-<span id="cb19-10"><a href="#cb19-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_smooth</span>(<span class="at">method =</span> <span class="st">"lm"</span>, <span class="at">se =</span> <span class="cn">FALSE</span>, <span class="at">color =</span> <span class="st">"grey60"</span>, <span class="at">linetype =</span> <span class="dv">2</span>)<span class="sc">+</span></span>
-<span id="cb19-11"><a href="#cb19-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>()<span class="sc">+</span></span>
-<span id="cb19-12"><a href="#cb19-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_x_log10</span>()<span class="sc">+</span></span>
-<span id="cb19-13"><a href="#cb19-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">"n predications (log)"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb19-8"><a href="#cb19-8" aria-hidden="true" tabindex="-1"></a>         <span class="at">n_predecations =</span> <span class="fu">str_count</span>(chunk_structure, <span class="st">"</span><span class="sc">\\</span><span class="st">["</span>),</span>
+<span id="cb19-9"><a href="#cb19-9" aria-hidden="true" tabindex="-1"></a>         <span class="at">ratio =</span> res_phas_retr<span class="sc">/</span>n_predecations) <span class="sc">|&gt;</span> </span>
+<span id="cb19-10"><a href="#cb19-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(ratio) <span class="sc">|&gt;</span> </span>
+<span id="cb19-11"><a href="#cb19-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">new_source =</span> <span class="fu">fct_inorder</span>(new_source)) <span class="sc">|&gt;</span> </span>
+<span id="cb19-12"><a href="#cb19-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(ratio, new_source, <span class="at">fill =</span> group_var)) <span class="sc">+</span></span>
+<span id="cb19-13"><a href="#cb19-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_col</span>() <span class="sc">+</span></span>
+<span id="cb19-14"><a href="#cb19-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">y =</span> <span class="cn">NULL</span>,</span>
+<span id="cb19-15"><a href="#cb19-15" aria-hidden="true" tabindex="-1"></a>       <span class="at">x =</span> <span class="st">"ratio of RES, PHAS or RETR forms"</span>,</span>
+<span id="cb19-16"><a href="#cb19-16" aria-hidden="true" tabindex="-1"></a>       <span class="at">fill =</span> <span class="cn">NULL</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output-display">
 <div>
 <figure class="figure">
 <p><img src="for_the_paper_files/figure-html/unnamed-chunk-17-1.png" class="img-fluid figure-img" width="960"></p>
-</figure>
-</div>
-</div>
-<details class="code-fold">
-<summary>Code</summary>
-<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a>mano_corpus <span class="sc">|&gt;</span> </span>
-<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(name, age, group_var, chunk_structure) <span class="sc">|&gt;</span> </span>
-<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">chunk_structure =</span> <span class="fu">str_remove_all</span>(chunk_structure, <span class="st">"rs%.*?%"</span>),</span>
-<span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a>         <span class="at">res =</span> <span class="fu">str_count</span>(chunk_structure, <span class="st">"RES"</span>),</span>
-<span id="cb20-5"><a href="#cb20-5" aria-hidden="true" tabindex="-1"></a>         <span class="at">phas =</span> <span class="fu">str_count</span>(chunk_structure, <span class="st">"PHAS"</span>),</span>
-<span id="cb20-6"><a href="#cb20-6" aria-hidden="true" tabindex="-1"></a>         <span class="at">retr =</span> <span class="fu">str_count</span>(chunk_structure, <span class="st">"RETR"</span>),</span>
-<span id="cb20-7"><a href="#cb20-7" aria-hidden="true" tabindex="-1"></a>         <span class="at">res_phas_retr =</span> res <span class="sc">+</span> phas <span class="sc">+</span> retr,</span>
-<span id="cb20-8"><a href="#cb20-8" aria-hidden="true" tabindex="-1"></a>         <span class="at">n_predecations =</span> <span class="fu">str_count</span>(chunk_structure, <span class="st">"</span><span class="sc">\\</span><span class="st">["</span>),</span>
-<span id="cb20-9"><a href="#cb20-9" aria-hidden="true" tabindex="-1"></a>         <span class="at">ratio =</span> res_phas_retr<span class="sc">/</span>n_predecations) <span class="sc">|&gt;</span> </span>
-<span id="cb20-10"><a href="#cb20-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(ratio, group_var))<span class="sc">+</span></span>
-<span id="cb20-11"><a href="#cb20-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="at">alpha =</span> <span class="fl">0.4</span>)<span class="sc">+</span></span>
-<span id="cb20-12"><a href="#cb20-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">y =</span> <span class="cn">NULL</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</details>
-<div class="cell-output-display">
-<div>
-<figure class="figure">
-<p><img src="for_the_paper_files/figure-html/unnamed-chunk-17-2.png" class="img-fluid figure-img" width="960"></p>
 </figure>
 </div>
 </div>
@@ -865,23 +854,23 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <div class="cell">
 <details class="code-fold">
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a>kpelle_corpus <span class="sc">|&gt;</span> </span>
-<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(new_source, group_var, chunk_structure) <span class="sc">|&gt;</span> </span>
-<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">chunk_structure =</span> <span class="fu">str_remove_all</span>(chunk_structure, <span class="st">"rs%.*?%"</span>),</span>
-<span id="cb21-4"><a href="#cb21-4" aria-hidden="true" tabindex="-1"></a>         <span class="at">res =</span> <span class="fu">str_count</span>(chunk_structure, <span class="st">"RES"</span>),</span>
-<span id="cb21-5"><a href="#cb21-5" aria-hidden="true" tabindex="-1"></a>         <span class="at">impf =</span> <span class="fu">str_count</span>(chunk_structure, <span class="st">"IMPF"</span>),</span>
-<span id="cb21-6"><a href="#cb21-6" aria-hidden="true" tabindex="-1"></a>         <span class="at">retr =</span> <span class="fu">str_count</span>(chunk_structure, <span class="st">"RETR"</span>)) <span class="sc">|&gt;</span> </span>
-<span id="cb21-7"><a href="#cb21-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">res =</span> <span class="fu">sum</span>(res),</span>
-<span id="cb21-8"><a href="#cb21-8" aria-hidden="true" tabindex="-1"></a>            <span class="at">impf =</span> <span class="fu">sum</span>(impf),</span>
-<span id="cb21-9"><a href="#cb21-9" aria-hidden="true" tabindex="-1"></a>            <span class="at">retr =</span> <span class="fu">sum</span>(retr)) <span class="ot">-&gt;</span></span>
-<span id="cb21-10"><a href="#cb21-10" aria-hidden="true" tabindex="-1"></a>  res_impf_retr</span>
-<span id="cb21-11"><a href="#cb21-11" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb21-12"><a href="#cb21-12" aria-hidden="true" tabindex="-1"></a>percantage_res_k <span class="ot">&lt;-</span> <span class="fu">round</span>((res_impf_retr<span class="sc">$</span>res)<span class="sc">/</span>n_predecations_without_RS_k<span class="sc">*</span><span class="dv">100</span>)</span>
-<span id="cb21-13"><a href="#cb21-13" aria-hidden="true" tabindex="-1"></a>percantage_impf_k <span class="ot">&lt;-</span> <span class="fu">round</span>((res_impf_retr<span class="sc">$</span>impf)<span class="sc">/</span>n_predecations_without_RS_k<span class="sc">*</span><span class="dv">100</span>)</span>
-<span id="cb21-14"><a href="#cb21-14" aria-hidden="true" tabindex="-1"></a>percantage_retr_k <span class="ot">&lt;-</span> <span class="fu">round</span>((res_impf_retr<span class="sc">$</span>retr)<span class="sc">/</span>n_predecations_without_RS_k<span class="sc">*</span><span class="dv">100</span>)</span>
-<span id="cb21-15"><a href="#cb21-15" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb21-16"><a href="#cb21-16" aria-hidden="true" tabindex="-1"></a>res_impf_retr_sum_k <span class="ot">&lt;-</span> <span class="fu">sum</span>(res_impf_retr)</span>
-<span id="cb21-17"><a href="#cb21-17" aria-hidden="true" tabindex="-1"></a>percantage_res_impf_retr_k <span class="ot">&lt;-</span> <span class="fu">round</span>((res_impf_retr_sum_k)<span class="sc">/</span>n_predecations_without_RS_k<span class="sc">*</span><span class="dv">100</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a>kpelle_corpus <span class="sc">|&gt;</span> </span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(new_source, group_var, chunk_structure) <span class="sc">|&gt;</span> </span>
+<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">chunk_structure =</span> <span class="fu">str_remove_all</span>(chunk_structure, <span class="st">"rs%.*?%"</span>),</span>
+<span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a>         <span class="at">res =</span> <span class="fu">str_count</span>(chunk_structure, <span class="st">"RES"</span>),</span>
+<span id="cb20-5"><a href="#cb20-5" aria-hidden="true" tabindex="-1"></a>         <span class="at">impf =</span> <span class="fu">str_count</span>(chunk_structure, <span class="st">"IMPF"</span>),</span>
+<span id="cb20-6"><a href="#cb20-6" aria-hidden="true" tabindex="-1"></a>         <span class="at">retr =</span> <span class="fu">str_count</span>(chunk_structure, <span class="st">"RETR"</span>)) <span class="sc">|&gt;</span> </span>
+<span id="cb20-7"><a href="#cb20-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">res =</span> <span class="fu">sum</span>(res),</span>
+<span id="cb20-8"><a href="#cb20-8" aria-hidden="true" tabindex="-1"></a>            <span class="at">impf =</span> <span class="fu">sum</span>(impf),</span>
+<span id="cb20-9"><a href="#cb20-9" aria-hidden="true" tabindex="-1"></a>            <span class="at">retr =</span> <span class="fu">sum</span>(retr)) <span class="ot">-&gt;</span></span>
+<span id="cb20-10"><a href="#cb20-10" aria-hidden="true" tabindex="-1"></a>  res_impf_retr</span>
+<span id="cb20-11"><a href="#cb20-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-12"><a href="#cb20-12" aria-hidden="true" tabindex="-1"></a>percantage_res_k <span class="ot">&lt;-</span> <span class="fu">round</span>((res_impf_retr<span class="sc">$</span>res)<span class="sc">/</span>n_predecations_without_RS_k<span class="sc">*</span><span class="dv">100</span>)</span>
+<span id="cb20-13"><a href="#cb20-13" aria-hidden="true" tabindex="-1"></a>percantage_impf_k <span class="ot">&lt;-</span> <span class="fu">round</span>((res_impf_retr<span class="sc">$</span>impf)<span class="sc">/</span>n_predecations_without_RS_k<span class="sc">*</span><span class="dv">100</span>)</span>
+<span id="cb20-14"><a href="#cb20-14" aria-hidden="true" tabindex="-1"></a>percantage_retr_k <span class="ot">&lt;-</span> <span class="fu">round</span>((res_impf_retr<span class="sc">$</span>retr)<span class="sc">/</span>n_predecations_without_RS_k<span class="sc">*</span><span class="dv">100</span>)</span>
+<span id="cb20-15"><a href="#cb20-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-16"><a href="#cb20-16" aria-hidden="true" tabindex="-1"></a>res_impf_retr_sum_k <span class="ot">&lt;-</span> <span class="fu">sum</span>(res_impf_retr)</span>
+<span id="cb20-17"><a href="#cb20-17" aria-hidden="true" tabindex="-1"></a>percantage_res_impf_retr_k <span class="ot">&lt;-</span> <span class="fu">round</span>((res_impf_retr_sum_k)<span class="sc">/</span>n_predecations_without_RS_k<span class="sc">*</span><span class="dv">100</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 </div>
 <ul>
@@ -893,19 +882,22 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <div class="cell">
 <details class="code-fold">
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a>kpelle_corpus <span class="sc">|&gt;</span> </span>
-<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(new_source, group_var, chunk_structure) <span class="sc">|&gt;</span> </span>
-<span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">chunk_structure =</span> <span class="fu">str_remove_all</span>(chunk_structure, <span class="st">"rs%.*?%"</span>),</span>
-<span id="cb22-4"><a href="#cb22-4" aria-hidden="true" tabindex="-1"></a>         <span class="at">res =</span> <span class="fu">str_count</span>(chunk_structure, <span class="st">"RES"</span>),</span>
-<span id="cb22-5"><a href="#cb22-5" aria-hidden="true" tabindex="-1"></a>         <span class="at">impf =</span> <span class="fu">str_count</span>(chunk_structure, <span class="st">"IMPF"</span>),</span>
-<span id="cb22-6"><a href="#cb22-6" aria-hidden="true" tabindex="-1"></a>         <span class="at">retr =</span> <span class="fu">str_count</span>(chunk_structure, <span class="st">"RETR"</span>),</span>
-<span id="cb22-7"><a href="#cb22-7" aria-hidden="true" tabindex="-1"></a>         <span class="at">res_impf_retr =</span> res <span class="sc">+</span> impf <span class="sc">+</span> retr,</span>
-<span id="cb22-8"><a href="#cb22-8" aria-hidden="true" tabindex="-1"></a>         <span class="at">n_predecations =</span> <span class="fu">str_count</span>(chunk_structure, <span class="st">"</span><span class="sc">\\</span><span class="st">["</span>)) <span class="sc">|&gt;</span> </span>
-<span id="cb22-9"><a href="#cb22-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(n_predecations, res_impf_retr, <span class="at">color =</span> group_var))<span class="sc">+</span></span>
-<span id="cb22-10"><a href="#cb22-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_smooth</span>(<span class="at">method =</span> <span class="st">"lm"</span>, <span class="at">se =</span> <span class="cn">FALSE</span>, <span class="at">color =</span> <span class="st">"grey60"</span>, <span class="at">linetype =</span> <span class="dv">2</span>)<span class="sc">+</span></span>
-<span id="cb22-11"><a href="#cb22-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>()<span class="sc">+</span></span>
-<span id="cb22-12"><a href="#cb22-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_x_log10</span>()<span class="sc">+</span></span>
-<span id="cb22-13"><a href="#cb22-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">"n predications (log)"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a>kpelle_corpus <span class="sc">|&gt;</span> </span>
+<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(new_source, group_var, chunk_structure) <span class="sc">|&gt;</span> </span>
+<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">chunk_structure =</span> <span class="fu">str_remove_all</span>(chunk_structure, <span class="st">"rs%.*?%"</span>),</span>
+<span id="cb21-4"><a href="#cb21-4" aria-hidden="true" tabindex="-1"></a>         <span class="at">res =</span> <span class="fu">str_count</span>(chunk_structure, <span class="st">"RES"</span>),</span>
+<span id="cb21-5"><a href="#cb21-5" aria-hidden="true" tabindex="-1"></a>         <span class="at">impf =</span> <span class="fu">str_count</span>(chunk_structure, <span class="st">"IMPF"</span>),</span>
+<span id="cb21-6"><a href="#cb21-6" aria-hidden="true" tabindex="-1"></a>         <span class="at">retr =</span> <span class="fu">str_count</span>(chunk_structure, <span class="st">"RETR"</span>),</span>
+<span id="cb21-7"><a href="#cb21-7" aria-hidden="true" tabindex="-1"></a>         <span class="at">res_impf_retr =</span> res <span class="sc">+</span> impf <span class="sc">+</span> retr,</span>
+<span id="cb21-8"><a href="#cb21-8" aria-hidden="true" tabindex="-1"></a>         <span class="at">n_predecations =</span> <span class="fu">str_count</span>(chunk_structure, <span class="st">"</span><span class="sc">\\</span><span class="st">["</span>),</span>
+<span id="cb21-9"><a href="#cb21-9" aria-hidden="true" tabindex="-1"></a>         <span class="at">ratio =</span> res_impf_retr<span class="sc">/</span>n_predecations) <span class="sc">|&gt;</span> </span>
+<span id="cb21-10"><a href="#cb21-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(ratio) <span class="sc">|&gt;</span> </span>
+<span id="cb21-11"><a href="#cb21-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">new_source =</span> <span class="fu">fct_inorder</span>(new_source)) <span class="sc">|&gt;</span> </span>
+<span id="cb21-12"><a href="#cb21-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(ratio, new_source, <span class="at">fill =</span> group_var)) <span class="sc">+</span></span>
+<span id="cb21-13"><a href="#cb21-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_col</span>() <span class="sc">+</span></span>
+<span id="cb21-14"><a href="#cb21-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">y =</span> <span class="cn">NULL</span>,</span>
+<span id="cb21-15"><a href="#cb21-15" aria-hidden="true" tabindex="-1"></a>       <span class="at">x =</span> <span class="st">"ratio of RES, PHAS or RETR forms"</span>,</span>
+<span id="cb21-16"><a href="#cb21-16" aria-hidden="true" tabindex="-1"></a>       <span class="at">fill =</span> <span class="cn">NULL</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output-display">
 <div>
@@ -914,29 +906,135 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </figure>
 </div>
 </div>
+</div>
+</section>
+</section>
+<section id="dur" class="level2">
+<h2 class="anchored" data-anchor-id="dur">DUR</h2>
+<section id="mano-3" class="level3">
+<h3 class="anchored" data-anchor-id="mano-3">Mano</h3>
+<blockquote class="blockquote">
+<p>Mano: calculate and visualize individual ratios of DUR to text length in predications outside RS</p>
+</blockquote>
+<div class="cell">
 <details class="code-fold">
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb23"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a>kpelle_corpus <span class="sc">|&gt;</span> </span>
-<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(new_source, group_var, chunk_structure) <span class="sc">|&gt;</span> </span>
-<span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">chunk_structure =</span> <span class="fu">str_remove_all</span>(chunk_structure, <span class="st">"rs%.*?%"</span>),</span>
-<span id="cb23-4"><a href="#cb23-4" aria-hidden="true" tabindex="-1"></a>         <span class="at">res =</span> <span class="fu">str_count</span>(chunk_structure, <span class="st">"RES"</span>),</span>
-<span id="cb23-5"><a href="#cb23-5" aria-hidden="true" tabindex="-1"></a>         <span class="at">impf =</span> <span class="fu">str_count</span>(chunk_structure, <span class="st">"IMPF"</span>),</span>
-<span id="cb23-6"><a href="#cb23-6" aria-hidden="true" tabindex="-1"></a>         <span class="at">retr =</span> <span class="fu">str_count</span>(chunk_structure, <span class="st">"RETR"</span>),</span>
-<span id="cb23-7"><a href="#cb23-7" aria-hidden="true" tabindex="-1"></a>         <span class="at">res_impf_retr =</span> res <span class="sc">+</span> impf <span class="sc">+</span> retr,</span>
-<span id="cb23-8"><a href="#cb23-8" aria-hidden="true" tabindex="-1"></a>         <span class="at">n_predecations =</span> <span class="fu">str_count</span>(chunk_structure, <span class="st">"</span><span class="sc">\\</span><span class="st">["</span>),</span>
-<span id="cb23-9"><a href="#cb23-9" aria-hidden="true" tabindex="-1"></a>         <span class="at">ratio =</span> res_impf_retr<span class="sc">/</span>n_predecations) <span class="sc">|&gt;</span> </span>
-<span id="cb23-10"><a href="#cb23-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(ratio, group_var))<span class="sc">+</span></span>
-<span id="cb23-11"><a href="#cb23-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="at">alpha =</span> <span class="fl">0.4</span>)<span class="sc">+</span></span>
-<span id="cb23-12"><a href="#cb23-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">y =</span> <span class="cn">NULL</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a>mano_corpus <span class="sc">|&gt;</span> </span>
+<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(new_source, group_var, chunk_structure) <span class="sc">|&gt;</span> </span>
+<span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">chunk_structure =</span> <span class="fu">str_remove_all</span>(chunk_structure, <span class="st">"rs%.*?%"</span>),</span>
+<span id="cb22-4"><a href="#cb22-4" aria-hidden="true" tabindex="-1"></a>         <span class="at">dur =</span> <span class="fu">str_count</span>(chunk_structure, <span class="st">"DUR"</span>),</span>
+<span id="cb22-5"><a href="#cb22-5" aria-hidden="true" tabindex="-1"></a>         <span class="at">n_predecations =</span> <span class="fu">str_count</span>(chunk_structure, <span class="st">"</span><span class="sc">\\</span><span class="st">["</span>),</span>
+<span id="cb22-6"><a href="#cb22-6" aria-hidden="true" tabindex="-1"></a>         <span class="at">ratio =</span> dur<span class="sc">/</span>n_predecations) <span class="sc">|&gt;</span> </span>
+<span id="cb22-7"><a href="#cb22-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(ratio) <span class="sc">|&gt;</span> </span>
+<span id="cb22-8"><a href="#cb22-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">new_source =</span> <span class="fu">fct_inorder</span>(new_source)) <span class="sc">|&gt;</span> </span>
+<span id="cb22-9"><a href="#cb22-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(ratio, new_source, <span class="at">fill =</span> group_var)) <span class="sc">+</span></span>
+<span id="cb22-10"><a href="#cb22-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_col</span>() <span class="sc">+</span></span>
+<span id="cb22-11"><a href="#cb22-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">y =</span> <span class="cn">NULL</span>,</span>
+<span id="cb22-12"><a href="#cb22-12" aria-hidden="true" tabindex="-1"></a>       <span class="at">x =</span> <span class="st">"ratio of DUR forms"</span>,</span>
+<span id="cb22-13"><a href="#cb22-13" aria-hidden="true" tabindex="-1"></a>       <span class="at">fill =</span> <span class="cn">NULL</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="for_the_paper_files/figure-html/unnamed-chunk-19-2.png" class="img-fluid figure-img" width="960"></p>
+<p><img src="for_the_paper_files/figure-html/unnamed-chunk-20-1.png" class="img-fluid figure-img" width="960"></p>
 </figure>
 </div>
 </div>
 </div>
+<blockquote class="blockquote">
+<p>Mano &amp; Kpelle: visualize which TAMP constructions are used with DUR (check all forms that have the _DUR extension, such as PST_DUR, separate DUR and regroup the remainder of the forms in the same way as you did when visualizing tense diversity)</p>
+</blockquote>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb23"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a>mano_corpus <span class="sc">|&gt;</span> </span>
+<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(new_source, group_var, chunk_structure) <span class="sc">|&gt;</span> </span>
+<span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">dur_ext =</span> <span class="fu">str_extract_all</span>(chunk_structure, <span class="st">"_[A-Z]*?_DUR"</span>)) <span class="sc">|&gt;</span> </span>
+<span id="cb23-4"><a href="#cb23-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="sc">-</span>chunk_structure) <span class="sc">|&gt;</span> </span>
+<span id="cb23-5"><a href="#cb23-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">unnest_longer</span>(dur_ext) <span class="sc">|&gt;</span> </span>
+<span id="cb23-6"><a href="#cb23-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">dur_ext =</span> <span class="fu">str_remove_all</span>(dur_ext, <span class="st">"_DUR"</span>),</span>
+<span id="cb23-7"><a href="#cb23-7" aria-hidden="true" tabindex="-1"></a>         <span class="at">dur_ext =</span> <span class="fu">str_remove_all</span>(dur_ext, <span class="st">"_"</span>)) <span class="sc">|&gt;</span> </span>
+<span id="cb23-8"><a href="#cb23-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count</span>(new_source, group_var, dur_ext) <span class="sc">|&gt;</span> </span>
+<span id="cb23-9"><a href="#cb23-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_wider</span>(<span class="at">names_from =</span> dur_ext, <span class="at">values_from =</span> n, <span class="at">values_fill =</span> <span class="dv">0</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output-display">
+<div data-pagedtable="false">
+  <script data-pagedtable-source="" type="application/json">
+{"columns":[{"label":["new_source"],"name":[1],"type":["chr"],"align":["left"]},{"label":["group_var"],"name":[2],"type":["chr"],"align":["left"]},{"label":["PST"],"name":[3],"type":["int"],"align":["right"]},{"label":["COND"],"name":[4],"type":["int"],"align":["right"]},{"label":["EXI"],"name":[5],"type":["int"],"align":["right"]},{"label":["NEG"],"name":[6],"type":["int"],"align":["right"]},{"label":["CONJ"],"name":[7],"type":["int"],"align":["right"]},{"label":["FUT"],"name":[8],"type":["int"],"align":["right"]},{"label":["PRED"],"name":[9],"type":["int"],"align":["right"]},{"label":["PRF"],"name":[10],"type":["int"],"align":["right"]}],"data":[{"1":"s_10_t_1","2":"Kirikou (Nzerekore): Mano","3":"12","4":"0","5":"0","6":"0","7":"0","8":"0","9":"0","10":"0"},{"1":"s_11_t_1","2":"Kirikou (Nzerekore): Mano","3":"6","4":"0","5":"0","6":"0","7":"0","8":"0","9":"0","10":"0"},{"1":"s_12_t_1","2":"Kirikou (other)","3":"3","4":"1","5":"1","6":"0","7":"0","8":"0","9":"0","10":"0"},{"1":"s_13_t_1","2":"Kirikou (Nzerekore): Bilingual","3":"16","4":"0","5":"5","6":"1","7":"0","8":"0","9":"0","10":"0"},{"1":"s_14_t_1","2":"folktales (children)","3":"0","4":"1","5":"1","6":"1","7":"0","8":"0","9":"0","10":"0"},{"1":"s_14_t_2","2":"folktales (children)","3":"0","4":"1","5":"5","6":"1","7":"0","8":"0","9":"0","10":"0"},{"1":"s_14_t_3","2":"folktales (children)","3":"4","4":"1","5":"2","6":"2","7":"0","8":"0","9":"0","10":"0"},{"1":"s_16_t_1","2":"Kirikou (other)","3":"3","4":"0","5":"0","6":"0","7":"0","8":"0","9":"0","10":"0"},{"1":"s_17_t_1","2":"Kirikou (Nzerekore): Mano","3":"15","4":"1","5":"10","6":"0","7":"2","8":"2","9":"2","10":"0"},{"1":"s_18_t_1","2":"Kirikou (other)","3":"9","4":"0","5":"0","6":"1","7":"0","8":"0","9":"0","10":"0"},{"1":"s_19_t_1","2":"folktales (adults)","3":"4","4":"0","5":"0","6":"0","7":"0","8":"0","9":"0","10":"0"},{"1":"s_20_t_1","2":"Kirikou (Nzerekore): Bilingual","3":"1","4":"0","5":"4","6":"0","7":"0","8":"0","9":"0","10":"0"},{"1":"s_21_t_1","2":"folktales (children)","3":"2","4":"0","5":"0","6":"0","7":"0","8":"0","9":"0","10":"0"},{"1":"s_2_t_1","2":"Kirikou (Nzerekore): Bilingual","3":"1","4":"0","5":"0","6":"0","7":"0","8":"0","9":"0","10":"0"},{"1":"s_4_t_1","2":"folktales (children)","3":"3","4":"0","5":"0","6":"0","7":"0","8":"0","9":"0","10":"0"},{"1":"s_4_t_2","2":"folktales (children)","3":"0","4":"1","5":"1","6":"0","7":"0","8":"0","9":"0","10":"0"},{"1":"s_4_t_3","2":"folktales (children)","3":"0","4":"0","5":"2","6":"0","7":"0","8":"0","9":"0","10":"0"},{"1":"s_4_t_4","2":"Kirikou (Nzerekore): Bilingual","3":"39","4":"0","5":"6","6":"1","7":"0","8":"0","9":"1","10":"0"},{"1":"s_5_t_1","2":"Kirikou (Nzerekore): Mano","3":"11","4":"0","5":"1","6":"0","7":"0","8":"0","9":"0","10":"0"},{"1":"s_6_t_1","2":"folktales (adults)","3":"5","4":"0","5":"3","6":"0","7":"0","8":"0","9":"1","10":"1"},{"1":"s_6_t_2","2":"folktales (adults)","3":"11","4":"0","5":"1","6":"0","7":"0","8":"0","9":"0","10":"0"},{"1":"s_7_t_1","2":"folktales (adults)","3":"2","4":"0","5":"0","6":"0","7":"0","8":"0","9":"0","10":"0"},{"1":"s_7_t_2","2":"folktales (adults)","3":"3","4":"0","5":"1","6":"0","7":"0","8":"0","9":"0","10":"0"},{"1":"s_8_t_1","2":"Kirikou (other)","3":"9","4":"0","5":"1","6":"0","7":"0","8":"0","9":"1","10":"0"},{"1":"s_9_t_1","2":"Kirikou (Nzerekore): Bilingual","3":"3","4":"0","5":"2","6":"0","7":"0","8":"0","9":"0","10":"0"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
+  </script>
+</div>
+</div>
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb24"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a>mano_corpus <span class="sc">|&gt;</span> </span>
+<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(new_source, age, group_var, chunk_structure) <span class="sc">|&gt;</span> </span>
+<span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">dur_ext =</span> <span class="fu">str_extract_all</span>(chunk_structure, <span class="st">"_[A-Z]*?_DUR"</span>)) <span class="sc">|&gt;</span> </span>
+<span id="cb24-4"><a href="#cb24-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="sc">-</span>chunk_structure) <span class="sc">|&gt;</span> </span>
+<span id="cb24-5"><a href="#cb24-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">unnest_longer</span>(dur_ext) <span class="sc">|&gt;</span> </span>
+<span id="cb24-6"><a href="#cb24-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">dur_ext =</span> <span class="fu">str_remove_all</span>(dur_ext, <span class="st">"_DUR"</span>),</span>
+<span id="cb24-7"><a href="#cb24-7" aria-hidden="true" tabindex="-1"></a>         <span class="at">dur_ext =</span> <span class="fu">str_remove_all</span>(dur_ext, <span class="st">"_"</span>)) <span class="sc">|&gt;</span> </span>
+<span id="cb24-8"><a href="#cb24-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count</span>(new_source, age, group_var, dur_ext) <span class="sc">|&gt;</span> </span>
+<span id="cb24-9"><a href="#cb24-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(new_source, age, group_var) <span class="sc">|&gt;</span> </span>
+<span id="cb24-10"><a href="#cb24-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">total =</span> <span class="fu">sum</span>(n),</span>
+<span id="cb24-11"><a href="#cb24-11" aria-hidden="true" tabindex="-1"></a>         <span class="at">ratio =</span> n<span class="sc">/</span>total) <span class="sc">|&gt;</span> </span>
+<span id="cb24-12"><a href="#cb24-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="sc">-</span>n, <span class="sc">-</span>total) <span class="sc">|&gt;</span> </span>
+<span id="cb24-13"><a href="#cb24-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ungroup</span>() <span class="sc">|&gt;</span> </span>
+<span id="cb24-14"><a href="#cb24-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">age2 =</span> <span class="fu">if_else</span>(age <span class="sc">==</span> <span class="dv">100</span>, <span class="st">"ad"</span>, <span class="fu">as.character</span>(age)),</span>
+<span id="cb24-15"><a href="#cb24-15" aria-hidden="true" tabindex="-1"></a>         <span class="at">new_source =</span> <span class="fu">str_c</span>(new_source, <span class="st">" ("</span>, age2, <span class="st">")"</span>),</span>
+<span id="cb24-16"><a href="#cb24-16" aria-hidden="true" tabindex="-1"></a>         <span class="at">new_source =</span> <span class="fu">fct_reorder</span>(new_source, age),</span>
+<span id="cb24-17"><a href="#cb24-17" aria-hidden="true" tabindex="-1"></a>         <span class="at">label =</span> <span class="fu">str_c</span>(<span class="fu">round</span>(ratio <span class="sc">*</span> <span class="dv">100</span>), <span class="st">"%"</span>)) <span class="sc">|&gt;</span></span>
+<span id="cb24-18"><a href="#cb24-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(ratio <span class="sc">&gt;</span> <span class="dv">0</span>) <span class="sc">|&gt;</span></span>
+<span id="cb24-19"><a href="#cb24-19" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> ratio, <span class="at">y =</span> new_source, <span class="at">label =</span> label, <span class="at">color =</span> dur_ext)) <span class="sc">+</span></span>
+<span id="cb24-20"><a href="#cb24-20" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_col</span>(<span class="fu">aes</span>(<span class="at">fill =</span> dur_ext)) <span class="sc">+</span></span>
+<span id="cb24-21"><a href="#cb24-21" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_label</span>(<span class="at">position =</span> <span class="fu">position_fill</span>(<span class="at">vjust =</span> <span class="fl">0.5</span>), <span class="at">fill =</span> <span class="st">"white"</span>) <span class="sc">+</span></span>
+<span id="cb24-22"><a href="#cb24-22" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_x_continuous</span>(<span class="at">label =</span> scales<span class="sc">::</span>percent) <span class="sc">+</span></span>
+<span id="cb24-23"><a href="#cb24-23" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="cn">NULL</span>, <span class="at">y =</span> <span class="cn">NULL</span>, <span class="at">fill =</span> <span class="cn">NULL</span>, <span class="at">color =</span> <span class="cn">NULL</span>) <span class="sc">+</span></span>
+<span id="cb24-24"><a href="#cb24-24" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">axis.text.y =</span> <span class="fu">element_text</span>(<span class="at">colour =</span> people_text_color_m)) <span class="sc">+</span></span>
+<span id="cb24-25"><a href="#cb24-25" aria-hidden="true" tabindex="-1"></a>  <span class="fu">guides</span>(<span class="at">color=</span><span class="st">"none"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="for_the_paper_files/figure-html/unnamed-chunk-21-1.png" class="img-fluid figure-img" width="960"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="kpelle-3" class="level3">
+<h3 class="anchored" data-anchor-id="kpelle-3">Kpelle</h3>
+<blockquote class="blockquote">
+<p>Kpelle: calculate individual ratios of DUR+STATni to text length in predications outside RS</p>
+</blockquote>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb25"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a>kpelle_corpus <span class="sc">|&gt;</span> </span>
+<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(new_source, group_var, chunk_structure) <span class="sc">|&gt;</span> </span>
+<span id="cb25-3"><a href="#cb25-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">chunk_structure =</span> <span class="fu">str_remove_all</span>(chunk_structure, <span class="st">"rs%.*?%"</span>),</span>
+<span id="cb25-4"><a href="#cb25-4" aria-hidden="true" tabindex="-1"></a>         <span class="at">dur =</span> <span class="fu">str_count</span>(chunk_structure, <span class="st">"DUR"</span>),</span>
+<span id="cb25-5"><a href="#cb25-5" aria-hidden="true" tabindex="-1"></a>         <span class="at">statni =</span> <span class="fu">str_count</span>(chunk_structure, <span class="st">"STATni"</span>),</span>
+<span id="cb25-6"><a href="#cb25-6" aria-hidden="true" tabindex="-1"></a>         <span class="at">n_predecations =</span> <span class="fu">str_count</span>(chunk_structure, <span class="st">"</span><span class="sc">\\</span><span class="st">["</span>),</span>
+<span id="cb25-7"><a href="#cb25-7" aria-hidden="true" tabindex="-1"></a>         <span class="at">ratio =</span> (dur<span class="sc">+</span>statni)<span class="sc">/</span>n_predecations) <span class="sc">|&gt;</span> </span>
+<span id="cb25-8"><a href="#cb25-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(ratio) <span class="sc">|&gt;</span> </span>
+<span id="cb25-9"><a href="#cb25-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">new_source =</span> <span class="fu">fct_inorder</span>(new_source)) <span class="sc">|&gt;</span> </span>
+<span id="cb25-10"><a href="#cb25-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(ratio, new_source, <span class="at">fill =</span> group_var)) <span class="sc">+</span></span>
+<span id="cb25-11"><a href="#cb25-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_col</span>() <span class="sc">+</span></span>
+<span id="cb25-12"><a href="#cb25-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">y =</span> <span class="cn">NULL</span>,</span>
+<span id="cb25-13"><a href="#cb25-13" aria-hidden="true" tabindex="-1"></a>       <span class="at">x =</span> <span class="st">"ratio of DUR or STATni forms"</span>,</span>
+<span id="cb25-14"><a href="#cb25-14" aria-hidden="true" tabindex="-1"></a>       <span class="at">fill =</span> <span class="cn">NULL</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="for_the_paper_files/figure-html/unnamed-chunk-22-1.png" class="img-fluid figure-img" width="960"></p>
+</figure>
+</div>
+</div>
+</div>
+<blockquote class="blockquote">
+<p>Mano &amp; Kpelle: visualize which TAMP constructions are used with DUR (check all forms that have the _DUR extension, such as PST_DUR, separate DUR and regroup the remainder of the forms in the same way as you did when visualizing tense diversity)</p>
+</blockquote>
 </section>
 </section>
 
