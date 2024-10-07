@@ -449,10 +449,9 @@ tense_k |>
   ungroup() |> 
   mutate(new_source = str_c(new_source, " (", age, ")"),
          new_source = fct_reorder(new_source, age),
-         tense = factor(tense, levels = c("PROH or IMP", "non-past", 
-                                          "NEG", "CONDs", "PRF",
-                                          "JNT or QUOT", "CONJ_PST", 
-                                          "CONJ", "PST")),
+         tense = factor(tense, levels = c("CONDs", "PROH or IMP", "non-past", 
+                                          "NEG", "CONJ", "CONJ_PST", "PRF", 
+                                          "JNT or QUOT", "PST")),
          label = str_c(round(ratio * 100), "%")) |>
   filter(ratio > 0) |>
   ggplot(aes(x = ratio, y = new_source, label = label, color = tense)) +
@@ -528,7 +527,7 @@ tense_without_RS_k |>
   geom_label(position = position_fill(vjust = 0.5), fill = "white") +
   scale_x_continuous(label = scales::percent) +
   labs(x = NULL, y = NULL, fill = NULL) + 
-  guides(color = NULL)
+  guides(color = "none")
 ```
 
 ## IMP vs PROH
@@ -620,7 +619,8 @@ mano_corpus |>
   geom_col() +
   labs(y = NULL,
        x = "ratio of RES, PHAS or RETR forms",
-       fill = NULL)
+       fill = NULL)+
+  scale_fill_manual(values = colors_m[c(4, 5, 1, 2, 3)])
 ```
 
 ### Kpelle
@@ -693,7 +693,8 @@ mano_corpus |>
   geom_col() +
   labs(y = NULL,
        x = "ratio of DUR forms",
-       fill = NULL)
+       fill = NULL)+
+  scale_fill_manual(values = colors_m[c(4, 5, 1, 2, 3)])
 ```
 
 > Mano & Kpelle: visualize which TAMP constructions are used with DUR (check all forms that have the _DUR extension, such as PST_DUR, separate DUR and regroup the remainder of the forms in the same way as you did when visualizing tense diversity)
@@ -837,7 +838,8 @@ mano_corpus |>
          new_source = fct_inorder(new_source)) |> 
   ggplot(aes(ratio, new_source, fill = group_var))+
   geom_col()+
-  labs(y = NULL, fill = NULL)
+  labs(y = NULL, fill = NULL) +
+  scale_fill_manual(values = colors_m[c(4, 5, 1, 2, 3)])
 ```
 
 ### Kpelle
@@ -901,7 +903,8 @@ mano_corpus |>
   geom_col() +
   labs(y = NULL,
        x = "ratio of PURP",
-       fill = NULL)
+       fill = NULL) +
+  scale_fill_manual(values = colors_m[c(4, 5, 1, 2, 3)])
 ```
 
 ### Kpelle
@@ -924,6 +927,32 @@ kpelle_corpus |>
   labs(y = NULL,
        x = "ratio of PURP",
        fill = NULL)
+```
+
+## COND
+
+### Mano
+
+> how many tokens of COND in Mano outside RS?
+
+```{r}
+mano_corpus |> 
+  mutate(chunk_structure = str_remove_all(chunk_structure, "rs%.*?%"),
+         cond = str_count(chunk_structure, "COND")) |> 
+  summarise(cond = sum(cond)) |> 
+  pull(cond)
+```
+
+### Kpelle
+
+> How many tokens of COND in Kpelle outside RS?
+
+```{r}
+kpelle_corpus |> 
+  mutate(chunk_structure = str_remove_all(chunk_structure, "rs%.*?%"),
+         cond = str_count(chunk_structure, "COND")) |> 
+  summarise(cond = sum(cond)) |> 
+  pull(cond)
 ```
 
 ## quot and jnt
@@ -980,7 +1009,8 @@ mano_corpus |>
   geom_col() +
   labs(y = NULL,
        x = "ratio of JNT",
-       fill = NULL)
+       fill = NULL) +
+  scale_fill_manual(values = colors_m[c(4, 5, 1, 2, 3)])
 ```
 
 > Visualize different .say constructions (visualize like the initial visualisations in the paper, with a color plot)
@@ -1175,7 +1205,8 @@ mano_corpus |>
   geom_col() +
   labs(y = NULL,
        x = "ratio of CR",
-       fill = NULL)
+       fill = NULL) +
+  scale_fill_manual(values = colors_m[c(4, 5, 1, 2, 3)])
 ```
 
 
@@ -1259,7 +1290,10 @@ mano_corpus |>
   ggplot(aes(value, new_source, fill = group_var))+
   geom_col()+
   facet_wrap(~type, nrow = 1, scales = "free")+
-  scale_y_reordered()
+  scale_y_reordered() +
+  labs(y = NULL, x = "ratio", fill = NULL) +
+  scale_fill_manual(values = colors_m[c(4, 5, 1, 2, 3)])
+  
 
 prefix <- "rel"
 
@@ -1289,6 +1323,7 @@ mano_corpus |>
   ggplot(aes(value, new_source, fill = group_var))+
   geom_col()+
   facet_wrap(~type, nrow = 1, scales = "free")+
+  labs(y = NULL, x = "ratio", fill = NULL) +
   scale_y_reordered()
 
 prefix <- "temp"
@@ -1319,6 +1354,7 @@ mano_corpus |>
   ggplot(aes(value, new_source, fill = group_var))+
   geom_col()+
   facet_wrap(~type, nrow = 1, scales = "free")+
+  labs(y = NULL, x = "ratio", fill = NULL) +
   scale_y_reordered()
 
 prefix <- "cond"
@@ -1349,6 +1385,7 @@ mano_corpus |>
   ggplot(aes(value, new_source, fill = group_var))+
   geom_col()+
   facet_wrap(~type, nrow = 1, scales = "free")+
+  labs(y = NULL, x = "ratio", fill = NULL) +
   scale_y_reordered()
 
 prefix <- "purp"
@@ -1379,6 +1416,7 @@ mano_corpus |>
   ggplot(aes(value, new_source, fill = group_var))+
   geom_col()+
   facet_wrap(~type, nrow = 1, scales = "free")+
+  labs(y = NULL, x = "ratio", fill = NULL) +
   scale_y_reordered()
 
 prefix <- "prec"
@@ -1409,6 +1447,7 @@ mano_corpus |>
   ggplot(aes(value, new_source, fill = group_var))+
   geom_col()+
   facet_wrap(~type, nrow = 1, scales = "free")+
+  labs(y = NULL, x = "ratio", fill = NULL) +
   scale_y_reordered()
 
 prefix <- "compar"
@@ -1439,6 +1478,7 @@ mano_corpus |>
   ggplot(aes(value, new_source, fill = group_var))+
   geom_col()+
   facet_wrap(~type, nrow = 1, scales = "free")+
+  labs(y = NULL, x = "ratio", fill = NULL) +
   scale_y_reordered()
 
 prefix <- "mod"
@@ -1469,6 +1509,7 @@ mano_corpus |>
   ggplot(aes(value, new_source, fill = group_var))+
   geom_col()+
   facet_wrap(~type, nrow = 1, scales = "free")+
+  labs(y = NULL, x = "ratio", fill = NULL) +
   scale_y_reordered()
 
 prefix <- "sa"
@@ -1499,6 +1540,7 @@ mano_corpus |>
   ggplot(aes(value, new_source, fill = group_var))+
   geom_col()+
   facet_wrap(~type, nrow = 1, scales = "free")+
+  labs(y = NULL, x = "ratio", fill = NULL) +
   scale_y_reordered()
 
 prefix <- "le"
@@ -1529,7 +1571,9 @@ mano_corpus |>
   ggplot(aes(value, new_source, fill = group_var))+
   geom_col()+
   facet_wrap(~type, nrow = 1, scales = "free")+
-  scale_y_reordered()
+  scale_y_reordered()  +
+  labs(y = NULL, x = "ratio", fill = NULL) +
+  scale_fill_manual(values = colors_m[c(4, 5, 1, 2, 3)])
 
 prefix <- "ht"
 
@@ -1559,7 +1603,9 @@ mano_corpus |>
   ggplot(aes(value, new_source, fill = group_var))+
   geom_col()+
   facet_wrap(~type, nrow = 1, scales = "free")+
-  scale_y_reordered()
+  scale_y_reordered()  +
+  labs(y = NULL, x = "ratio", fill = NULL) +
+  scale_fill_manual(values = colors_m[c(4, 5, 1, 2, 3)])
 
 prefix <- "at"
 
@@ -1589,7 +1635,9 @@ mano_corpus |>
   ggplot(aes(value, new_source, fill = group_var))+
   geom_col()+
   facet_wrap(~type, nrow = 1, scales = "free")+
-  scale_y_reordered()
+  scale_y_reordered() +
+  labs(y = NULL, x = "ratio", fill = NULL) +
+  scale_fill_manual(values = colors_m[c(4, 5, 1, 2, 3)])
 
 prefix <- "top"
 
@@ -1619,7 +1667,9 @@ mano_corpus |>
   ggplot(aes(value, new_source, fill = group_var))+
   geom_col()+
   facet_wrap(~type, nrow = 1, scales = "free")+
-  scale_y_reordered()
+  scale_y_reordered() +
+  labs(y = NULL, x = "ratio", fill = NULL) +
+  scale_fill_manual(values = colors_m[c(4, 5, 1, 2, 3)])
 
 prefix <- "voc"
 
@@ -1649,7 +1699,9 @@ mano_corpus |>
   ggplot(aes(value, new_source, fill = group_var))+
   geom_col()+
   facet_wrap(~type, nrow = 1, scales = "free")+
-  scale_y_reordered()
+  scale_y_reordered() +
+  labs(y = NULL, x = "ratio", fill = NULL) +
+  scale_fill_manual(values = colors_m[c(4, 5, 1, 2, 3)])
 ```
 
 ### Kpelle
@@ -1703,6 +1755,7 @@ kpelle_corpus |>
   ggplot(aes(value, new_source, fill = group_var))+
   geom_col()+
   facet_wrap(~type, nrow = 1, scales = "free")+
+  labs(y = NULL, x = "ratio", fill = NULL) +
   scale_y_reordered()
 
 prefix <- "rel"
@@ -1763,6 +1816,7 @@ kpelle_corpus |>
   ggplot(aes(value, new_source, fill = group_var))+
   geom_col()+
   facet_wrap(~type, nrow = 1, scales = "free")+
+  labs(y = NULL, x = "ratio", fill = NULL) +
   scale_y_reordered()
 
 prefix <- "cond"
@@ -1793,6 +1847,7 @@ kpelle_corpus |>
   ggplot(aes(value, new_source, fill = group_var))+
   geom_col()+
   facet_wrap(~type, nrow = 1, scales = "free")+
+  labs(y = NULL, x = "ratio", fill = NULL) +
   scale_y_reordered()
 
 prefix <- "purp"
@@ -1823,6 +1878,7 @@ kpelle_corpus |>
   ggplot(aes(value, new_source, fill = group_var))+
   geom_col()+
   facet_wrap(~type, nrow = 1, scales = "free")+
+  labs(y = NULL, x = "ratio", fill = NULL) +
   scale_y_reordered()
 
 prefix <- "prec"
@@ -1853,6 +1909,7 @@ kpelle_corpus |>
   ggplot(aes(value, new_source, fill = group_var))+
   geom_col()+
   facet_wrap(~type, nrow = 1, scales = "free")+
+  labs(y = NULL, x = "ratio", fill = NULL) +
   scale_y_reordered()
 
 prefix <- "compar"
@@ -1883,6 +1940,7 @@ kpelle_corpus |>
   ggplot(aes(value, new_source, fill = group_var))+
   geom_col()+
   facet_wrap(~type, nrow = 1, scales = "free")+
+  labs(y = NULL, x = "ratio", fill = NULL) +
   scale_y_reordered()
 
 prefix <- "mod"
@@ -1913,6 +1971,7 @@ kpelle_corpus |>
   ggplot(aes(value, new_source, fill = group_var))+
   geom_col()+
   facet_wrap(~type, nrow = 1, scales = "free")+
+  labs(y = NULL, x = "ratio", fill = NULL) +
   scale_y_reordered()
 
 prefix <- "sa"
@@ -1943,6 +2002,7 @@ kpelle_corpus |>
   ggplot(aes(value, new_source, fill = group_var))+
   geom_col()+
   facet_wrap(~type, nrow = 1, scales = "free")+
+  labs(y = NULL, x = "ratio", fill = NULL) +
   scale_y_reordered()
 
 prefix <- "le"
@@ -1973,6 +2033,7 @@ kpelle_corpus |>
   ggplot(aes(value, new_source, fill = group_var))+
   geom_col()+
   facet_wrap(~type, nrow = 1, scales = "free")+
+  labs(y = NULL, x = "ratio", fill = NULL) +
   scale_y_reordered()
 
 prefix <- "ht"
@@ -2003,6 +2064,7 @@ kpelle_corpus |>
   ggplot(aes(value, new_source, fill = group_var))+
   geom_col()+
   facet_wrap(~type, nrow = 1, scales = "free")+
+  labs(y = NULL, x = "ratio", fill = NULL) +
   scale_y_reordered()
 
 prefix <- "at"
@@ -2033,6 +2095,7 @@ kpelle_corpus |>
   ggplot(aes(value, new_source, fill = group_var))+
   geom_col()+
   facet_wrap(~type, nrow = 1, scales = "free")+
+  labs(y = NULL, x = "ratio", fill = NULL) +
   scale_y_reordered()
 
 prefix <- "top"
@@ -2063,6 +2126,7 @@ kpelle_corpus |>
   ggplot(aes(value, new_source, fill = group_var))+
   geom_col()+
   facet_wrap(~type, nrow = 1, scales = "free")+
+  labs(y = NULL, x = "ratio", fill = NULL) +
   scale_y_reordered()
 
 prefix <- "voc"
@@ -2093,5 +2157,6 @@ kpelle_corpus |>
   ggplot(aes(value, new_source, fill = group_var))+
   geom_col()+
   facet_wrap(~type, nrow = 1, scales = "free")+
+  labs(y = NULL, x = "ratio", fill = NULL) +
   scale_y_reordered()
 ```
