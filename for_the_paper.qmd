@@ -930,15 +930,222 @@ kpelle_corpus |>
 ### Mano
 
 > Visualize ratios of jnt vs jnt.say
+
+```{r}
+mano_corpus |> 
+  select(new_source, age, group_var, chunk_structure) |> 
+  mutate(jnt_say = str_count(chunk_structure, "JNT\\.SAY"),
+         jnt = str_count(chunk_structure, "JNT")-jnt_say,
+         ratio = jnt/(jnt+jnt_say)) |> 
+  arrange(ratio) 
+
+mano_corpus |> 
+  select(new_source, age, group_var, chunk_structure) |> 
+  mutate(jnt_say = str_count(chunk_structure, "JNT\\.SAY"),
+         jnt = str_count(chunk_structure, "JNT")-jnt_say,
+         ratio = jnt/(jnt+jnt_say)) |> 
+  arrange(ratio) |> 
+  mutate(age2 = if_else(age == 100, "ad", as.character(age)),
+         new_source = str_c(new_source, " (", age2, ")"),
+         new_source = fct_inorder(new_source)) |> 
+  ggplot(aes(ratio, new_source, fill = group_var)) +
+  geom_col() +
+  labs(y = NULL,
+       x = "ratio of JNT",
+       fill = NULL)
+```
+
 > Visualize ratios of jnt.say vs other.say
+
+```{r}
+mano_corpus |> 
+  select(new_source, age, group_var, chunk_structure) |> 
+  mutate(jnt_say = str_count(chunk_structure, "JNT\\.SAY"),
+         say = str_count(chunk_structure, "\\.SAY")-jnt_say,
+         ratio = jnt_say/(say+jnt_say)) |> 
+  arrange(ratio) 
+
+mano_corpus |> 
+  select(new_source, age, group_var, chunk_structure) |> 
+  mutate(jnt_say = str_count(chunk_structure, "JNT\\.SAY"),
+         other_say = str_count(chunk_structure, "\\.SAY")-jnt_say,
+         ratio = jnt_say/(other_say+jnt_say),
+         ratio = if_else(is.nan(ratio), 0, ratio)) |> 
+  arrange(ratio) |> 
+  mutate(age2 = if_else(age == 100, "ad", as.character(age)),
+         new_source = str_c(new_source, " (", age2, ")"),
+         new_source = fct_inorder(new_source)) |> 
+  ggplot(aes(ratio, new_source, fill = group_var)) +
+  geom_col() +
+  labs(y = NULL,
+       x = "ratio of JNT",
+       fill = NULL)
+```
+
 > Visualize different .say constructions (visualize like the initial visualisations in the paper, with a color plot)
+
+```{r}
+mano_corpus |> 
+  select(new_source, age, group_var, chunk_structure) |> 
+  mutate(says = str_extract_all(chunk_structure, "_[A-Z]*?\\.SAY")) |> 
+  select(-chunk_structure) |> 
+  unnest_longer(says) |> 
+  mutate(says = str_remove_all(says, "\\.SAY"),
+         says = str_remove_all(says, "_")) |> 
+  count(new_source, group_var, says) |> 
+  pivot_wider(names_from = says, values_from = n, values_fill = 0)
+
+mano_corpus |> 
+  select(new_source, age, group_var, chunk_structure) |> 
+  mutate(says = str_extract_all(chunk_structure, "_[A-Z]*?\\.SAY")) |> 
+  select(-chunk_structure) |> 
+  unnest_longer(says) |> 
+  mutate(says = str_remove_all(says, "\\.SAY"),
+         says = str_remove_all(says, "_")) |> 
+  count(new_source, age, group_var, says) |> 
+  group_by(new_source, age, group_var) |> 
+  mutate(total = sum(n),
+         ratio = n/total) |> 
+  select(-n, -total) |> 
+  ungroup() |> 
+  mutate(age2 = if_else(age == 100, "ad", as.character(age)),
+         new_source = str_c(new_source, " (", age2, ")"),
+         new_source = fct_reorder(new_source, age),
+         label = str_c(round(ratio * 100), "%")) |>
+  filter(ratio > 0) |>
+  ggplot(aes(x = ratio, y = new_source, label = label, color = says)) +
+  geom_col(aes(fill = says)) +
+  geom_label(position = position_fill(vjust = 0.5), fill = "white") +
+  scale_x_continuous(label = scales::percent) +
+  labs(x = NULL, y = NULL, fill = NULL, color = NULL) +
+  theme(axis.text.y = element_text(colour = people_text_color_m)) +
+  guides(color="none")
+```
 
 ### Kpelle
 
 > Visualize ratios of quot vs jnt.say
+
+```{r}
+kpelle_corpus |> 
+  select(new_source, age, group_var, chunk_structure) |> 
+  mutate(jnt_say = str_count(chunk_structure, "JNT\\.SAY"),
+         quot = str_count(chunk_structure, "quot"),
+         ratio = quot/(quot+jnt_say)) |> 
+  arrange(ratio) 
+
+kpelle_corpus |> 
+  select(new_source, age, group_var, chunk_structure) |> 
+  mutate(jnt_say = str_count(chunk_structure, "JNT\\.SAY"),
+         quot = str_count(chunk_structure, "quot"),
+         ratio = jnt_say/(quot+jnt_say),
+         ratio = if_else(is.nan(ratio), 0, ratio)) |> 
+  arrange(ratio) |> 
+  mutate(new_source = str_c(new_source, " (", age, ")"),
+         new_source = fct_inorder(new_source)) |> 
+  ggplot(aes(ratio, new_source, fill = group_var)) +
+  geom_col() +
+  labs(y = NULL,
+       x = "ratio of QUOT",
+       fill = NULL)
+```
+
 > Visualize ratios of jnt vs quot + jnt.say
+
+```{r}
+kpelle_corpus |> 
+  select(new_source, age, group_var, chunk_structure) |> 
+  mutate(jnt_say = str_count(chunk_structure, "JNT\\.SAY"),
+         jnt = str_count(chunk_structure, "JNT") - jnt_say,
+         quot = str_count(chunk_structure, "quot"),
+         ratio = jnt/(quot+jnt_say+jnt),
+         ratio = if_else(is.nan(ratio), 0, ratio)) |> 
+  arrange(ratio) 
+
+kpelle_corpus |> 
+  select(new_source, age, group_var, chunk_structure) |> 
+  mutate(jnt_say = str_count(chunk_structure, "JNT\\.SAY"),
+         jnt = str_count(chunk_structure, "JNT") - jnt_say,
+         quot = str_count(chunk_structure, "quot"),
+         ratio = jnt/(quot+jnt_say+jnt),
+         ratio = if_else(is.nan(ratio), 0, ratio)) |> 
+  arrange(ratio) |>  
+  mutate(new_source = str_c(new_source, " (", age, ")"),
+         new_source = fct_inorder(new_source)) |> 
+  ggplot(aes(ratio, new_source, fill = group_var)) +
+  geom_col() +
+  labs(y = NULL,
+       x = "ratio of JNT",
+       fill = NULL)
+```
+
 > Visualize ratios of quot+jnt.say vs other.say
+
+```{r}
+kpelle_corpus |> 
+  select(new_source, age, group_var, chunk_structure) |> 
+  mutate(jnt_say = str_count(chunk_structure, "JNT\\.SAY"),
+         says = str_count(chunk_structure, "SAY") - jnt_say,
+         quot = str_count(chunk_structure, "quot"),
+         ratio = (quot+jnt_say) /(quot+jnt_say+says),
+         ratio = if_else(is.nan(ratio), 0, ratio)) |> 
+  arrange(ratio) 
+
+kpelle_corpus |> 
+  select(new_source, age, group_var, chunk_structure) |> 
+  mutate(jnt_say = str_count(chunk_structure, "JNT\\.SAY"),
+         says = str_count(chunk_structure, "SAY") - jnt_say,
+         quot = str_count(chunk_structure, "quot"),
+         ratio = (quot+jnt_say) /(quot+jnt_say+says),
+         ratio = if_else(is.nan(ratio), 0, ratio)) |> 
+  arrange(ratio)  |>  
+  mutate(new_source = str_c(new_source, " (", age, ")"),
+         new_source = fct_inorder(new_source)) |> 
+  ggplot(aes(ratio, new_source, fill = group_var)) +
+  geom_col() +
+  labs(y = NULL,
+       x = "ratio of JNT.SAY or QUOT",
+       fill = NULL)
+```
+
 > Visualize ratios quot + different .say constructions (visualize like the initial visualisations in the paper, with a color plot) 
+
+```{r}
+kpelle_corpus |> 
+  select(new_source, age, group_var, chunk_structure) |> 
+  mutate(says = str_extract_all(chunk_structure, "(_[A-Z]*?\\.SAY)|(QUOT)")) |> 
+  select(-chunk_structure) |> 
+  unnest_longer(says) |> 
+  mutate(says = str_remove_all(says, "\\.SAY"),
+         says = str_remove_all(says, "_")) |> 
+  count(new_source, group_var, says) |> 
+  pivot_wider(names_from = says, values_from = n, values_fill = 0)
+
+kpelle_corpus |> 
+  select(new_source, age, group_var, chunk_structure) |> 
+  mutate(says = str_extract_all(chunk_structure, "(_[A-Z]*?\\.SAY)|(QUOT)")) |> 
+  select(-chunk_structure) |> 
+  unnest_longer(says) |> 
+  mutate(says = str_remove_all(says, "\\.SAY"),
+         says = str_remove_all(says, "_")) |> 
+  count(new_source, age, group_var, says) |> 
+  group_by(new_source, age, group_var) |> 
+  mutate(total = sum(n),
+         ratio = n/total) |> 
+  select(-n, -total) |> 
+  ungroup() |> 
+  mutate(new_source = str_c(new_source, " (", age, ")"),
+         new_source = fct_reorder(new_source, age),
+         label = str_c(round(ratio * 100), "%")) |>
+  filter(ratio > 0) |>
+  ggplot(aes(x = ratio, y = new_source, label = label, color = says)) +
+  geom_col(aes(fill = says)) +
+  geom_label(position = position_fill(vjust = 0.5), fill = "white") +
+  scale_x_continuous(label = scales::percent) +
+  labs(x = NULL, y = NULL, fill = NULL, color = NULL) +
+  guides(color="none")
+```
+
 
 ## reference tracking
 
