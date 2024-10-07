@@ -1308,7 +1308,6 @@ mano_corpus |>
   scale_y_reordered() +
   labs(y = NULL, x = "ratio", fill = NULL) +
   scale_fill_manual(values = colors_m[c(4, 5, 1, 2, 3)])
-  
 
 prefix <- "rel"
 
@@ -1339,7 +1338,8 @@ mano_corpus |>
   geom_col()+
   facet_wrap(~type, nrow = 1, scales = "free")+
   labs(y = NULL, x = "ratio", fill = NULL) +
-  scale_y_reordered()
+  scale_y_reordered() +
+  scale_fill_manual(values = colors_m[c(4, 5, 1, 2, 3)])
 
 prefix <- "temp"
 
@@ -1370,7 +1370,8 @@ mano_corpus |>
   geom_col()+
   facet_wrap(~type, nrow = 1, scales = "free")+
   labs(y = NULL, x = "ratio", fill = NULL) +
-  scale_y_reordered()
+  scale_y_reordered() +
+  scale_fill_manual(values = colors_m[c(4, 5, 1, 2, 3)])
 
 prefix <- "cond"
 
@@ -1401,7 +1402,8 @@ mano_corpus |>
   geom_col()+
   facet_wrap(~type, nrow = 1, scales = "free")+
   labs(y = NULL, x = "ratio", fill = NULL) +
-  scale_y_reordered()
+  scale_y_reordered() +
+  scale_fill_manual(values = colors_m[c(4, 5, 1, 2, 3)])
 
 prefix <- "purp"
 
@@ -1432,7 +1434,8 @@ mano_corpus |>
   geom_col()+
   facet_wrap(~type, nrow = 1, scales = "free")+
   labs(y = NULL, x = "ratio", fill = NULL) +
-  scale_y_reordered()
+  scale_y_reordered() +
+  scale_fill_manual(values = colors_m[c(4, 5, 1, 2, 3)])
 
 prefix <- "prec"
 
@@ -1463,7 +1466,8 @@ mano_corpus |>
   geom_col()+
   facet_wrap(~type, nrow = 1, scales = "free")+
   labs(y = NULL, x = "ratio", fill = NULL) +
-  scale_y_reordered()
+  scale_y_reordered() +
+  scale_fill_manual(values = colors_m[c(4, 5, 1, 2, 3)])
 
 prefix <- "compar"
 
@@ -1494,7 +1498,8 @@ mano_corpus |>
   geom_col()+
   facet_wrap(~type, nrow = 1, scales = "free")+
   labs(y = NULL, x = "ratio", fill = NULL) +
-  scale_y_reordered()
+  scale_y_reordered() +
+  scale_fill_manual(values = colors_m[c(4, 5, 1, 2, 3)])
 
 prefix <- "mod"
 
@@ -1525,7 +1530,8 @@ mano_corpus |>
   geom_col()+
   facet_wrap(~type, nrow = 1, scales = "free")+
   labs(y = NULL, x = "ratio", fill = NULL) +
-  scale_y_reordered()
+  scale_y_reordered() +
+  scale_fill_manual(values = colors_m[c(4, 5, 1, 2, 3)])
 
 prefix <- "sa"
 
@@ -1556,7 +1562,8 @@ mano_corpus |>
   geom_col()+
   facet_wrap(~type, nrow = 1, scales = "free")+
   labs(y = NULL, x = "ratio", fill = NULL) +
-  scale_y_reordered()
+  scale_y_reordered() +
+  scale_fill_manual(values = colors_m[c(4, 5, 1, 2, 3)])
 
 prefix <- "le"
 
