@@ -158,7 +158,7 @@ readxl::read_xlsx("kirikou_annotations.xlsx", sheet = "folktales Kpelle children
             time_start = min(time_start),
             time_end = max(time_end),
             duration = time_end - time_start) |> 
-  mutate(age_group = "children") |> 
+  mutate(age_group = "folktales (children)") |> 
   select(-time_start, -time_end) |> 
   ungroup() ->
   kpelle_chi_corpus
@@ -185,7 +185,7 @@ readxl::read_xlsx("kirikou_annotations.xlsx", sheet = "folktales Kpelle adults")
             time_start = min(time_start),
             time_end = max(time_end),
             duration = time_end - time_start) |> 
-  mutate(age_group = "adults") |> 
+  mutate(age_group = "folktales (adults)") |> 
   select(-time_start, -time_end) |> 
   ungroup() |> 
   bind_rows(kpelle_chi_corpus) |> 
@@ -202,6 +202,8 @@ readxl::read_xlsx("kirikou_annotations.xlsx", sheet = "folktales Kpelle adults")
   kpelle_corpus
 
 rm(kpelle_chi_corpus)
+
+people_text_color_k <- colors_m[c(rep(5, 2), rep(4, 5))]
 ```
 
 ## Общая информация про корпус 
@@ -459,6 +461,7 @@ tense_k |>
   geom_label(position = position_fill(vjust = 0.5), fill = "white") +
   scale_x_continuous(label = scales::percent) +
   labs(x = NULL, y = NULL, fill = NULL) +
+  theme(axis.text.y = element_text(colour = people_text_color_k)) +
   guides(color = "none")
 ```
 
@@ -527,6 +530,7 @@ tense_without_RS_k |>
   geom_label(position = position_fill(vjust = 0.5), fill = "white") +
   scale_x_continuous(label = scales::percent) +
   labs(x = NULL, y = NULL, fill = NULL) + 
+  theme(axis.text.y = element_text(colour = people_text_color_k)) +
   guides(color = "none")
 ```
 
@@ -667,6 +671,7 @@ kpelle_corpus |>
          new_source = fct_inorder(new_source)) |> 
   ggplot(aes(ratio, new_source, fill = group_var)) +
   geom_col() +
+  scale_fill_manual(values = colors_m[c(4, 5)]) +
   labs(y = NULL,
        x = "ratio of RES, PHAS or RETR forms",
        fill = NULL)
@@ -754,6 +759,7 @@ kpelle_corpus |>
          new_source = fct_inorder(new_source)) |> 
   ggplot(aes(ratio, new_source, fill = group_var)) +
   geom_col() +
+  scale_fill_manual(values = colors_m[c(4, 5)]) +
   labs(y = NULL,
        x = "ratio of DUR or STATni forms",
        fill = NULL)
@@ -794,6 +800,7 @@ kpelle_corpus |>
   geom_col(aes(fill = dur_ext)) +
   geom_label(position = position_fill(vjust = 0.5), fill = "white") +
   scale_x_continuous(label = scales::percent) +
+  theme(axis.text.y = element_text(colour = people_text_color_k)) +
   labs(x = NULL, y = NULL, fill = NULL, color = NULL) +
   guides(color="none")
 ```
@@ -879,7 +886,8 @@ kpelle_corpus |>
          new_source = fct_inorder(new_source)) |> 
   ggplot(aes(ratio, new_source, fill = group_var))+
   geom_col()+
-  labs(y = NULL, fill = NULL)
+  labs(y = NULL, fill = NULL) +
+  scale_fill_manual(values = colors_m[c(4, 5)])
 ```
 
 ## PURP
@@ -926,7 +934,8 @@ kpelle_corpus |>
   geom_col() +
   labs(y = NULL,
        x = "ratio of PURP",
-       fill = NULL)
+       fill = NULL) +
+  scale_fill_manual(values = colors_m[c(4, 5)])
 ```
 
 ## COND
@@ -973,7 +982,8 @@ mano_corpus |>
   select(new_source, age, group_var, chunk_structure) |> 
   mutate(jnt_say = str_count(chunk_structure, "JNT\\.SAY"),
          jnt = str_count(chunk_structure, "JNT")-jnt_say,
-         ratio = jnt/(jnt+jnt_say)) |> 
+         ratio = jnt/(jnt+jnt_say),
+         ratio = if_else(is.nan(ratio), 0, ratio)) |> 
   arrange(ratio) |> 
   mutate(age2 = if_else(age == 100, "ad", as.character(age)),
          new_source = str_c(new_source, " (", age2, ")"),
@@ -982,7 +992,8 @@ mano_corpus |>
   geom_col() +
   labs(y = NULL,
        x = "ratio of JNT",
-       fill = NULL)
+       fill = NULL) +
+  scale_fill_manual(values = colors_m[c(4, 5, 1, 2, 3)])
 ```
 
 > Visualize ratios of jnt.say vs other.say
@@ -1078,7 +1089,8 @@ kpelle_corpus |>
   geom_col() +
   labs(y = NULL,
        x = "ratio of QUOT",
-       fill = NULL)
+       fill = NULL) + 
+  scale_fill_manual(values = colors_m[c(4, 5)])
 ```
 
 > Visualize ratios of jnt vs quot + jnt.say
@@ -1107,7 +1119,8 @@ kpelle_corpus |>
   geom_col() +
   labs(y = NULL,
        x = "ratio of JNT",
-       fill = NULL)
+       fill = NULL) + 
+  scale_fill_manual(values = colors_m[c(4, 5)])
 ```
 
 > Visualize ratios of quot+jnt.say vs other.say
@@ -1136,7 +1149,8 @@ kpelle_corpus |>
   geom_col() +
   labs(y = NULL,
        x = "ratio of JNT.SAY or QUOT",
-       fill = NULL)
+       fill = NULL) + 
+  scale_fill_manual(values = colors_m[c(4, 5)])
 ```
 
 > Visualize ratios quot + different .say constructions (visualize like the initial visualisations in the paper, with a color plot) 
@@ -1174,9 +1188,9 @@ kpelle_corpus |>
   geom_label(position = position_fill(vjust = 0.5), fill = "white") +
   scale_x_continuous(label = scales::percent) +
   labs(x = NULL, y = NULL, fill = NULL, color = NULL) +
-  guides(color="none")
+  guides(color="none") +
+  theme(axis.text.y = element_text(colour = people_text_color_k))
 ```
-
 
 ## reference tracking
 
@@ -1234,7 +1248,8 @@ kpelle_corpus |>
   geom_col() +
   labs(y = NULL,
        x = "ratio of CR",
-       fill = NULL)
+       fill = NULL) +
+  scale_fill_manual(values = colors_m[c(4, 5)])
 ```
 
 ## complex syntax
@@ -1756,7 +1771,8 @@ kpelle_corpus |>
   geom_col()+
   facet_wrap(~type, nrow = 1, scales = "free")+
   labs(y = NULL, x = "ratio", fill = NULL) +
-  scale_y_reordered()
+  scale_y_reordered() +
+  scale_fill_manual(values = colors_m[c(4, 5)])
 
 prefix <- "rel"
 
@@ -1786,7 +1802,8 @@ kpelle_corpus |>
   ggplot(aes(value, new_source, fill = group_var))+
   geom_col()+
   facet_wrap(~type, nrow = 1, scales = "free")+
-  scale_y_reordered()
+  scale_y_reordered() +
+  scale_fill_manual(values = colors_m[c(4, 5)])
 
 prefix <- "temp"
 
@@ -1817,7 +1834,8 @@ kpelle_corpus |>
   geom_col()+
   facet_wrap(~type, nrow = 1, scales = "free")+
   labs(y = NULL, x = "ratio", fill = NULL) +
-  scale_y_reordered()
+  scale_y_reordered() +
+  scale_fill_manual(values = colors_m[c(4, 5)])
 
 prefix <- "cond"
 
@@ -1848,7 +1866,8 @@ kpelle_corpus |>
   geom_col()+
   facet_wrap(~type, nrow = 1, scales = "free")+
   labs(y = NULL, x = "ratio", fill = NULL) +
-  scale_y_reordered()
+  scale_y_reordered() +
+  scale_fill_manual(values = colors_m[c(4, 5)])
 
 prefix <- "purp"
 
@@ -1879,7 +1898,8 @@ kpelle_corpus |>
   geom_col()+
   facet_wrap(~type, nrow = 1, scales = "free")+
   labs(y = NULL, x = "ratio", fill = NULL) +
-  scale_y_reordered()
+  scale_y_reordered() +
+  scale_fill_manual(values = colors_m[c(4, 5)])
 
 prefix <- "prec"
 
@@ -1910,7 +1930,8 @@ kpelle_corpus |>
   geom_col()+
   facet_wrap(~type, nrow = 1, scales = "free")+
   labs(y = NULL, x = "ratio", fill = NULL) +
-  scale_y_reordered()
+  scale_y_reordered() +
+  scale_fill_manual(values = colors_m[c(4, 5)])
 
 prefix <- "compar"
 
@@ -1941,7 +1962,8 @@ kpelle_corpus |>
   geom_col()+
   facet_wrap(~type, nrow = 1, scales = "free")+
   labs(y = NULL, x = "ratio", fill = NULL) +
-  scale_y_reordered()
+  scale_y_reordered() +
+  scale_fill_manual(values = colors_m[c(4, 5)])
 
 prefix <- "mod"
 
@@ -1972,7 +1994,8 @@ kpelle_corpus |>
   geom_col()+
   facet_wrap(~type, nrow = 1, scales = "free")+
   labs(y = NULL, x = "ratio", fill = NULL) +
-  scale_y_reordered()
+  scale_y_reordered() +
+  scale_fill_manual(values = colors_m[c(4, 5)])
 
 prefix <- "sa"
 
@@ -2003,7 +2026,8 @@ kpelle_corpus |>
   geom_col()+
   facet_wrap(~type, nrow = 1, scales = "free")+
   labs(y = NULL, x = "ratio", fill = NULL) +
-  scale_y_reordered()
+  scale_y_reordered() +
+  scale_fill_manual(values = colors_m[c(4, 5)])
 
 prefix <- "le"
 
@@ -2034,7 +2058,8 @@ kpelle_corpus |>
   geom_col()+
   facet_wrap(~type, nrow = 1, scales = "free")+
   labs(y = NULL, x = "ratio", fill = NULL) +
-  scale_y_reordered()
+  scale_y_reordered() +
+  scale_fill_manual(values = colors_m[c(4, 5)])
 
 prefix <- "ht"
 
@@ -2065,7 +2090,8 @@ kpelle_corpus |>
   geom_col()+
   facet_wrap(~type, nrow = 1, scales = "free")+
   labs(y = NULL, x = "ratio", fill = NULL) +
-  scale_y_reordered()
+  scale_y_reordered() +
+  scale_fill_manual(values = colors_m[c(4, 5)])
 
 prefix <- "at"
 
@@ -2096,7 +2122,8 @@ kpelle_corpus |>
   geom_col()+
   facet_wrap(~type, nrow = 1, scales = "free")+
   labs(y = NULL, x = "ratio", fill = NULL) +
-  scale_y_reordered()
+  scale_y_reordered() +
+  scale_fill_manual(values = colors_m[c(4, 5)])
 
 prefix <- "top"
 
@@ -2127,7 +2154,8 @@ kpelle_corpus |>
   geom_col()+
   facet_wrap(~type, nrow = 1, scales = "free")+
   labs(y = NULL, x = "ratio", fill = NULL) +
-  scale_y_reordered()
+  scale_y_reordered() +
+  scale_fill_manual(values = colors_m[c(4, 5)])
 
 prefix <- "voc"
 
@@ -2158,5 +2186,6 @@ kpelle_corpus |>
   geom_col()+
   facet_wrap(~type, nrow = 1, scales = "free")+
   labs(y = NULL, x = "ratio", fill = NULL) +
-  scale_y_reordered()
+  scale_y_reordered() +
+  scale_fill_manual(values = colors_m[c(4, 5)])
 ```
