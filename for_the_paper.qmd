@@ -603,7 +603,7 @@ percantage_res_phas_retr_m <- round((res_phas_retr_sum_m)/n_predecations_without
 
 ```{r}
 mano_corpus |> 
-  select(new_source, group_var, chunk_structure) |> 
+  select(new_source, age, group_var, chunk_structure) |> 
   mutate(chunk_structure = str_remove_all(chunk_structure, "rs%.*?%"),
          res = str_count(chunk_structure, "RES"),
          phas = str_count(chunk_structure, "PHAS"),
@@ -612,7 +612,9 @@ mano_corpus |>
          n_predecations = str_count(chunk_structure, "\\["),
          ratio = res_phas_retr/n_predecations) |> 
   arrange(ratio) |> 
-  mutate(new_source = fct_inorder(new_source)) |> 
+  mutate(age2 = if_else(age == 100, "ad", as.character(age)),
+         new_source = str_c(new_source, " (", age2, ")"),
+         new_source = fct_inorder(new_source)) |> 
   ggplot(aes(ratio, new_source, fill = group_var)) +
   geom_col() +
   labs(y = NULL,
@@ -651,7 +653,7 @@ percantage_res_impf_retr_k <- round((res_impf_retr_sum_k)/n_predecations_without
 
 ```{r}
 kpelle_corpus |> 
-  select(new_source, group_var, chunk_structure) |> 
+  select(new_source, age, group_var, chunk_structure) |> 
   mutate(chunk_structure = str_remove_all(chunk_structure, "rs%.*?%"),
          res = str_count(chunk_structure, "RES"),
          impf = str_count(chunk_structure, "IMPF"),
@@ -660,7 +662,8 @@ kpelle_corpus |>
          n_predecations = str_count(chunk_structure, "\\["),
          ratio = res_impf_retr/n_predecations) |> 
   arrange(ratio) |> 
-  mutate(new_source = fct_inorder(new_source)) |> 
+  mutate(new_source = str_c(new_source, " (", age, ")"),
+         new_source = fct_inorder(new_source)) |> 
   ggplot(aes(ratio, new_source, fill = group_var)) +
   geom_col() +
   labs(y = NULL,
@@ -676,13 +679,15 @@ kpelle_corpus |>
 
 ```{r}
 mano_corpus |> 
-  select(new_source, group_var, chunk_structure) |> 
+  select(new_source, age, group_var, chunk_structure) |> 
   mutate(chunk_structure = str_remove_all(chunk_structure, "rs%.*?%"),
          dur = str_count(chunk_structure, "DUR"),
          n_predecations = str_count(chunk_structure, "\\["),
          ratio = dur/n_predecations) |> 
   arrange(ratio) |> 
-  mutate(new_source = fct_inorder(new_source)) |> 
+  mutate(age2 = if_else(age == 100, "ad", as.character(age)),
+         new_source = str_c(new_source, " (", age2, ")"),
+         new_source = fct_inorder(new_source)) |> 
   ggplot(aes(ratio, new_source, fill = group_var)) +
   geom_col() +
   labs(y = NULL,
@@ -736,14 +741,15 @@ mano_corpus |>
 
 ```{r}
 kpelle_corpus |> 
-  select(new_source, group_var, chunk_structure) |> 
+  select(new_source, age, group_var, chunk_structure) |> 
   mutate(chunk_structure = str_remove_all(chunk_structure, "rs%.*?%"),
          dur = str_count(chunk_structure, "DUR"),
          statni = str_count(chunk_structure, "STATni"),
          n_predecations = str_count(chunk_structure, "\\["),
          ratio = (dur+statni)/n_predecations) |> 
   arrange(ratio) |> 
-  mutate(new_source = fct_inorder(new_source)) |> 
+  mutate(new_source = str_c(new_source, " (", age, ")"),
+         new_source = fct_inorder(new_source)) |> 
   ggplot(aes(ratio, new_source, fill = group_var)) +
   geom_col() +
   labs(y = NULL,
@@ -788,4 +794,87 @@ kpelle_corpus |>
   scale_x_continuous(label = scales::percent) +
   labs(x = NULL, y = NULL, fill = NULL, color = NULL) +
   guides(color="none")
+```
+
+## Complex syntax
+
+### Mano
+
+> Mano: visualize subset of complex syntax: the ratio of  prefixes (temp, prec, cond, comme, tail-head, ht[, ht{), + glosses (COND, not the macrocategory but only the gloss) + "clause-final ā as the only marker of subordination" (search in the comment field, column AA) to all predications, without filtering RS
+
+```{r}
+mano_corpus |> 
+  select(new_source, age, group_var, chunk_structure, comment) |> 
+  mutate(temp = str_count(chunk_structure, "temp"),
+         prec = str_count(chunk_structure, "prec"),
+         cond = str_count(chunk_structure, "cond"),
+         tail_head = str_count(chunk_structure, "tail-head"),
+         ht = str_count(chunk_structure, "ht[\\[\\{]"),
+         cond = str_count(chunk_structure, "COND"),
+         clause_final_a = str_count(comment, "clause-final ā as the only marker of subordination"),
+         sum_of_all = temp+prec+cond+tail_head+ht+cond+clause_final_a,
+         n_predecations = str_count(chunk_structure, "\\["),
+         ratio = sum_of_all/n_predecations) |> 
+  select(-comment, -chunk_structure)
+
+mano_corpus |> 
+  select(new_source, age, group_var, chunk_structure, comment) |> 
+  mutate(temp = str_count(chunk_structure, "temp"),
+         prec = str_count(chunk_structure, "prec"),
+         cond = str_count(chunk_structure, "cond"),
+         tail_head = str_count(chunk_structure, "tail-head"),
+         ht = str_count(chunk_structure, "ht[\\[\\{]"),
+         cond = str_count(chunk_structure, "COND"),
+         clause_final_a = str_count(comment, "clause-final ā as the only marker of subordination"),
+         sum_of_all = temp+prec+cond+tail_head+ht+cond+clause_final_a,
+         n_predecations = str_count(chunk_structure, "\\["),
+         ratio = sum_of_all/n_predecations) |> 
+  select(-comment, -chunk_structure) |> 
+  arrange(ratio) |> 
+  mutate(age2 = if_else(age == 100, "ad", as.character(age)),
+         new_source = str_c(new_source, " (", age2, ")"),
+         new_source = fct_inorder(new_source)) |> 
+  ggplot(aes(ratio, new_source, fill = group_var))+
+  geom_col()+
+  labs(y = NULL, fill = NULL)
+```
+
+### Kpelle
+
+> Kpelle:  visualize subset of complex syntax: the ratio of prefixes (temp, comme, cond, tail-head, ht[, ht{ ) + glosses (COND) + clause-final í (search cells containing "clause-final í as the only marker of subordination" in column AA) to all predications, without filtering RS
+
+```{r}
+kpelle_corpus |> 
+  select(new_source, age, group_var, chunk_structure, comment) |> 
+  mutate(temp = str_count(chunk_structure, "temp"),
+         comme = str_count(chunk_structure, "comme"),
+         cond = str_count(chunk_structure, "cond"),
+         tail_head = str_count(chunk_structure, "tail-head"),
+         ht = str_count(chunk_structure, "ht[\\[\\{]"),
+         cond = str_count(chunk_structure, "COND"),
+         clause_final_i = str_count(comment, "clause-final i"),
+         sum_of_all = temp+comme+cond+tail_head+ht+cond+clause_final_i,
+         n_predecations = str_count(chunk_structure, "\\["),
+         ratio = sum_of_all/n_predecations) |> 
+  select(-comment, -chunk_structure)
+
+kpelle_corpus |> 
+  select(new_source, age, group_var, chunk_structure, comment) |> 
+  mutate(temp = str_count(chunk_structure, "temp"),
+         comme = str_count(chunk_structure, "comme"),
+         cond = str_count(chunk_structure, "cond"),
+         tail_head = str_count(chunk_structure, "tail-head"),
+         ht = str_count(chunk_structure, "ht[\\[\\{]"),
+         cond = str_count(chunk_structure, "COND"),
+         clause_final_i = str_count(comment, "clause-final i"),
+         sum_of_all = temp+comme+cond+tail_head+ht+cond+clause_final_i,
+         n_predecations = str_count(chunk_structure, "\\["),
+         ratio = sum_of_all/n_predecations) |> 
+  select(-comment, -chunk_structure) |> 
+  arrange(ratio) |> 
+  mutate(new_source = str_c(new_source, " (", age, ")"),
+         new_source = fct_inorder(new_source)) |> 
+  ggplot(aes(ratio, new_source, fill = group_var))+
+  geom_col()+
+  labs(y = NULL, fill = NULL)
 ```
