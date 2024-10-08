@@ -1078,14 +1078,15 @@ mano_corpus |>
 kpelle_corpus |> 
   select(new_source, age, group_var, chunk_structure) |> 
   mutate(jnt_say = str_count(chunk_structure, "JNT\\.SAY"),
-         quot = str_count(chunk_structure, "quot"),
+         quot = str_count(chunk_structure, "QUOT"),
          ratio = quot/(quot+jnt_say)) |> 
+  select(-chunk_structure) |> 
   arrange(ratio) 
 
 kpelle_corpus |> 
   select(new_source, age, group_var, chunk_structure) |> 
   mutate(jnt_say = str_count(chunk_structure, "JNT\\.SAY"),
-         quot = str_count(chunk_structure, "quot"),
+         quot = str_count(chunk_structure, "QUOT"),
          ratio = jnt_say/(quot+jnt_say),
          ratio = if_else(is.nan(ratio), 0, ratio)) |> 
   arrange(ratio) |> 
@@ -1106,16 +1107,17 @@ kpelle_corpus |>
   select(new_source, age, group_var, chunk_structure) |> 
   mutate(jnt_say = str_count(chunk_structure, "JNT\\.SAY"),
          jnt = str_count(chunk_structure, "JNT"),
-         quot = str_count(chunk_structure, "quot"),
+         quot = str_count(chunk_structure, "QUOT"),
          ratio = (jnt_say+quot)/(quot+jnt),
          ratio = if_else(is.nan(ratio), 0, ratio)) |> 
+  select(-chunk_structure) |> 
   arrange(ratio) 
 
 kpelle_corpus |> 
   select(new_source, age, group_var, chunk_structure) |> 
   mutate(jnt_say = str_count(chunk_structure, "JNT\\.SAY"),
          jnt = str_count(chunk_structure, "JNT"),
-         quot = str_count(chunk_structure, "quot"),
+         quot = str_count(chunk_structure, "QUOT"),
          ratio = (jnt_say+quot)/(quot+jnt),
          ratio = if_else(is.nan(ratio), 0, ratio)) |> 
   arrange(ratio) |>  
@@ -1136,16 +1138,17 @@ kpelle_corpus |>
   select(new_source, age, group_var, chunk_structure) |> 
   mutate(jnt_say = str_count(chunk_structure, "JNT\\.SAY"),
          says = str_count(chunk_structure, "SAY"),
-         quot = str_count(chunk_structure, "quot"),
+         quot = str_count(chunk_structure, "QUOT"),
          ratio = (quot+jnt_say) /(says),
          ratio = if_else(is.nan(ratio), 0, ratio)) |> 
+  select(-chunk_structure) |> 
   arrange(ratio) 
 
 kpelle_corpus |> 
   select(new_source, age, group_var, chunk_structure) |> 
   mutate(jnt_say = str_count(chunk_structure, "JNT\\.SAY"),
          says = str_count(chunk_structure, "SAY"),
-         quot = str_count(chunk_structure, "quot"),
+         quot = str_count(chunk_structure, "QUOT"),
          ratio = (quot+jnt_say) /(says),
          ratio = if_else(is.nan(ratio), 0, ratio)) |> 
   arrange(ratio)  |>  
