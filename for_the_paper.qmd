@@ -1087,7 +1087,7 @@ kpelle_corpus |>
   select(new_source, age, group_var, chunk_structure) |> 
   mutate(jnt_say = str_count(chunk_structure, "JNT\\.SAY"),
          quot = str_count(chunk_structure, "QUOT"),
-         ratio = jnt_say/(quot+jnt_say),
+         ratio = quot/(quot+jnt_say),
          ratio = if_else(is.nan(ratio), 0, ratio)) |> 
   arrange(ratio) |> 
   mutate(new_source = str_c(new_source, " (", age, ")"),
