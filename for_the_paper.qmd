@@ -995,7 +995,7 @@ mano_corpus |>
   ggplot(aes(ratio, new_source, fill = group_var)) +
   geom_col() +
   labs(y = NULL,
-       x = "ratio of JNT",
+       x = "ratio of JNT.SAY",
        fill = NULL) +
   scale_fill_manual(values = colors_m[c(4, 5, 1, 2, 3)]) +
   guides(fill=guide_legend(nrow=2, byrow=TRUE))
@@ -1024,7 +1024,7 @@ mano_corpus |>
   ggplot(aes(ratio, new_source, fill = group_var)) +
   geom_col() +
   labs(y = NULL,
-       x = "ratio of JNT",
+       x = "ratio of JNT.SAY",
        fill = NULL) +
   scale_fill_manual(values = colors_m[c(4, 5, 1, 2, 3)]) +
   guides(fill=guide_legend(nrow=2, byrow=TRUE))
@@ -1095,7 +1095,7 @@ kpelle_corpus |>
   ggplot(aes(ratio, new_source, fill = group_var)) +
   geom_col() +
   labs(y = NULL,
-       x = "ratio of QUOT",
+       x = "ratio of JNT.SAY",
        fill = NULL) + 
   scale_fill_manual(values = colors_m[c(4, 5)])
 ```
@@ -1126,7 +1126,7 @@ kpelle_corpus |>
   ggplot(aes(ratio, new_source, fill = group_var)) +
   geom_col() +
   labs(y = NULL,
-       x = "ratio of JNT",
+       x = "ratio of JNT.SAY+QUOT",
        fill = NULL) + 
   scale_fill_manual(values = colors_m[c(4, 5)])
 ```
@@ -1157,7 +1157,7 @@ kpelle_corpus |>
   ggplot(aes(ratio, new_source, fill = group_var)) +
   geom_col() +
   labs(y = NULL,
-       x = "ratio of JNT.SAY or QUOT",
+       x = "ratio of JNT.SAY + QUOT",
        fill = NULL) + 
   scale_fill_manual(values = colors_m[c(4, 5)])
 ```
