@@ -1095,7 +1095,7 @@ kpelle_corpus |>
   ggplot(aes(ratio, new_source, fill = group_var)) +
   geom_col() +
   labs(y = NULL,
-       x = "ratio of JNT.SAY",
+       x = "ratio of QUOT",
        fill = NULL) + 
   scale_fill_manual(values = colors_m[c(4, 5)])
 ```
