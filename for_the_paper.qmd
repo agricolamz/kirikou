@@ -972,7 +972,7 @@ kpelle_corpus |>
 
 ### Mano
 
-> Visualize ratios of jnt vs jnt.say
+> Visualize ratios of jnt.say vs jnt
 
 ```{r}
 mano_corpus |> 
@@ -1100,7 +1100,7 @@ kpelle_corpus |>
   scale_fill_manual(values = colors_m[c(4, 5)])
 ```
 
-> Visualize ratios of quot + jnt.say vs jnt 
+> Visualize ratios of quot + jnt.say vs jnt
 
 ```{r}
 kpelle_corpus |> 
