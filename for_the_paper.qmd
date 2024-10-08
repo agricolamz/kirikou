@@ -624,7 +624,8 @@ mano_corpus |>
   labs(y = NULL,
        x = "ratio of RES, PHAS or RETR forms",
        fill = NULL)+
-  scale_fill_manual(values = colors_m[c(4, 5, 1, 2, 3)])
+  scale_fill_manual(values = colors_m[c(4, 5, 1, 2, 3)]) +
+  guides(fill=guide_legend(nrow=2, byrow=TRUE))
 ```
 
 ### Kpelle
@@ -699,7 +700,8 @@ mano_corpus |>
   labs(y = NULL,
        x = "ratio of DUR forms",
        fill = NULL)+
-  scale_fill_manual(values = colors_m[c(4, 5, 1, 2, 3)])
+  scale_fill_manual(values = colors_m[c(4, 5, 1, 2, 3)]) +
+  guides(fill=guide_legend(nrow=2, byrow=TRUE))
 ```
 
 > Mano & Kpelle: visualize which TAMP constructions are used with DUR (check all forms that have the _DUR extension, such as PST_DUR, separate DUR and regroup the remainder of the forms in the same way as you did when visualizing tense diversity)
@@ -846,7 +848,8 @@ mano_corpus |>
   ggplot(aes(ratio, new_source, fill = group_var))+
   geom_col()+
   labs(y = NULL, fill = NULL) +
-  scale_fill_manual(values = colors_m[c(4, 5, 1, 2, 3)])
+  scale_fill_manual(values = colors_m[c(4, 5, 1, 2, 3)])  +
+  guides(fill=guide_legend(nrow=2, byrow=TRUE))
 ```
 
 ### Kpelle
@@ -912,7 +915,8 @@ mano_corpus |>
   labs(y = NULL,
        x = "ratio of PURP",
        fill = NULL) +
-  scale_fill_manual(values = colors_m[c(4, 5, 1, 2, 3)])
+  scale_fill_manual(values = colors_m[c(4, 5, 1, 2, 3)]) +
+  guides(fill=guide_legend(nrow=2, byrow=TRUE))
 ```
 
 ### Kpelle
@@ -993,7 +997,8 @@ mano_corpus |>
   labs(y = NULL,
        x = "ratio of JNT",
        fill = NULL) +
-  scale_fill_manual(values = colors_m[c(4, 5, 1, 2, 3)])
+  scale_fill_manual(values = colors_m[c(4, 5, 1, 2, 3)]) +
+  guides(fill=guide_legend(nrow=2, byrow=TRUE))
 ```
 
 > Visualize ratios of jnt.say vs other.say
@@ -1021,7 +1026,8 @@ mano_corpus |>
   labs(y = NULL,
        x = "ratio of JNT",
        fill = NULL) +
-  scale_fill_manual(values = colors_m[c(4, 5, 1, 2, 3)])
+  scale_fill_manual(values = colors_m[c(4, 5, 1, 2, 3)]) +
+  guides(fill=guide_legend(nrow=2, byrow=TRUE))
 ```
 
 > Visualize different .say constructions (visualize like the initial visualisations in the paper, with a color plot)
@@ -1220,7 +1226,8 @@ mano_corpus |>
   labs(y = NULL,
        x = "ratio of CR",
        fill = NULL) +
-  scale_fill_manual(values = colors_m[c(4, 5, 1, 2, 3)])
+  scale_fill_manual(values = colors_m[c(4, 5, 1, 2, 3)]) +
+  guides(fill=guide_legend(nrow=2, byrow=TRUE))
 ```
 
 
@@ -1307,7 +1314,8 @@ mano_corpus |>
   facet_wrap(~type, nrow = 1, scales = "free")+
   scale_y_reordered() +
   labs(y = NULL, x = "ratio", fill = NULL) +
-  scale_fill_manual(values = colors_m[c(4, 5, 1, 2, 3)])
+  scale_fill_manual(values = colors_m[c(4, 5, 1, 2, 3)]) +
+  guides(fill=guide_legend(nrow=2, byrow=TRUE))
 
 prefix <- "rel"
 
@@ -1339,7 +1347,8 @@ mano_corpus |>
   facet_wrap(~type, nrow = 1, scales = "free")+
   labs(y = NULL, x = "ratio", fill = NULL) +
   scale_y_reordered() +
-  scale_fill_manual(values = colors_m[c(4, 5, 1, 2, 3)])
+  scale_fill_manual(values = colors_m[c(4, 5, 1, 2, 3)]) +
+  guides(fill=guide_legend(nrow=2, byrow=TRUE))
 
 prefix <- "temp"
 
@@ -1371,7 +1380,8 @@ mano_corpus |>
   facet_wrap(~type, nrow = 1, scales = "free")+
   labs(y = NULL, x = "ratio", fill = NULL) +
   scale_y_reordered() +
-  scale_fill_manual(values = colors_m[c(4, 5, 1, 2, 3)])
+  scale_fill_manual(values = colors_m[c(4, 5, 1, 2, 3)]) +
+  guides(fill=guide_legend(nrow=2, byrow=TRUE))
 
 prefix <- "cond"
 
@@ -1403,7 +1413,8 @@ mano_corpus |>
   facet_wrap(~type, nrow = 1, scales = "free")+
   labs(y = NULL, x = "ratio", fill = NULL) +
   scale_y_reordered() +
-  scale_fill_manual(values = colors_m[c(4, 5, 1, 2, 3)])
+  scale_fill_manual(values = colors_m[c(4, 5, 1, 2, 3)]) +
+  guides(fill=guide_legend(nrow=2, byrow=TRUE))
 
 prefix <- "purp"
 
@@ -1435,7 +1446,8 @@ mano_corpus |>
   facet_wrap(~type, nrow = 1, scales = "free")+
   labs(y = NULL, x = "ratio", fill = NULL) +
   scale_y_reordered() +
-  scale_fill_manual(values = colors_m[c(4, 5, 1, 2, 3)])
+  scale_fill_manual(values = colors_m[c(4, 5, 1, 2, 3)]) +
+  guides(fill=guide_legend(nrow=2, byrow=TRUE))
 
 prefix <- "prec"
 
@@ -1467,7 +1479,8 @@ mano_corpus |>
   facet_wrap(~type, nrow = 1, scales = "free")+
   labs(y = NULL, x = "ratio", fill = NULL) +
   scale_y_reordered() +
-  scale_fill_manual(values = colors_m[c(4, 5, 1, 2, 3)])
+  scale_fill_manual(values = colors_m[c(4, 5, 1, 2, 3)]) +
+  guides(fill=guide_legend(nrow=2, byrow=TRUE))
 
 prefix <- "compar"
 
@@ -1499,7 +1512,8 @@ mano_corpus |>
   facet_wrap(~type, nrow = 1, scales = "free")+
   labs(y = NULL, x = "ratio", fill = NULL) +
   scale_y_reordered() +
-  scale_fill_manual(values = colors_m[c(4, 5, 1, 2, 3)])
+  scale_fill_manual(values = colors_m[c(4, 5, 1, 2, 3)]) +
+  guides(fill=guide_legend(nrow=2, byrow=TRUE))
 
 prefix <- "mod"
 
@@ -1531,7 +1545,8 @@ mano_corpus |>
   facet_wrap(~type, nrow = 1, scales = "free")+
   labs(y = NULL, x = "ratio", fill = NULL) +
   scale_y_reordered() +
-  scale_fill_manual(values = colors_m[c(4, 5, 1, 2, 3)])
+  scale_fill_manual(values = colors_m[c(4, 5, 1, 2, 3)]) +
+  guides(fill=guide_legend(nrow=2, byrow=TRUE))
 
 prefix <- "sa"
 
@@ -1563,7 +1578,8 @@ mano_corpus |>
   facet_wrap(~type, nrow = 1, scales = "free")+
   labs(y = NULL, x = "ratio", fill = NULL) +
   scale_y_reordered() +
-  scale_fill_manual(values = colors_m[c(4, 5, 1, 2, 3)])
+  scale_fill_manual(values = colors_m[c(4, 5, 1, 2, 3)]) +
+  guides(fill=guide_legend(nrow=2, byrow=TRUE))
 
 prefix <- "le"
 
@@ -1595,7 +1611,8 @@ mano_corpus |>
   facet_wrap(~type, nrow = 1, scales = "free")+
   scale_y_reordered()  +
   labs(y = NULL, x = "ratio", fill = NULL) +
-  scale_fill_manual(values = colors_m[c(4, 5, 1, 2, 3)])
+  scale_fill_manual(values = colors_m[c(4, 5, 1, 2, 3)]) +
+  guides(fill=guide_legend(nrow=2, byrow=TRUE))
 
 prefix <- "ht"
 
@@ -1627,7 +1644,8 @@ mano_corpus |>
   facet_wrap(~type, nrow = 1, scales = "free")+
   scale_y_reordered()  +
   labs(y = NULL, x = "ratio", fill = NULL) +
-  scale_fill_manual(values = colors_m[c(4, 5, 1, 2, 3)])
+  scale_fill_manual(values = colors_m[c(4, 5, 1, 2, 3)]) +
+  guides(fill=guide_legend(nrow=2, byrow=TRUE))
 
 prefix <- "at"
 
@@ -1659,7 +1677,8 @@ mano_corpus |>
   facet_wrap(~type, nrow = 1, scales = "free")+
   scale_y_reordered() +
   labs(y = NULL, x = "ratio", fill = NULL) +
-  scale_fill_manual(values = colors_m[c(4, 5, 1, 2, 3)])
+  scale_fill_manual(values = colors_m[c(4, 5, 1, 2, 3)]) +
+  guides(fill=guide_legend(nrow=2, byrow=TRUE))
 
 prefix <- "top"
 
@@ -1691,7 +1710,8 @@ mano_corpus |>
   facet_wrap(~type, nrow = 1, scales = "free")+
   scale_y_reordered() +
   labs(y = NULL, x = "ratio", fill = NULL) +
-  scale_fill_manual(values = colors_m[c(4, 5, 1, 2, 3)])
+  scale_fill_manual(values = colors_m[c(4, 5, 1, 2, 3)]) +
+  guides(fill=guide_legend(nrow=2, byrow=TRUE))
 
 prefix <- "voc"
 
@@ -1723,7 +1743,8 @@ mano_corpus |>
   facet_wrap(~type, nrow = 1, scales = "free")+
   scale_y_reordered() +
   labs(y = NULL, x = "ratio", fill = NULL) +
-  scale_fill_manual(values = colors_m[c(4, 5, 1, 2, 3)])
+  scale_fill_manual(values = colors_m[c(4, 5, 1, 2, 3)]) +
+  guides(fill=guide_legend(nrow=2, byrow=TRUE))
 ```
 
 ### Kpelle
