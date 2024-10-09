@@ -951,7 +951,7 @@ kpelle_corpus |>
 
 ### Mano
 
-> Mano: visualize subset of complex syntax: the ratio of  prefixes (temp, prec, cond, comme, tail-head, ht[, ht{), + glosses (COND, not the macrocategory but only the gloss) + "clause-final ā as the only marker of subordination" (search in the comment field, column AA) to all predications, without filtering RS
+> Visualize subset of complex syntax: the ratio of  prefixes (temp, prec, cond, comme, tail-head, ht[, ht{, ht<NP.NMLZ> + glosses (COND, not the macrocategory but only the gloss) + "clause-final ā as the only marker of subordination" (search in the comment field, column AA) to all predications, without filtering RS
 
 ```{r}
 mano_corpus |> 
@@ -962,9 +962,10 @@ mano_corpus |>
          comme = str_count(chunk_structure, "comme"),
          tail_head = str_count(chunk_structure, "tail-head"),
          ht = str_count(chunk_structure, "ht[\\[\\{]"),
+         ht_np_nmlz = str_count(chunk_structure, "ht<NP.NMLZ>"),
          cond = str_count(chunk_structure, "COND"),
          clause_final_a = str_count(comment, "clause-final ā as the only marker of subordination"),
-         sum_of_all = temp+prec+cond+comme+tail_head+ht+cond+clause_final_a,
+         sum_of_all = temp+prec+cond+comme+tail_head+ht+ht_np_nmlz+cond+clause_final_a,
          n_predecations = str_count(chunk_structure, "\\["),
          ratio = sum_of_all/n_predecations) |> 
   select(-comment, -chunk_structure)
@@ -977,9 +978,10 @@ mano_corpus |>
          comme = str_count(chunk_structure, "comme"),
          tail_head = str_count(chunk_structure, "tail-head"),
          ht = str_count(chunk_structure, "ht[\\[\\{]"),
+         ht_np_nmlz = str_count(chunk_structure, "ht<NP.NMLZ>"),
          cond = str_count(chunk_structure, "COND"),
          clause_final_a = str_count(comment, "clause-final ā as the only marker of subordination"),
-         sum_of_all = temp+prec+cond+comme+tail_head+ht+cond+clause_final_a,
+         sum_of_all = temp+prec+cond+comme+tail_head+ht+ht_np_nmlz+cond+clause_final_a,
          n_predecations = str_count(chunk_structure, "\\["),
          ratio = sum_of_all/n_predecations) |> 
   select(-comment, -chunk_structure) |> 
@@ -1006,9 +1008,10 @@ kpelle_corpus |>
          cond = str_count(chunk_structure, "cond"),
          tail_head = str_count(chunk_structure, "tail-head"),
          ht = str_count(chunk_structure, "ht[\\[\\{]"),
+         ht_np_nmlz = str_count(chunk_structure, "ht<NP.NMLZ>"),
          cond = str_count(chunk_structure, "COND"),
          clause_final_i = str_count(comment, "clause-final i"),
-         sum_of_all = temp+comme+cond+tail_head+ht+cond+clause_final_i,
+         sum_of_all = temp+comme+cond+tail_head+ht+ht_np_nmlz+cond+clause_final_i,
          n_predecations = str_count(chunk_structure, "\\["),
          ratio = sum_of_all/n_predecations) |> 
   select(-comment, -chunk_structure)
@@ -1020,9 +1023,10 @@ kpelle_corpus |>
          cond = str_count(chunk_structure, "cond"),
          tail_head = str_count(chunk_structure, "tail-head"),
          ht = str_count(chunk_structure, "ht[\\[\\{]"),
+         ht_np_nmlz = str_count(chunk_structure, "ht<NP.NMLZ>"),
          cond = str_count(chunk_structure, "COND"),
          clause_final_i = str_count(comment, "clause-final i"),
-         sum_of_all = temp+comme+cond+tail_head+ht+cond+clause_final_i,
+         sum_of_all = temp+comme+cond+tail_head+ht+ht_np_nmlz+cond+clause_final_i,
          n_predecations = str_count(chunk_structure, "\\["),
          ratio = sum_of_all/n_predecations) |> 
   select(-comment, -chunk_structure) |> 
@@ -1040,15 +1044,16 @@ kpelle_corpus |>
 
 ### Mano
 
-> Mano & Kpelle: check purp (prefix) + PURP to all predications, without filtering
+> check purp (prefix) + PURP + mod to all predications, without filtering
 
 ```{r}
 mano_corpus |> 
   select(new_source, age, group_var, chunk_structure) |> 
   mutate(purp_gloss = str_count(chunk_structure, "PURP"),
          purp_prefix = str_count(chunk_structure, "purp"),
+         mod = str_count(chunk_structure, "mod"),
          n_predecations = str_count(chunk_structure, "\\["),
-         ratio = (purp_gloss+purp_prefix)/n_predecations) |> 
+         ratio = (purp_gloss+purp_prefix+mod)/n_predecations) |> 
   arrange(ratio) |> 
   mutate(age2 = if_else(age == 100, "ad", as.character(age)),
          new_source = str_c(new_source, " (", age2, ")"),
@@ -1064,15 +1069,16 @@ mano_corpus |>
 
 ### Kpelle
 
-> Mano & Kpelle: check purp (prefix) + PURP to all predications, without filtering
+> check purp (prefix) + PURP + mod to all predications, without filtering
 
 ```{r}
 kpelle_corpus |> 
   select(new_source, age, group_var, chunk_structure) |> 
   mutate(purp_gloss = str_count(chunk_structure, "PURP"),
-         purp_prefix = str_count(chunk_structure, "purp"),
+         purp_prefix = str_count(chunk_structure, "purp"), 
+         mod = str_count(chunk_structure, "mod"),
          n_predecations = str_count(chunk_structure, "\\["),
-         ratio = (purp_gloss+purp_prefix)/n_predecations) |> 
+         ratio = (purp_gloss+purp_prefix+mod)/n_predecations) |> 
   arrange(ratio) |> 
   mutate(age2 = if_else(age == 100, "ad", as.character(age)),
          new_source = str_c(new_source, " (", age2, ")"),
