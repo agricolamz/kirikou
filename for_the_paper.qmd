@@ -1232,7 +1232,9 @@ kpelle_corpus |>
   ungroup() |> 
   mutate(new_source = str_c(new_source, " (", age, ")"),
          new_source = fct_reorder(new_source, age),
-         label = str_c(round(ratio * 100), "%")) |>
+         label = str_c(round(ratio * 100), "%"),
+         says = fct_relevel(says, "JNT", after = 8),
+         says = fct_relevel(says, "QUOT", after = 7)) |>
   filter(ratio > 0) |>
   ggplot(aes(x = ratio, y = new_source, label = label, color = says)) +
   geom_col(aes(fill = says)) +
