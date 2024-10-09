@@ -980,6 +980,7 @@ mano_corpus |>
   mutate(jnt_say = str_count(chunk_structure, "JNT\\.SAY"),
          jnt = str_count(chunk_structure, "JNT"),
          ratio = jnt_say/jnt) |> 
+  select(-chunk_structure) |> 
   arrange(ratio) 
 
 mano_corpus |> 
@@ -1009,6 +1010,7 @@ mano_corpus |>
   mutate(jnt_say = str_count(chunk_structure, "JNT\\.SAY"),
          say = str_count(chunk_structure, "\\.SAY"),
          ratio = jnt_say/say) |> 
+  select(-chunk_structure) |> 
   arrange(ratio) 
 
 mano_corpus |> 
@@ -1041,7 +1043,38 @@ mano_corpus |>
   mutate(says = str_remove_all(says, "\\.SAY"),
          says = str_remove_all(says, "_")) |> 
   count(new_source, group_var, says) |> 
-  pivot_wider(names_from = says, values_from = n, values_fill = 0)
+  pivot_wider(names_from = says, values_from = n, values_fill = 0) 
+
+
+people_text_color_m_for_jnt_plot <- 
+  c(
+      colors_m[4], # s_7_t_1  folktales (adults)
+      colors_m[4], # s_7_t_2  folktales (adults)
+      colors_m[5], # s_14_t_1 folktales (children)
+      colors_m[3], # s_12_t_1 Kirikou (other)
+      colors_m[2], # s_17_t_1 Kirikou (Nzerekore): Mano
+      colors_m[5], # s_21_t_1 folktales (children)
+      colors_m[1], # s_20_t_1 Kirikou (Nzerekore): Bilingual
+      colors_m[4], # s_6_t_2  folktales (adults)
+      colors_m[3], # s_8_t_1  Kirikou (other)
+      colors_m[3], # s_3_t_1  Kirikou (other)
+      colors_m[5], # s_4_t_2  folktales (children)
+      colors_m[5], # s_14_t_3 folktales (children)
+      colors_m[1], # s_13_t_1 Kirikou (Nzerekore): Bilingual
+      colors_m[2], # s_11_t_1 Kirikou (Nzerekore): Mano
+      colors_m[5], # s_4_t_1  folktales (children)
+      colors_m[5], # s_4_t_3 folktales (children)
+      colors_m[5], # s_14_t_2 folktales (children)
+      colors_m[1], # s_4_t_4  Kirikou (Nzerekore): Bilingual
+      colors_m[3], # s_18_t_1 Kirikou (other)
+      colors_m[2], # s_5_t_1  Kirikou (Nzerekore): Mano
+      colors_m[4], # s_6_t_1  folktales (adults)
+      colors_m[2], # s_10_t_1 Kirikou (Nzerekore): Mano
+      colors_m[1], # s_15_t_1 Kirikou (Nzerekore): Bilingual
+      colors_m[3], # s_16_t_1 Kirikou (other)
+      colors_m[4], # s_19_t_1 folktales (adults)
+      colors_m[1] # s_9_t_1  Kirikou (Nzerekore): Bilingual
+  )
 
 mano_corpus |> 
   select(new_source, age, group_var, chunk_structure) |> 
@@ -1055,18 +1088,25 @@ mano_corpus |>
   mutate(total = sum(n),
          ratio = n/total) |> 
   select(-n, -total) |> 
+  pivot_wider(names_from = says, values_from = ratio, values_fill = 0) |> 
+  mutate(JNT_RATIO = JNT) |> 
+  pivot_longer(names_to = "says", values_to = "ratio", JNT:PRF) |> 
+  filter(ratio != 0) |> 
   ungroup() |> 
   mutate(age2 = if_else(age == 100, "ad", as.character(age)),
          new_source = str_c(new_source, " (", age2, ")"),
-         new_source = fct_reorder(new_source, age),
-         label = str_c(round(ratio * 100), "%")) |>
+         new_source = fct_reorder(new_source, JNT_RATIO),
+         label = str_c(round(ratio * 100), "%"),
+         says = fct_relevel(says, "JNT", after = 6),
+         says = fct_relevel(says, "IPFV", after = 5),
+         says = fct_relevel(says, "PST", after = 4)) |>
   filter(ratio > 0) |>
   ggplot(aes(x = ratio, y = new_source, label = label, color = says)) +
   geom_col(aes(fill = says)) +
   geom_label(position = position_fill(vjust = 0.5), fill = "white") +
   scale_x_continuous(label = scales::percent) +
   labs(x = NULL, y = NULL, fill = NULL, color = NULL) +
-  theme(axis.text.y = element_text(colour = people_text_color_m)) +
+  theme(axis.text.y = element_text(colour = people_text_color_m_for_jnt_plot)) +
   guides(color="none")
 ```
 
