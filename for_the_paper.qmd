@@ -449,7 +449,8 @@ tense_k |>
          ratio = n/total) |> 
   select(-n, -total) |> 
   ungroup() |> 
-  mutate(new_source = str_c(new_source, " (", age, ")"),
+  mutate(age2 = if_else(age > 20, "ad", as.character(age)),
+         new_source = str_c(new_source, " (", age2, ")"),
          new_source = fct_reorder(new_source, age),
          tense = factor(tense, levels = c("CONDs", "PROH or IMP", "non-past", 
                                           "NEG", "CONJ", "CONJ_PST", "PRF", 
@@ -517,7 +518,8 @@ tense_without_RS_k |>
          ratio = n/total) |> 
   select(-n, -total) |> 
   ungroup() |> 
-  mutate(new_source = str_c(new_source, " (", age, ")"),
+  mutate(age2 = if_else(age > 20, "ad", as.character(age)),
+         new_source = str_c(new_source, " (", age2, ")"),
          new_source = fct_reorder(new_source, age),
          tense = factor(tense, levels = c("PROH or IMP", "non-past", 
                                           "NEG", "CONDs", "PRF",
@@ -668,7 +670,8 @@ kpelle_corpus |>
          n_predecations = str_count(chunk_structure, "\\["),
          ratio = res_impf_retr/n_predecations) |> 
   arrange(ratio) |> 
-  mutate(new_source = str_c(new_source, " (", age, ")"),
+  mutate(age2 = if_else(age > 20, "ad", as.character(age)),
+         new_source = str_c(new_source, " (", age2, ")"),
          new_source = fct_inorder(new_source)) |> 
   ggplot(aes(ratio, new_source, fill = group_var)) +
   geom_col() +
@@ -757,7 +760,8 @@ kpelle_corpus |>
          n_predecations = str_count(chunk_structure, "\\["),
          ratio = (dur+statni)/n_predecations) |> 
   arrange(ratio) |> 
-  mutate(new_source = str_c(new_source, " (", age, ")"),
+  mutate(age2 = if_else(age > 20, "ad", as.character(age)),
+         new_source = str_c(new_source, " (", age2, ")"),
          new_source = fct_inorder(new_source)) |> 
   ggplot(aes(ratio, new_source, fill = group_var)) +
   geom_col() +
@@ -885,7 +889,8 @@ kpelle_corpus |>
          ratio = sum_of_all/n_predecations) |> 
   select(-comment, -chunk_structure) |> 
   arrange(ratio) |> 
-  mutate(new_source = str_c(new_source, " (", age, ")"),
+  mutate(age2 = if_else(age > 20, "ad", as.character(age)),
+         new_source = str_c(new_source, " (", age2, ")"),
          new_source = fct_inorder(new_source)) |> 
   ggplot(aes(ratio, new_source, fill = group_var))+
   geom_col()+
@@ -1130,7 +1135,8 @@ kpelle_corpus |>
          ratio = quot/(quot+jnt_say),
          ratio = if_else(is.nan(ratio), 0, ratio)) |> 
   arrange(ratio) |> 
-  mutate(new_source = str_c(new_source, " (", age, ")"),
+  mutate(age2 = if_else(age > 20, "ad", as.character(age)),
+         new_source = str_c(new_source, " (", age2, ")"),
          new_source = fct_inorder(new_source)) |> 
   ggplot(aes(ratio, new_source, fill = group_var)) +
   geom_col() +
@@ -1161,7 +1167,8 @@ kpelle_corpus |>
          ratio = (jnt_say+quot)/(quot+jnt),
          ratio = if_else(is.nan(ratio), 0, ratio)) |> 
   arrange(ratio) |>  
-  mutate(new_source = str_c(new_source, " (", age, ")"),
+  mutate(age2 = if_else(age > 20, "ad", as.character(age)),
+         new_source = str_c(new_source, " (", age2, ")"),
          new_source = fct_inorder(new_source)) |> 
   ggplot(aes(ratio, new_source, fill = group_var)) +
   geom_col() +
@@ -1194,7 +1201,8 @@ kpelle_corpus |>
          ratio = (quot+jnt_say) /(says),
          ratio = if_else(is.nan(ratio), 0, ratio)) |> 
   arrange(ratio)  |>  
-  mutate(new_source = str_c(new_source, " (", age, ")"),
+  mutate(age2 = if_else(age > 20, "ad", as.character(age)),
+         new_source = str_c(new_source, " (", age2, ")"),
          new_source = fct_inorder(new_source)) |> 
   ggplot(aes(ratio, new_source, fill = group_var)) +
   geom_col() +
@@ -1230,8 +1238,13 @@ kpelle_corpus |>
          ratio = n/total) |> 
   select(-n, -total) |> 
   ungroup() |> 
-  mutate(new_source = str_c(new_source, " (", age, ")"),
-         new_source = fct_reorder(new_source, age),
+  pivot_wider(names_from = says, values_from = ratio, values_fill = 0) |> 
+  mutate(QUOT_RATIO = QUOT) |> 
+  pivot_longer(names_to = "says", values_to = "ratio", QUOT:COND) |> 
+  filter(ratio != 0) |> 
+  mutate(age2 = if_else(age > 20, "ad", as.character(age)),
+         new_source = str_c(new_source, " (", age2, ")"),
+         new_source = fct_reorder(new_source, QUOT_RATIO),
          label = str_c(round(ratio * 100), "%"),
          says = fct_relevel(says, "JNT", after = 8),
          says = fct_relevel(says, "QUOT", after = 7)) |>
@@ -1242,7 +1255,7 @@ kpelle_corpus |>
   scale_x_continuous(label = scales::percent) +
   labs(x = NULL, y = NULL, fill = NULL, color = NULL) +
   guides(color="none") +
-  theme(axis.text.y = element_text(colour = people_text_color_k))
+  theme(axis.text.y = element_text(colour = people_text_color_k[c(1, 3, 3, 3, 3, 3, 1)]))
 ```
 
 ## reference tracking
@@ -1296,7 +1309,8 @@ kpelle_corpus |>
          sr = str_count(chunk_structure, "pro\\(SR\\)"),
          ratio = cr/(sr+cr)) |> 
   arrange(ratio)  |> 
-  mutate(new_source = str_c(new_source, " (", age, ")"),
+  mutate(age2 = if_else(age > 20, "ad", as.character(age)),
+         new_source = str_c(new_source, " (", age2, ")"),
          new_source = fct_inorder(new_source)) |> 
   ggplot(aes(ratio, new_source, fill = group_var)) +
   geom_col() +
@@ -1839,8 +1853,8 @@ kpelle_corpus |>
   mutate(type = case_when(type == "total" ~ str_c("overall ratio of ", prefix),
                           type == "ors" ~ str_c("ratio of ", prefix, " outside RS"),
                           type == "wrs" ~ str_c("ratio of ", prefix, " within RS"))) |> 
-  mutate(
-         new_source = str_c(new_source, " (", age, ")"),
+  mutate(age2 = if_else(age > 20, "ad", as.character(age)),
+         new_source = str_c(new_source, " (", age2, ")"),
          new_source = reorder_within(new_source, within = type, by = value)) |> 
   ggplot(aes(value, new_source, fill = group_var))+
   geom_col()+
@@ -1871,8 +1885,8 @@ kpelle_corpus |>
   mutate(type = case_when(type == "total" ~ str_c("overall ratio of ", prefix),
                           type == "ors" ~ str_c("ratio of ", prefix, " outside RS"),
                           type == "wrs" ~ str_c("ratio of ", prefix, " within RS"))) |> 
-  mutate(
-         new_source = str_c(new_source, " (", age, ")"),
+  mutate(age2 = if_else(age > 20, "ad", as.character(age)),
+         new_source = str_c(new_source, " (", age2, ")"),
          new_source = reorder_within(new_source, within = type, by = value)) |> 
   ggplot(aes(value, new_source, fill = group_var))+
   geom_col()+
@@ -1902,8 +1916,8 @@ kpelle_corpus |>
   mutate(type = case_when(type == "total" ~ str_c("overall ratio of ", prefix),
                           type == "ors" ~ str_c("ratio of ", prefix, " outside RS"),
                           type == "wrs" ~ str_c("ratio of ", prefix, " within RS"))) |> 
-  mutate(
-         new_source = str_c(new_source, " (", age, ")"),
+  mutate(age2 = if_else(age > 20, "ad", as.character(age)),
+         new_source = str_c(new_source, " (", age2, ")"),
          new_source = reorder_within(new_source, within = type, by = value)) |> 
   ggplot(aes(value, new_source, fill = group_var))+
   geom_col()+
@@ -1934,8 +1948,8 @@ kpelle_corpus |>
   mutate(type = case_when(type == "total" ~ str_c("overall ratio of ", prefix),
                           type == "ors" ~ str_c("ratio of ", prefix, " outside RS"),
                           type == "wrs" ~ str_c("ratio of ", prefix, " within RS"))) |> 
-  mutate(
-         new_source = str_c(new_source, " (", age, ")"),
+  mutate(age2 = if_else(age > 20, "ad", as.character(age)),
+         new_source = str_c(new_source, " (", age2, ")"),
          new_source = reorder_within(new_source, within = type, by = value)) |> 
   ggplot(aes(value, new_source, fill = group_var))+
   geom_col()+
@@ -1966,8 +1980,8 @@ kpelle_corpus |>
   mutate(type = case_when(type == "total" ~ str_c("overall ratio of ", prefix),
                           type == "ors" ~ str_c("ratio of ", prefix, " outside RS"),
                           type == "wrs" ~ str_c("ratio of ", prefix, " within RS"))) |> 
-  mutate(
-         new_source = str_c(new_source, " (", age, ")"),
+  mutate(age2 = if_else(age > 20, "ad", as.character(age)),
+         new_source = str_c(new_source, " (", age2, ")"),
          new_source = reorder_within(new_source, within = type, by = value)) |> 
   ggplot(aes(value, new_source, fill = group_var))+
   geom_col()+
@@ -1998,8 +2012,8 @@ kpelle_corpus |>
   mutate(type = case_when(type == "total" ~ str_c("overall ratio of ", prefix),
                           type == "ors" ~ str_c("ratio of ", prefix, " outside RS"),
                           type == "wrs" ~ str_c("ratio of ", prefix, " within RS"))) |> 
-  mutate(
-         new_source = str_c(new_source, " (", age, ")"),
+  mutate(age2 = if_else(age > 20, "ad", as.character(age)),
+         new_source = str_c(new_source, " (", age2, ")"),
          new_source = reorder_within(new_source, within = type, by = value)) |> 
   ggplot(aes(value, new_source, fill = group_var))+
   geom_col()+
@@ -2030,8 +2044,8 @@ kpelle_corpus |>
   mutate(type = case_when(type == "total" ~ str_c("overall ratio of ", prefix),
                           type == "ors" ~ str_c("ratio of ", prefix, " outside RS"),
                           type == "wrs" ~ str_c("ratio of ", prefix, " within RS"))) |> 
-  mutate(
-         new_source = str_c(new_source, " (", age, ")"),
+  mutate(age2 = if_else(age > 20, "ad", as.character(age)),
+         new_source = str_c(new_source, " (", age2, ")"),
          new_source = reorder_within(new_source, within = type, by = value)) |> 
   ggplot(aes(value, new_source, fill = group_var))+
   geom_col()+
@@ -2062,8 +2076,8 @@ kpelle_corpus |>
   mutate(type = case_when(type == "total" ~ str_c("overall ratio of ", prefix),
                           type == "ors" ~ str_c("ratio of ", prefix, " outside RS"),
                           type == "wrs" ~ str_c("ratio of ", prefix, " within RS"))) |> 
-  mutate(
-         new_source = str_c(new_source, " (", age, ")"),
+  mutate(age2 = if_else(age > 20, "ad", as.character(age)),
+         new_source = str_c(new_source, " (", age2, ")"),
          new_source = reorder_within(new_source, within = type, by = value)) |> 
   ggplot(aes(value, new_source, fill = group_var))+
   geom_col()+
@@ -2094,8 +2108,8 @@ kpelle_corpus |>
   mutate(type = case_when(type == "total" ~ str_c("overall ratio of ", prefix),
                           type == "ors" ~ str_c("ratio of ", prefix, " outside RS"),
                           type == "wrs" ~ str_c("ratio of ", prefix, " within RS"))) |> 
-  mutate(
-         new_source = str_c(new_source, " (", age, ")"),
+  mutate(age2 = if_else(age > 20, "ad", as.character(age)),
+         new_source = str_c(new_source, " (", age2, ")"),
          new_source = reorder_within(new_source, within = type, by = value)) |> 
   ggplot(aes(value, new_source, fill = group_var))+
   geom_col()+
@@ -2126,8 +2140,8 @@ kpelle_corpus |>
   mutate(type = case_when(type == "total" ~ str_c("overall ratio of ", prefix),
                           type == "ors" ~ str_c("ratio of ", prefix, " outside RS"),
                           type == "wrs" ~ str_c("ratio of ", prefix, " within RS"))) |> 
-  mutate(
-         new_source = str_c(new_source, " (", age, ")"),
+  mutate(age2 = if_else(age > 20, "ad", as.character(age)),
+         new_source = str_c(new_source, " (", age2, ")"),
          new_source = reorder_within(new_source, within = type, by = value)) |> 
   ggplot(aes(value, new_source, fill = group_var))+
   geom_col()+
@@ -2158,8 +2172,8 @@ kpelle_corpus |>
   mutate(type = case_when(type == "total" ~ str_c("overall ratio of ", prefix),
                           type == "ors" ~ str_c("ratio of ", prefix, " outside RS"),
                           type == "wrs" ~ str_c("ratio of ", prefix, " within RS"))) |> 
-  mutate(
-         new_source = str_c(new_source, " (", age, ")"),
+  mutate(age2 = if_else(age > 20, "ad", as.character(age)),
+         new_source = str_c(new_source, " (", age2, ")"),
          new_source = reorder_within(new_source, within = type, by = value)) |> 
   ggplot(aes(value, new_source, fill = group_var))+
   geom_col()+
@@ -2190,8 +2204,8 @@ kpelle_corpus |>
   mutate(type = case_when(type == "total" ~ str_c("overall ratio of ", prefix),
                           type == "ors" ~ str_c("ratio of ", prefix, " outside RS"),
                           type == "wrs" ~ str_c("ratio of ", prefix, " within RS"))) |> 
-  mutate(
-         new_source = str_c(new_source, " (", age, ")"),
+  mutate(age2 = if_else(age > 20, "ad", as.character(age)),
+         new_source = str_c(new_source, " (", age2, ")"),
          new_source = reorder_within(new_source, within = type, by = value)) |> 
   ggplot(aes(value, new_source, fill = group_var))+
   geom_col()+
@@ -2222,8 +2236,8 @@ kpelle_corpus |>
   mutate(type = case_when(type == "total" ~ str_c("overall ratio of ", prefix),
                           type == "ors" ~ str_c("ratio of ", prefix, " outside RS"),
                           type == "wrs" ~ str_c("ratio of ", prefix, " within RS"))) |> 
-  mutate(
-         new_source = str_c(new_source, " (", age, ")"),
+  mutate(age2 = if_else(age > 20, "ad", as.character(age)),
+         new_source = str_c(new_source, " (", age2, ")"),
          new_source = reorder_within(new_source, within = type, by = value)) |> 
   ggplot(aes(value, new_source, fill = group_var))+
   geom_col()+
@@ -2254,8 +2268,8 @@ kpelle_corpus |>
   mutate(type = case_when(type == "total" ~ str_c("overall ratio of ", prefix),
                           type == "ors" ~ str_c("ratio of ", prefix, " outside RS"),
                           type == "wrs" ~ str_c("ratio of ", prefix, " within RS"))) |> 
-  mutate(
-         new_source = str_c(new_source, " (", age, ")"),
+  mutate(age2 = if_else(age > 20, "ad", as.character(age)),
+         new_source = str_c(new_source, " (", age2, ")"),
          new_source = reorder_within(new_source, within = type, by = value)) |> 
   ggplot(aes(value, new_source, fill = group_var))+
   geom_col()+
