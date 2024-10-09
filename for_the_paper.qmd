@@ -998,7 +998,7 @@ mano_corpus |>
 
 ### Kpelle
 
-> Kpelle:  visualize subset of complex syntax: the ratio of prefixes (temp, comme, cond, tail-head, ht[, ht{ ) + glosses (COND) + clause-final í (search cells containing "clause-final í as the only marker of subordination" in column AA) to all predications, without filtering RS
+> Visualize subset of complex syntax: the ratio of  prefixes (temp, prec, cond, comme, tail-head, ht[, ht{, ht<NP.NMLZ> + glosses (COND, not the macrocategory but only the gloss) + "clause-final ā as the only marker of subordination" (search in the comment field, column AA) to all predications, without filtering RS
 
 ```{r}
 kpelle_corpus |> 
