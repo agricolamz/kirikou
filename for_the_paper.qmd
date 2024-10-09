@@ -397,6 +397,73 @@ tense_without_RS_m |>
   guides(color = "none")
 ```
 
+The breakdown of constructions within the reported speech alone:
+
+```{r}
+extract_and_concatenate_rs <- function(string){
+  string |> 
+    str_extract_all("rs%.*?%") |> 
+    unlist() |> 
+    str_remove_all("rs%") |> 
+    str_remove_all("%") |> 
+    str_c(collapse = " ")
+}
+
+mano_corpus |> 
+  select(new_source, age, group_var, chunk_structure) |> 
+  mutate(chunk_structure = map_chr(mano_corpus$chunk_structure, extract_and_concatenate_rs),
+         PST = str_count(chunk_structure, "PST"),
+         JNT = str_count(chunk_structure, "JNT"),
+         IPFV = str_count(chunk_structure, "IPFV"),
+         PRED = str_count(chunk_structure, "PRED"),
+         EXI = str_count(chunk_structure, "EXI"),
+         CONJ = str_count(chunk_structure, "CONJ"),
+         PRF = str_count(chunk_structure, "PRF"),
+         FUT = str_count(chunk_structure, "FUT"),
+         NEG.COND = str_count(chunk_structure, "NEG.COND"),
+         NEG = str_count(chunk_structure, "NEG") - NEG.COND,
+         COND = str_count(chunk_structure, "COND"),
+         IMP = str_count(chunk_structure, "IMP"),
+         PROSP = str_count(chunk_structure, "PROSP"),
+         PROT.IRR = str_count(chunk_structure, "PROT.IRR"),
+         APOD.IRR = str_count(chunk_structure, "APOD.IRR"),
+         IRR = str_count(chunk_structure, "IRR") - PROT.IRR - APOD.IRR,
+         PROH = str_count(chunk_structure, "PROH")) |> 
+  select(-chunk_structure) ->
+  tense_within_RS_m
+
+tense_within_RS_m
+
+tense_within_RS_m |> 
+  pivot_longer(names_to = "tense", values_to = "n", -c(new_source, age, group_var)) |> 
+  mutate(tense = case_when(tense %in% c("COND", "IRR", "PROT.IRR", "APOD.IRR", "NEG.COND") ~ "CONDs",
+                           tense %in% c("PROH", "IMP") ~ "PROH or IMP",
+                           tense %in% c("EXI", "PRED", "IPFV", "FUT", "PROSP") ~ "non-past",
+                           TRUE ~ tense)) |>  
+  group_by(new_source, age, group_var, tense) |>
+  summarise(n = sum(n)) |> 
+  group_by(new_source, age, group_var) |> 
+  mutate(total = sum(n),
+         ratio = n/total) |> 
+  select(-n, -total) |> 
+  ungroup() |> 
+  mutate(age2 = if_else(age == 100, "ad", as.character(age)),
+         new_source = str_c(new_source, " (", age2, ")"),
+         new_source = fct_reorder(new_source, age),
+         tense = factor(tense, levels = c("CONDs", "PROH or IMP",
+                                          "non-past","NEG", "CONJ",
+                                          "PRF", "JNT", "PST")),
+         label = str_c(round(ratio * 100), "%")) |>
+  filter(ratio > 0) |>
+  ggplot(aes(x = ratio, y = new_source, label = label, color = tense)) +
+  geom_col(aes(fill = tense)) +
+  geom_label(position = position_fill(vjust = 0.5), fill = "white") +
+  scale_x_continuous(label = scales::percent) +
+  labs(x = NULL, y = NULL, fill = NULL) +
+  theme(axis.text.y = element_text(colour = people_text_color_m)) +
+  guides(color = "none")
+```
+
 ### Kpelle
 
 ```{r}
@@ -536,6 +603,75 @@ tense_without_RS_k |>
   guides(color = "none")
 ```
 
+The breakdown of constructions within the reported speech alone:
+
+```{r}
+extract_and_concatenate_rs <- function(string){
+  string |> 
+    str_extract_all("rs%.*?%") |> 
+    unlist() |> 
+    str_remove_all("rs%") |> 
+    str_remove_all("%") |> 
+    str_c(collapse = " ")
+}
+
+kpelle_corpus |> 
+  select(new_source, age, group_var, chunk_structure) |> 
+  mutate(chunk_structure = map_chr(kpelle_corpus$chunk_structure, extract_and_concatenate_rs),
+         CONJ_PST = str_count(chunk_structure, "CONJ/PST"),
+         PST = str_count(chunk_structure, "PST")-CONJ_PST,
+         CONJ = str_count(chunk_structure, "CONJ")-CONJ_PST,
+         JNT = str_count(chunk_structure, "JNT"),
+         QUOT = str_count(chunk_structure, "QUOT"),
+         PRF = str_count(chunk_structure, "PRF"),
+         IRR_COND = str_count(chunk_structure, "IRR/COND"),
+         COND = str_count(chunk_structure, "COND")-IRR_COND,
+         IRR = str_count(chunk_structure, "IRR")-IRR_COND,
+         NEG = str_count(chunk_structure, "NEG"),
+         EXI = str_count(chunk_structure, "EXI"),
+         PRED = str_count(chunk_structure, "PRED"),
+         RESSTAT = str_count(chunk_structure, "RESSTAT"),
+         STAT1 = str_count(chunk_structure, "STAT1"),
+         FUT = str_count(chunk_structure, "FUT"),
+         IMP = str_count(chunk_structure, "IMP"),
+         PROH = str_count(chunk_structure, "PROH")) |> 
+  select(-chunk_structure) ->
+  tense_within_RS_k
+
+tense_within_RS_k
+
+tense_within_RS_k |> 
+  pivot_longer(names_to = "tense", values_to = "n", -c(new_source, age, group_var)) |> 
+  mutate(tense = case_when(tense %in% c("JNT", "QUOT") ~ "JNT or QUOT",
+                           tense %in% c("COND", "IRR", "IRR_COND") ~ "CONDs",
+                           tense %in% c("PROH", "IMP") ~ "PROH or IMP",
+                           tense %in% c("EXI", "PRED", "RESSTAT", "FUT", "STAT1") ~ "non-past",
+                           TRUE ~ tense)) |> 
+  group_by(new_source, age, group_var, tense) |>
+  summarise(n = sum(n)) |> 
+  group_by(new_source, age, group_var) |> 
+  mutate(total = sum(n),
+         ratio = n/total) |> 
+  select(-n, -total) |> 
+  ungroup() |> 
+  mutate(age2 = if_else(age == 100, "ad", as.character(age)),
+         new_source = str_c(new_source, " (", age2, ")"),
+         new_source = fct_reorder(new_source, age),
+         tense = factor(tense, levels = c("PROH or IMP", "non-past", 
+                                          "NEG", "CONDs", "PRF",
+                                          "JNT or QUOT", "CONJ_PST", 
+                                          "CONJ", "PST")),
+         label = str_c(round(ratio * 100), "%")) |>
+  filter(ratio > 0) |>
+  ggplot(aes(x = ratio, y = new_source, label = label, color = tense)) +
+  geom_col(aes(fill = tense)) +
+  geom_label(position = position_fill(vjust = 0.5), fill = "white") +
+  scale_x_continuous(label = scales::percent) +
+  labs(x = NULL, y = NULL, fill = NULL) +
+  theme(axis.text.y = element_text(colour = people_text_color_k)) +
+  guides(color = "none")
+```
+
 ## IMP vs PROH
 
 ### Mano
@@ -624,7 +760,7 @@ mano_corpus |>
   ggplot(aes(ratio, new_source, fill = group_var)) +
   geom_col() +
   labs(y = NULL,
-       x = "ratio of RES, PHAS or RETR forms",
+       x = "ratio of RES and RETR forms",
        fill = NULL)+
   scale_fill_manual(values = colors_m[c(4, 5, 1, 2, 3)]) +
   guides(fill=guide_legend(nrow=2, byrow=TRUE))
@@ -677,7 +813,7 @@ kpelle_corpus |>
   geom_col() +
   scale_fill_manual(values = colors_m[c(4, 5)]) +
   labs(y = NULL,
-       x = "ratio of RES, PHAS or RETR forms",
+       x = "ratio of RES and RETR forms",
        fill = NULL)
 ```
 
@@ -823,11 +959,12 @@ mano_corpus |>
   mutate(temp = str_count(chunk_structure, "temp"),
          prec = str_count(chunk_structure, "prec"),
          cond = str_count(chunk_structure, "cond"),
+         comme = str_count(chunk_structure, "comme"),
          tail_head = str_count(chunk_structure, "tail-head"),
          ht = str_count(chunk_structure, "ht[\\[\\{]"),
          cond = str_count(chunk_structure, "COND"),
          clause_final_a = str_count(comment, "clause-final ā as the only marker of subordination"),
-         sum_of_all = temp+prec+cond+tail_head+ht+cond+clause_final_a,
+         sum_of_all = temp+prec+cond+comme+tail_head+ht+cond+clause_final_a,
          n_predecations = str_count(chunk_structure, "\\["),
          ratio = sum_of_all/n_predecations) |> 
   select(-comment, -chunk_structure)
@@ -837,11 +974,12 @@ mano_corpus |>
   mutate(temp = str_count(chunk_structure, "temp"),
          prec = str_count(chunk_structure, "prec"),
          cond = str_count(chunk_structure, "cond"),
+         comme = str_count(chunk_structure, "comme"),
          tail_head = str_count(chunk_structure, "tail-head"),
          ht = str_count(chunk_structure, "ht[\\[\\{]"),
          cond = str_count(chunk_structure, "COND"),
          clause_final_a = str_count(comment, "clause-final ā as the only marker of subordination"),
-         sum_of_all = temp+prec+cond+tail_head+ht+cond+clause_final_a,
+         sum_of_all = temp+prec+cond+comme+tail_head+ht+cond+clause_final_a,
          n_predecations = str_count(chunk_structure, "\\["),
          ratio = sum_of_all/n_predecations) |> 
   select(-comment, -chunk_structure) |> 
@@ -2277,4 +2415,39 @@ kpelle_corpus |>
   labs(y = NULL, x = "ratio", fill = NULL) +
   scale_y_reordered() +
   scale_fill_manual(values = colors_m[c(4, 5)])
+```
+
+## comme + prec + cond + temp 
+
+### Mano 
+
+> comme + prec + cond + temp  outside RS in Mano
+
+```{r}
+mano_corpus |> 
+  select(new_source, age, group_var, chunk_structure, comment) |> 
+  mutate(chunk_structure = str_remove_all(chunk_structure, "rs%.*?%"),
+         temp = str_count(chunk_structure, "temp"),
+         prec = str_count(chunk_structure, "prec"),
+         cond = str_count(chunk_structure, "cond"),
+         comme = str_count(chunk_structure, "comme"),
+         total = comme + prec + cond + temp) |> 
+  summarise(total = sum(total)) |> 
+  pull(total)
+```
+
+### Kpelle
+
+> comme + cond + temp2 in Kpelle
+
+```{r}
+kpelle_corpus |> 
+  select(new_source, age, group_var, chunk_structure, comment) |> 
+  mutate(chunk_structure = str_remove_all(chunk_structure, "rs%.*?%"),
+         temp2 = str_count(chunk_structure, "temp2"),
+         cond = str_count(chunk_structure, "cond"),
+         comme = str_count(chunk_structure, "comme"),
+         total = comme  + cond + temp2) |> 
+  summarise(total = sum(total)) |> 
+  pull(total)
 ```
