@@ -1133,13 +1133,15 @@ kpelle_corpus |>
 
 > Visualize ratios of quot+jnt.say vs other.say
 
+> а, поняла, там надо наверное quot + jnt.say / say + quot
+
 ```{r}
 kpelle_corpus |> 
   select(new_source, age, group_var, chunk_structure) |> 
   mutate(jnt_say = str_count(chunk_structure, "JNT\\.SAY"),
          says = str_count(chunk_structure, "SAY"),
          quot = str_count(chunk_structure, "QUOT"),
-         ratio = (quot+jnt_say) /(says),
+         ratio = (quot+jnt_say) /(says + quot),
          ratio = if_else(is.nan(ratio), 0, ratio)) |> 
   select(-chunk_structure) |> 
   arrange(ratio) 

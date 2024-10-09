@@ -154,7 +154,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <div>
     <div class="quarto-title-meta-heading">Published</div>
     <div class="quarto-title-meta-contents">
-      <p class="date">8.10.2024</p>
+      <p class="date">9.10.2024</p>
     </div>
   </div>
   
@@ -1641,6 +1641,9 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <blockquote class="blockquote">
 <p>Visualize ratios of quot+jnt.say vs other.say</p>
 </blockquote>
+<blockquote class="blockquote">
+<p>а, поняла, там надо наверное quot + jnt.say / say + quot</p>
+</blockquote>
 <div class="cell">
 <details class="code-fold">
 <summary>Code</summary>
@@ -1649,7 +1652,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb48-3"><a href="#cb48-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">jnt_say =</span> <span class="fu">str_count</span>(chunk_structure, <span class="st">"JNT</span><span class="sc">\\</span><span class="st">.SAY"</span>),</span>
 <span id="cb48-4"><a href="#cb48-4" aria-hidden="true" tabindex="-1"></a>         <span class="at">says =</span> <span class="fu">str_count</span>(chunk_structure, <span class="st">"SAY"</span>),</span>
 <span id="cb48-5"><a href="#cb48-5" aria-hidden="true" tabindex="-1"></a>         <span class="at">quot =</span> <span class="fu">str_count</span>(chunk_structure, <span class="st">"QUOT"</span>),</span>
-<span id="cb48-6"><a href="#cb48-6" aria-hidden="true" tabindex="-1"></a>         <span class="at">ratio =</span> (quot<span class="sc">+</span>jnt_say) <span class="sc">/</span>(says),</span>
+<span id="cb48-6"><a href="#cb48-6" aria-hidden="true" tabindex="-1"></a>         <span class="at">ratio =</span> (quot<span class="sc">+</span>jnt_say) <span class="sc">/</span>(says <span class="sc">+</span> quot),</span>
 <span id="cb48-7"><a href="#cb48-7" aria-hidden="true" tabindex="-1"></a>         <span class="at">ratio =</span> <span class="fu">if_else</span>(<span class="fu">is.nan</span>(ratio), <span class="dv">0</span>, ratio)) <span class="sc">|&gt;</span> </span>
 <span id="cb48-8"><a href="#cb48-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="sc">-</span>chunk_structure) <span class="sc">|&gt;</span> </span>
 <span id="cb48-9"><a href="#cb48-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(ratio) </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
@@ -1657,7 +1660,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <div class="cell-output-display">
 <div data-pagedtable="false">
   <script data-pagedtable-source="" type="application/json">
-{"columns":[{"label":["new_source"],"name":[1],"type":["chr"],"align":["left"]},{"label":["age"],"name":[2],"type":["dbl"],"align":["right"]},{"label":["group_var"],"name":[3],"type":["chr"],"align":["left"]},{"label":["jnt_say"],"name":[4],"type":["int"],"align":["right"]},{"label":["says"],"name":[5],"type":["int"],"align":["right"]},{"label":["quot"],"name":[6],"type":["int"],"align":["right"]},{"label":["ratio"],"name":[7],"type":["dbl"],"align":["right"]}],"data":[{"1":"s_6_t_1","2":"19","3":"folktales (children)","4":"0","5":"4","6":"9","7":"2.250000"},{"1":"s_4_t_1","2":"60","3":"folktales (adults)","4":"5","5":"6","6":"21","7":"4.333333"},{"1":"s_3_t_1","2":"32","3":"folktales (adults)","4":"4","5":"5","6":"19","7":"4.600000"},{"1":"s_5_t_2","2":"60","3":"folktales (adults)","4":"1","5":"6","6":"38","7":"6.500000"},{"1":"s_2_t_1","2":"65","3":"folktales (adults)","4":"0","5":"1","6":"12","7":"12.000000"},{"1":"s_5_t_1","2":"60","3":"folktales (adults)","4":"2","5":"4","6":"79","7":"20.250000"},{"1":"s_1_t_1","2":"10","3":"folktales (children)","4":"0","5":"0","6":"45","7":"Inf"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
+{"columns":[{"label":["new_source"],"name":[1],"type":["chr"],"align":["left"]},{"label":["age"],"name":[2],"type":["dbl"],"align":["right"]},{"label":["group_var"],"name":[3],"type":["chr"],"align":["left"]},{"label":["jnt_say"],"name":[4],"type":["int"],"align":["right"]},{"label":["says"],"name":[5],"type":["int"],"align":["right"]},{"label":["quot"],"name":[6],"type":["int"],"align":["right"]},{"label":["ratio"],"name":[7],"type":["dbl"],"align":["right"]}],"data":[{"1":"s_6_t_1","2":"19","3":"folktales (children)","4":"0","5":"4","6":"9","7":"0.6923077"},{"1":"s_5_t_2","2":"60","3":"folktales (adults)","4":"1","5":"6","6":"38","7":"0.8863636"},{"1":"s_2_t_1","2":"65","3":"folktales (adults)","4":"0","5":"1","6":"12","7":"0.9230769"},{"1":"s_3_t_1","2":"32","3":"folktales (adults)","4":"4","5":"5","6":"19","7":"0.9583333"},{"1":"s_4_t_1","2":"60","3":"folktales (adults)","4":"5","5":"6","6":"21","7":"0.9629630"},{"1":"s_5_t_1","2":"60","3":"folktales (adults)","4":"2","5":"4","6":"79","7":"0.9759036"},{"1":"s_1_t_1","2":"10","3":"folktales (children)","4":"0","5":"0","6":"45","7":"1.0000000"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
   </script>
 </div>
 </div>
