@@ -654,7 +654,7 @@ tense_within_RS_k |>
          ratio = n/total) |> 
   select(-n, -total) |> 
   ungroup() |> 
-  mutate(age2 = if_else(age == 100, "ad", as.character(age)),
+  mutate(age2 = if_else(age > 20, "ad", as.character(age)),
          new_source = str_c(new_source, " (", age2, ")"),
          new_source = fct_reorder(new_source, age),
          tense = factor(tense, levels = c("PROH or IMP", "non-past", 
@@ -933,7 +933,7 @@ kpelle_corpus |>
          ratio = n/total) |> 
   select(-n, -total) |> 
   ungroup() |> 
-  mutate(age2 = if_else(age == 100, "ad", as.character(age)),
+  mutate(age2 = if_else(age > 20, "ad", as.character(age)),
          new_source = str_c(new_source, " (", age2, ")"),
          new_source = fct_reorder(new_source, age),
          label = str_c(round(ratio * 100), "%")) |>
@@ -1080,7 +1080,7 @@ kpelle_corpus |>
          n_predecations = str_count(chunk_structure, "\\["),
          ratio = (purp_gloss+purp_prefix+mod)/n_predecations) |> 
   arrange(ratio) |> 
-  mutate(age2 = if_else(age == 100, "ad", as.character(age)),
+  mutate(age2 = if_else(age > 20, "ad", as.character(age)),
          new_source = str_c(new_source, " (", age2, ")"),
          new_source = fct_inorder(new_source)) |> 
   ggplot(aes(ratio, new_source, fill = group_var)) +
