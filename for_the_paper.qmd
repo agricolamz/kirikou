@@ -912,7 +912,7 @@ kpelle_corpus |>
 ```{r}
 kpelle_corpus |> 
   select(new_source, group_var, chunk_structure) |> 
-  mutate(dur_ext = str_extract_all(chunk_structure, "_[A-Z]*?_DUR")) |> 
+  mutate(dur_ext = str_extract_all(chunk_structure, "_[/A-Z]*?_DUR")) |> 
   select(-chunk_structure) |> 
   unnest_longer(dur_ext) |> 
   mutate(dur_ext = str_remove_all(dur_ext, "_DUR"),
@@ -922,7 +922,7 @@ kpelle_corpus |>
 
 kpelle_corpus |> 
   select(new_source, age, group_var, chunk_structure) |> 
-  mutate(dur_ext = str_extract_all(chunk_structure, "_[A-Z]*?_DUR")) |> 
+  mutate(dur_ext = str_extract_all(chunk_structure, "_[/A-Z]*?_DUR")) |> 
   select(-chunk_structure) |> 
   unnest_longer(dur_ext) |> 
   mutate(dur_ext = str_remove_all(dur_ext, "_DUR"),
